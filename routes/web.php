@@ -60,7 +60,7 @@ Route::middleware('auth')->group(function () {
         // Orders
         Route::resource('orders', OrderController::class);
         Route::get('/orders/{order}/invoice', [OrderController::class, 'invoice'])->name('orders.invoice');
-asd
+
         // Payments (nested under orders + standalone create/search/edit/update/delete)
         Route::get('/payments/create', [PaymentController::class, 'create'])->name('payments.create');
         Route::get('/payments/search', [PaymentController::class, 'search'])->name('payments.search');
