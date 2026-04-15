@@ -96,5 +96,113 @@
         </div>
     </div>
 
+    {{-- Payments --}}
+    <div class="bg-white rounded-xl shadow-sm border border-slate-100">
+        <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+            <div>
+                <h3 class="font-semibold text-slate-700">💳 Payments</h3>
+                <p class="text-xs text-slate-400 mt-0.5">
+                    Collected: <span class="text-green-600 font-semibold">Rs {{ number_format($order->advance_amount) }}</span>
+                    &nbsp;·&nbsp; Remaining: <span class="{{ $order->balance_amount > 0 ? 'text-red-600' : 'text-green-600' }} font-semibold">Rs {{ number_format($order->balance_amount) }}</span>
+                </p>
+            </div>
+        </div>
+
+        {{-- Add payment form --}}
+        <div class="px-5 py-4 border-b border-slate-100 bg-slate-50">
+            <form method="POST" action="{{ route('orders.payments.store', $order) }}" class="grid grid-cols-2 md:grid-cols-5 gap-3 items-end">
+                @csrf
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">Amount (Rs) *</label>
+                    <input type="number" name="amount" min="1" step="0.01" placeholder="e.g. 5000"
+                        value="{{ old('amount') }}"
+                        class="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        required>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">Method *</label>
+                    <select name="method"
+                        class="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="cash">Cash</option>
+                        <option value="bank_transfer">Bank Transfer</option>
+                        <option value="cheque">Cheque</option>
+                        <option value="online">Online</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">Date *</label>
+                    <input type="date" name="payment_date" value="{{ old('payment_date', today()->toDateString()) }}"
+                        class="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        required>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">Reference / Note</label>
+                    <input type="text" name="reference" placeholder="Txn ID, cheque no…"
+                        value="{{ old('reference') }}"
+                        class="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <button type="submit"
+                        class="w-full bg-green-600 hover:bg-green-700 text-white text-sm font-medium px-4 py-1.5 rounded-lg">
+                        + Record Payment
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        {{-- Payment history --}}
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-slate-50 text-slate-600">
+                    <tr>
+                        <th class="px-4 py-2 text-left font-medium">Date</th>
+                        <th class="px-4 py-2 text-left font-medium">Amount</th>
+                        <th class="px-4 py-2 text-left font-medium">Method</th>
+                        <th class="px-4 py-2 text-left font-medium">Reference</th>
+                        <th class="px-4 py-2 text-left font-medium">Received By</th>
+                        <th class="px-4 py-2"></th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-50">
+                    @forelse($order->payments->sortByDesc('payment_date') as $payment)
+                    <tr class="hover:bg-slate-50">
+                        <td class="px-4 py-2 text-slate-600">{{ $payment->payment_date->format('d M Y') }}</td>
+                        <td class="px-4 py-2 font-semibold text-green-700">Rs {{ number_format($payment->amount) }}</td>
+                        <td class="px-4 py-2">
+                            <span class="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">
+                                {{ \App\Models\Payment::METHODS[$payment->method] ?? $payment->method }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-2 text-slate-500 text-xs">{{ $payment->reference ?? '—' }}</td>
+                        <td class="px-4 py-2 text-slate-500 text-xs">{{ $payment->receivedBy?->name ?? '—' }}</td>
+                        <td class="px-4 py-2 text-right">
+                            <div class="flex justify-end gap-1">
+                                <a href="{{ route('payments.edit', $payment) }}"
+                                   class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 px-2 py-1 rounded">Edit</a>
+                                <form method="POST" action="{{ route('payments.destroy', $payment) }}"
+                                    onsubmit="return confirm('Remove this payment? Order balance will be updated.')">
+                                    @csrf @method('DELETE')
+                                    <button class="text-xs text-red-500 hover:text-red-700 px-2 py-1">Remove</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr><td colspan="6" class="px-4 py-5 text-center text-slate-400 text-sm">No payments recorded yet.</td></tr>
+                    @endforelse
+                </tbody>
+                @if($order->payments->isNotEmpty())
+                <tfoot class="bg-slate-50">
+                    <tr>
+                        <td class="px-4 py-2 font-semibold text-slate-700" colspan="1">Total Paid</td>
+                        <td class="px-4 py-2 font-bold text-green-700">Rs {{ number_format($order->payments->sum('amount')) }}</td>
+                        <td colspan="4"></td>
+                    </tr>
+                </tfoot>
+                @endif
+            </table>
+        </div>
+    </div>
+
 </div>
 @endsection

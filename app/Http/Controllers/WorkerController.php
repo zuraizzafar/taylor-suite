@@ -85,17 +85,3 @@ class WorkerController extends Controller
         return redirect()->route('workers.index')->with('success', 'Worker deleted.');
     }
 }
-
-        $data['is_active'] = $request->has('is_active');
-        $worker->update($data);
-
-        return redirect()->route('workers.index')
-            ->with('success', 'Worker updated.');
-    }
-
-    public function destroy(Worker $worker): RedirectResponse
-    {
-        $worker->delete();
-        return redirect()->route('workers.index')->with('success', 'Worker removed.');
-    }
-}

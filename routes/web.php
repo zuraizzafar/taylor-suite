@@ -7,12 +7,14 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\MeasurementController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ScanController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\SuitController;
 use App\Http\Controllers\WorkerController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\WorkerPortalController;
 use Illuminate\Support\Facades\Route;
 
@@ -58,6 +60,14 @@ Route::middleware('auth')->group(function () {
         // Orders
         Route::resource('orders', OrderController::class);
         Route::get('/orders/{order}/invoice', [OrderController::class, 'invoice'])->name('orders.invoice');
+asd
+        // Payments (nested under orders + standalone create/search/edit/update/delete)
+        Route::get('/payments/create', [PaymentController::class, 'create'])->name('payments.create');
+        Route::get('/payments/search', [PaymentController::class, 'search'])->name('payments.search');
+        Route::post('/orders/{order}/payments', [PaymentController::class, 'store'])->name('orders.payments.store');
+        Route::get('/payments/{payment}/edit', [PaymentController::class, 'edit'])->name('payments.edit');
+        Route::put('/payments/{payment}', [PaymentController::class, 'update'])->name('payments.update');
+        Route::delete('/payments/{payment}', [PaymentController::class, 'destroy'])->name('payments.destroy');
 
         // Suits
         Route::resource('suits', SuitController::class)->except(['destroy']);
@@ -74,6 +84,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/reports/delivered', [ReportController::class, 'delivered'])->name('reports.delivered');
         Route::get('/reports/salary', [ReportController::class, 'salary'])->name('reports.salary');
         Route::get('/reports/pending-balances', [ReportController::class, 'pendingBalances'])->name('reports.pending-balances');
+        Route::get('/reports/payments', [ReportController::class, 'payments'])->name('reports.payments');
 
         // Expenses
         Route::resource('expenses', ExpenseController::class);
@@ -84,6 +95,13 @@ Route::middleware('auth')->group(function () {
         Route::resource('branches', BranchController::class);
         Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
         Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
+
+        // User management (branch managers + workers)
+        Route::get('/users', [UserController::class, 'index'])->name('users.index');
+        Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
+        Route::post('/users', [UserController::class, 'store'])->name('users.store');
+        Route::get('/users/{user}/password', [UserController::class, 'editPassword'])->name('users.password');
+        Route::put('/users/{user}/password', [UserController::class, 'updatePassword'])->name('users.password.update');
     });
 });
 

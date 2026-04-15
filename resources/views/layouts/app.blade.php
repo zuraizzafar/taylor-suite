@@ -82,6 +82,14 @@
                class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('reports.pending-balances') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">
                 <span>🔴</span> Pending Balances
             </a>
+            <a href="{{ route('reports.payments') }}"
+               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('reports.payments') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">
+                <span>💳</span> Payments
+            </a>
+            <a href="{{ route('payments.create') }}"
+               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('payments.create') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">
+                <span>➕</span> Add Payment
+            </a>
 
             @if(auth()->user()->isAdmin())
             <div class="pt-3 pb-1 px-3">
@@ -90,6 +98,10 @@
             <a href="{{ route('branches.index') }}"
                class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('branches.*') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">
                 <span>🏢</span> Branches
+            </a>
+            <a href="{{ route('users.index') }}"
+               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('users.*') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">
+                <span>👥</span> User Management
             </a>
             <a href="{{ route('settings.index') }}"
                class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('settings.*') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">
@@ -163,6 +175,79 @@
         </main>
     </div>
 
+    {{-- ── Quick Pay Modal (global) ─────────────────────────────────────────── --}}
+    <div id="qp-overlay"
+         onclick="closePayModal()"
+         style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;align-items:center;justify-content:center;">
+        <div onclick="event.stopPropagation()"
+             style="background:#fff;border-radius:14px;padding:28px 32px;width:100%;max-width:480px;margin:16px;box-shadow:0 25px 60px rgba(0,0,0,0.3);">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+                <h3 id="qp-title" style="font-size:16px;font-weight:700;color:#1e293b">Record Payment</h3>
+                <button onclick="closePayModal()" style="font-size:18px;color:#94a3b8;background:none;border:none;cursor:pointer;line-height:1">&times;</button>
+            </div>
+            <p id="qp-balance" style="font-size:12px;color:#64748b;margin-bottom:16px;"></p>
+            <form id="qp-form" method="POST">
+                @csrf
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+                    <div>
+                        <label style="display:block;font-size:11px;font-weight:600;color:#475569;margin-bottom:4px;">Amount (Rs) *</label>
+                        <input type="number" id="qp-amount" name="amount" min="1" step="0.01" required
+                            style="width:100%;border:1px solid #cbd5e1;border-radius:8px;padding:7px 10px;font-size:13px;outline:none;">
+                    </div>
+                    <div>
+                        <label style="display:block;font-size:11px;font-weight:600;color:#475569;margin-bottom:4px;">Method *</label>
+                        <select name="method" style="width:100%;border:1px solid #cbd5e1;border-radius:8px;padding:7px 10px;font-size:13px;outline:none;">
+                            <option value="cash">Cash</option>
+                            <option value="bank_transfer">Bank Transfer</option>
+                            <option value="cheque">Cheque</option>
+                            <option value="online">Online</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display:block;font-size:11px;font-weight:600;color:#475569;margin-bottom:4px;">Date *</label>
+                        <input type="date" name="payment_date" id="qp-date" required
+                            style="width:100%;border:1px solid #cbd5e1;border-radius:8px;padding:7px 10px;font-size:13px;outline:none;">
+                    </div>
+                    <div>
+                        <label style="display:block;font-size:11px;font-weight:600;color:#475569;margin-bottom:4px;">Reference</label>
+                        <input type="text" name="reference" placeholder="Txn ID, cheque no…"
+                            style="width:100%;border:1px solid #cbd5e1;border-radius:8px;padding:7px 10px;font-size:13px;outline:none;">
+                    </div>
+                </div>
+                <div style="margin-bottom:16px;">
+                    <label style="display:block;font-size:11px;font-weight:600;color:#475569;margin-bottom:4px;">Note</label>
+                    <input type="text" name="note" placeholder="Optional note"
+                        style="width:100%;border:1px solid #cbd5e1;border-radius:8px;padding:7px 10px;font-size:13px;outline:none;">
+                </div>
+                <div style="display:flex;gap:10px;">
+                    <button type="submit"
+                        style="flex:1;background:#16a34a;color:#fff;border:none;border-radius:8px;padding:9px 0;font-size:13px;font-weight:600;cursor:pointer;">
+                        ✓ Record Payment
+                    </button>
+                    <button type="button" onclick="closePayModal()"
+                        style="background:#f1f5f9;color:#475569;border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     @stack('scripts')
+    <script>
+        function openPayModal(orderId, orderNum, balance) {
+            document.getElementById('qp-form').action = '/orders/' + orderId + '/payments';
+            document.getElementById('qp-title').textContent = 'Payment — ' + orderNum;
+            document.getElementById('qp-balance').textContent = 'Remaining balance: Rs ' + Number(balance).toLocaleString();
+            var amtInput = document.getElementById('qp-amount');
+            amtInput.value = balance > 0 ? balance : '';
+            amtInput.max   = balance;
+            document.getElementById('qp-date').value = new Date().toISOString().substring(0, 10);
+            document.getElementById('qp-overlay').style.display = 'flex';
+        }
+        function closePayModal() {
+            document.getElementById('qp-overlay').style.display = 'none';
+        }
+    </script>
 </body>
 </html>

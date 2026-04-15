@@ -16,6 +16,7 @@
                     <th class="px-4 py-3 text-left font-medium">Name</th>
                     <th class="px-4 py-3 text-left font-medium">Address</th>
                     <th class="px-4 py-3 text-left font-medium">Phone</th>
+                    <th class="px-4 py-3 text-left font-medium">Managers</th>
                     <th class="px-4 py-3 text-left font-medium">Customers</th>
                     <th class="px-4 py-3 text-left font-medium">Orders</th>
                     <th class="px-4 py-3 text-left font-medium">Status</th>
@@ -28,6 +29,13 @@
                     <td class="px-4 py-3 font-medium text-slate-800">{{ $branch->name }}</td>
                     <td class="px-4 py-3 text-slate-500">{{ $branch->address ?? '—' }}</td>
                     <td class="px-4 py-3 text-slate-500">{{ $branch->phone ?? '—' }}</td>
+                    <td class="px-4 py-3 text-slate-600 text-xs">
+                        @forelse($branch->managers as $mgr)
+                        <span class="inline-block bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded mb-0.5">{{ $mgr->name }}</span>
+                        @empty
+                        <span class="text-slate-400">—</span>
+                        @endforelse
+                    </td>
                     <td class="px-4 py-3 text-center">
                         <span class="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full">{{ $branch->customers_count }}</span>
                     </td>
@@ -54,7 +62,7 @@
                     </td>
                 </tr>
                 @empty
-                <tr><td colspan="7" class="px-4 py-8 text-center text-slate-400">No branches yet.</td></tr>
+                <tr><td colspan="8" class="px-4 py-8 text-center text-slate-400">No branches yet.</td></tr>
                 @endforelse
             </tbody>
         </table>

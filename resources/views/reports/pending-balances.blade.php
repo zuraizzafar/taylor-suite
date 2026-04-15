@@ -42,8 +42,16 @@
                         Rs {{ number_format($customer->total_outstanding) }}
                     </td>
                     <td class="px-4 py-3 text-center">
+                        <div class="flex items-center justify-center gap-1">
                         <a href="{{ route('customers.show', $customer) }}"
                             class="text-xs text-blue-600 hover:underline">View</a>
+                        @foreach($customer->orders as $pendingOrder)
+                        <button onclick="openPayModal({{ $pendingOrder->id }}, '{{ $pendingOrder->order_number }}', {{ $pendingOrder->balance_amount }})"
+                            class="text-xs bg-green-600 hover:bg-green-700 text-white px-2 py-0.5 rounded">
+                            Pay {{ $pendingOrder->order_number }}
+                        </button>
+                        @endforeach
+                        </div>
                     </td>
                 </tr>
                 @empty

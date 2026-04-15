@@ -6,6 +6,32 @@
 @section('content')
 <div class="pt-2">
 
+    {{-- Branch filter (admin only) --}}
+    @if(auth()->user()->isAdmin() && $branches->isNotEmpty())
+    <div class="mb-5 flex items-center gap-3">
+        <form method="GET" action="{{ route('dashboard') }}" class="flex items-center gap-2">
+            <label class="text-sm font-medium text-slate-600">Branch:</label>
+            <select name="branch_id" onchange="this.form.submit()"
+                class="border border-slate-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">All Branches</option>
+                @foreach($branches as $b)
+                <option value="{{ $b->id }}" {{ request('branch_id') == $b->id ? 'selected' : '' }}>
+                    {{ $b->name }}
+                </option>
+                @endforeach
+            </select>
+            @if(request('branch_id'))
+            <a href="{{ route('dashboard') }}" class="text-xs text-slate-500 hover:text-slate-700 underline">Clear</a>
+            @endif
+        </form>
+        @if($selectedBranch)
+        <span class="text-sm font-semibold text-blue-700 bg-blue-50 border border-blue-200 px-3 py-1 rounded-full">
+            Showing: {{ $selectedBranch->name }}
+        </span>
+        @endif
+    </div>
+    @endif
+
     {{-- Stats cards --}}
     <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
         <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-100">

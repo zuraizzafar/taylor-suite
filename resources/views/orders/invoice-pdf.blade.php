@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: DejaVu Sans, sans-serif; font-size: 11px; color: #1e293b; background: #fff; }
+    body { font-family: DejaVu Sans, sans-serif; font-size: 12px; color: #1e293b; background: #fff; }
 
     /* Page */
-    .page { padding: 36px 40px 30px; page-break-after: always; }
+    .page { padding: 36px 40px 30px; page-break-after: always; font-family: DejaVu Sans, sans-serif; }
     .page:last-child { page-break-after: auto; }
 
     /* Copy label pill */
@@ -18,6 +18,7 @@
         border: 1px solid #cbd5e1;
         font-size: 8.5px;
         font-weight: 700;
+        font-family: DejaVu Sans, sans-serif;
         text-transform: uppercase;
         letter-spacing: 2px;
         color: #64748b;
@@ -32,73 +33,69 @@
         padding-bottom: 14px;
         border-bottom: 2px solid #1e293b;
         margin-bottom: 16px;
+        font-family: DejaVu Sans, sans-serif;
     }
-    .header-left  { display: table-cell; vertical-align: top; width: 60%; }
-    .header-right { display: table-cell; vertical-align: top; text-align: right; }
+    .header-left  { display: table-cell; vertical-align: top; width: 60%; font-family: DejaVu Sans, sans-serif; }
+    .header-right { display: table-cell; vertical-align: top; text-align: right; font-family: DejaVu Sans, sans-serif; }
 
-    .logo-fallback { font-size: 20px; font-weight: 800; color: #0f172a; letter-spacing: -0.5px; }
-    .logo-img      { height: 56px; width: auto; }
-    .company-meta  { font-size: 9px; color: #64748b; margin-top: 4px; line-height: 1.6; }
+    .logo-fallback { font-size: 22px; font-weight: 800; color: #0f172a; letter-spacing: -0.5px; font-family: DejaVu Sans, sans-serif; }
+    .logo-img      { height: 80px; width: auto; }
+    .company-meta  { font-size: 10px; color: #64748b; margin-top: 6px; line-height: 1.7; font-family: DejaVu Sans, sans-serif; }
 
-    .invoice-title { font-size: 26px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 2px; }
-    .invoice-no    { display: inline-block; background: #1e293b; color: #fff; font-size: 10px; font-weight: 700; letter-spacing: 0.5px; padding: 3px 10px; border-radius: 4px; margin-top: 5px; }
-    .invoice-dates { font-size: 9.5px; color: #475569; margin-top: 6px; line-height: 1.8; }
-    .invoice-dates strong { color: #1e293b; }
+    .invoice-title  { font-size: 26px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 2px; font-family: DejaVu Sans, sans-serif; }
+    .invoice-no     { display: inline-block; background: #1e293b; color: #fff; font-size: 10px; font-weight: 700; letter-spacing: 0.5px; padding: 3px 10px; border-radius: 4px; margin-top: 5px; font-family: DejaVu Sans, sans-serif; }
+    .invoice-dates  { font-size: 9.5px; color: #475569; margin-top: 6px; line-height: 1.8; font-family: DejaVu Sans, sans-serif; }
+    .invoice-dates strong { color: #1e293b; font-family: DejaVu Sans, sans-serif; }
 
     /* Info boxes */
-    .info-row  { display: table; width: 100%; margin-bottom: 16px; border-spacing: 12px 0; }
-    .info-cell { display: table-cell; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px 12px; vertical-align: top; }
-    .info-cell-title { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; margin-bottom: 5px; }
-    .info-cell-name  { font-size: 12px; font-weight: 700; color: #0f172a; }
-    .info-cell-sub   { font-size: 9.5px; color: #64748b; margin-top: 3px; line-height: 1.6; }
+    .info-row       { display: table; width: 100%; margin-bottom: 16px; border-spacing: 12px 0; font-family: DejaVu Sans, sans-serif; }
+    .info-cell      { display: table-cell; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px 12px; vertical-align: top; font-family: DejaVu Sans, sans-serif; }
+    .info-cell-title { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; margin-bottom: 5px; font-family: DejaVu Sans, sans-serif; }
+    .info-cell-name  { font-size: 12px; font-weight: 700; color: #0f172a; font-family: DejaVu Sans, sans-serif; }
+    .info-cell-sub   { font-size: 9.5px; color: #64748b; margin-top: 3px; line-height: 1.6; font-family: DejaVu Sans, sans-serif; }
 
     /* Suits table */
-    table.items { width: 100%; border-collapse: collapse; margin-bottom: 18px; font-size: 10px; }
-    table.items thead tr { background: #1e293b; color: #fff; }
-    table.items thead th { padding: 7px 9px; font-size: 9px; font-weight: 600; text-align: left; letter-spacing: 0.3px; }
+    table.items           { width: 100%; border-collapse: collapse; margin-bottom: 18px; font-size: 12px; font-family: DejaVu Sans, sans-serif; }
+    table.items thead tr  { background: #1e293b; }
+    table.items thead th  { padding: 8px 10px; font-size: 14px; font-weight: 600; text-align: left; letter-spacing: 0.3px; font-family: DejaVu Sans, sans-serif; color: #ffffff; background: #1e293b; }
     table.items tbody tr:nth-child(even) { background: #f8fafc; }
-    table.items tbody td { padding: 7px 9px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
-    table.items tfoot td { padding: 6px 9px; background: #f1f5f9; border-top: 1.5px solid #cbd5e1; font-weight: 600; font-size: 9.5px; }
+    table.items tbody td  { padding: 8px 10px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; font-size: 12px; font-family: DejaVu Sans, sans-serif; color: #1e293b; }
+    table.items tfoot td  { padding: 7px 10px; background: #f1f5f9; border-top: 1.5px solid #cbd5e1; font-weight: 600; font-size: 11px; font-family: DejaVu Sans, sans-serif; color: #1e293b; }
 
     /* Status badges */
-    .st-pending   { color: #6b7280; }
-    .st-cutting   { color: #d97706; }
-    .st-stitching { color: #2563eb; }
-    .st-ready     { color: #16a34a; }
-    .st-delivered { color: #0f172a; }
+    .st-pending   { color: #6b7280; font-family: DejaVu Sans, sans-serif; }
+    .st-cutting   { color: #d97706; font-family: DejaVu Sans, sans-serif; }
+    .st-stitching { color: #2563eb; font-family: DejaVu Sans, sans-serif; }
+    .st-ready     { color: #16a34a; font-family: DejaVu Sans, sans-serif; }
+    .st-delivered { color: #0f172a; font-family: DejaVu Sans, sans-serif; }
 
     /* Payment summary */
-    .payment-wrap { display: table; width: 100%; margin-bottom: 16px; }
+    .payment-wrap       { display: table; width: 100%; margin-bottom: 16px; }
     .payment-wrap-inner { display: table-cell; text-align: right; }
-    .payment-table { width: 270px; border: 1px solid #e2e8f0; border-radius: 6px; border-collapse: collapse; }
-    .payment-table td { padding: 6px 12px; font-size: 10.5px; }
-    .payment-table tr { border-bottom: 1px solid #f1f5f9; }
+    .payment-table      { width: 270px; border: 1px solid #e2e8f0; border-radius: 6px; border-collapse: collapse; font-family: DejaVu Sans, sans-serif; }
+    .payment-table td   { padding: 6px 12px; font-size: 11px; font-family: DejaVu Sans, sans-serif; color: #1e293b; }
+    .payment-table tr   { border-bottom: 1px solid #f1f5f9; }
     .payment-table tr:last-child { border-bottom: none; }
-    .lbl { color: #64748b; }
-    .val { text-align: right; font-weight: 600; }
-    .row-advance { background: #f0fdf4; }
-    .row-advance .lbl { color: #16a34a; }
-    .row-advance .val { color: #16a34a; }
-    .row-balance .lbl { color: #dc2626; }
-    .row-balance .val { color: #dc2626; }
-    .row-prev .lbl { color: #d97706; }
-    .row-prev .val { color: #d97706; }
-    .row-grand { background: #1e293b; }
-    .row-grand .lbl { color: #cbd5e1; font-size: 10.5px; font-weight: 600; }
-    .row-grand .val { color: #fbbf24; font-size: 12px; font-weight: 700; }
+    .lbl { color: #64748b; font-family: DejaVu Sans, sans-serif; }
+    .val { text-align: right; font-weight: 600; font-family: DejaVu Sans, sans-serif; }
+    .row-advance    { background: #f0fdf4; }
+    .row-balance    { }
+    .row-prev       { }
+    .row-grand      { background: #1e293b; }
 
     /* Order notes */
-    .note-box { margin-bottom: 14px; font-size: 9.5px; color: #64748b; padding: 7px 10px; background: #f8fafc; border-left: 3px solid #cbd5e1; border-radius: 3px; }
+    .note-box   { margin-bottom: 14px; font-size: 10px; color: #64748b; padding: 7px 10px; background: #f8fafc; border-left: 3px solid #cbd5e1; border-radius: 3px; font-family: DejaVu Sans, sans-serif; }
+    .note-box strong { font-family: DejaVu Sans, sans-serif; color: #1e293b; }
 
     /* Legal notice */
-    .legal-box { border: 1px solid #e2e8f0; border-left: 4px solid #1e293b; border-radius: 4px; padding: 9px 12px; margin-bottom: 20px; background: #f8fafc; }
-    .legal-title { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; margin-bottom: 4px; }
-    .legal-text  { font-size: 9px; color: #475569; line-height: 1.6; }
+    .legal-box   { border: 1px solid #e2e8f0; border-left: 4px solid #1e293b; border-radius: 4px; padding: 9px 12px; margin-bottom: 20px; background: #f8fafc; }
+    .legal-title { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; margin-bottom: 4px; font-family: DejaVu Sans, sans-serif; }
+    .legal-text  { font-size: 9.5px; color: #475569; line-height: 1.6; font-family: DejaVu Sans, sans-serif; }
 
     /* Footer */
-    .footer { border-top: 1px solid #e2e8f0; padding-top: 8px; font-size: 8.5px; color: #94a3b8; display: table; width: 100%; }
-    .footer-left  { display: table-cell; }
-    .footer-right { display: table-cell; text-align: right; }
+    .footer       { border-top: 1px solid #e2e8f0; padding-top: 8px; font-size: 9px; color: #94a3b8; display: table; width: 100%; font-family: DejaVu Sans, sans-serif; }
+    .footer-left  { display: table-cell; font-family: DejaVu Sans, sans-serif; }
+    .footer-right { display: table-cell; text-align: right; font-family: DejaVu Sans, sans-serif; }
 </style>
 </head>
 <body>
@@ -200,9 +197,9 @@
                 @if($bankAccount)Account: <strong>{{ $bankAccount }}</strong>@endif
             </div>
             @if($payQrB64)
-            <div style="margin-top:6px">
-                <img src="data:{{ $payQrMime }};base64,{{ $payQrB64 }}" alt="Payment QR" style="width:60px;height:60px">
-                <div style="font-size:8px;color:#94a3b8;margin-top:2px">Scan to pay</div>
+            <div style="margin-top:8px">
+                <img src="data:{{ $payQrMime }};base64,{{ $payQrB64 }}" alt="Payment QR" style="width:90px;height:90px">
+                <div style="font-size:9px;color:#94a3b8;margin-top:3px">Scan to pay</div>
             </div>
             @endif
         </div>
@@ -251,26 +248,26 @@
         <div class="payment-wrap-inner">
         <table class="payment-table">
             <tr>
-                <td class="lbl">Total Amount</td>
-                <td class="val">Rs {{ number_format($order->total_amount) }}</td>
+                <td class="lbl" style="font-family:DejaVu Sans,sans-serif;color:#64748b">Total Amount</td>
+                <td class="val" style="font-family:DejaVu Sans,sans-serif;color:#1e293b">Rs {{ number_format($order->total_amount) }}</td>
             </tr>
             <tr class="row-advance">
-                <td class="lbl">Advance Paid</td>
-                <td class="val">Rs {{ number_format($order->advance_amount) }}</td>
+                <td class="lbl" style="font-family:DejaVu Sans,sans-serif;color:#16a34a">Advance Paid</td>
+                <td class="val" style="font-family:DejaVu Sans,sans-serif;color:#16a34a">Rs {{ number_format($order->advance_amount) }}</td>
             </tr>
             <tr class="row-balance">
-                <td class="lbl">Balance Due (this order)</td>
-                <td class="val">Rs {{ number_format($order->balance_amount) }}</td>
+                <td class="lbl" style="font-family:DejaVu Sans,sans-serif;color:#dc2626">Balance Due (this order)</td>
+                <td class="val" style="font-family:DejaVu Sans,sans-serif;color:#dc2626">Rs {{ number_format($order->balance_amount) }}</td>
             </tr>
             @if($showPreviousRow)
             <tr class="row-prev">
-                <td class="lbl">Previous Dues</td>
-                <td class="val">Rs {{ number_format($previousBalance) }}</td>
+                <td class="lbl" style="font-family:DejaVu Sans,sans-serif;color:#d97706">Previous Dues</td>
+                <td class="val" style="font-family:DejaVu Sans,sans-serif;color:#d97706">Rs {{ number_format($previousBalance) }}</td>
             </tr>
             @endif
             <tr class="row-grand">
-                <td class="lbl">Grand Total Owed</td>
-                <td class="val">Rs {{ number_format($grandTotal) }}</td>
+                <td class="lbl" style="font-family:DejaVu Sans,sans-serif;color:#e2e8f0;font-weight:700">Grand Total Owed</td>
+                <td class="val" style="font-family:DejaVu Sans,sans-serif;color:#fbbf24;font-weight:800;font-size:13px">Rs {{ number_format($grandTotal) }}</td>
             </tr>
         </table>
         </div>

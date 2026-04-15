@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Customer;
 use App\Models\Order;
+use App\Models\Payment;
 use App\Models\Suit;
 use App\Models\Worker;
 use App\Traits\HasBranchScope;
@@ -89,91 +90,27 @@ class ReportController extends Controller
 
         return view('reports.pending-balances', compact('customers', 'grandTotal'));
     }
-}
 
-    public function daily(Request $request): View
+    public function payments(Request $request): View
     {
-        $date   = $request->input('date', today()->toDateString());
-        $orders = Order::with(['customer', 'suits'])
-            ->whereDate('order_date', $date)
-            ->latest()
-            ->get();
+        $from   = $request->input('from', today()->startOfMonth()->toDateString());
+        $to     = $request->input('to', today()->toDateString());
+        $method = $request->input('method', '');
 
-        return view('reports.daily', compact('orders', 'date'));
-    }
+        $query = Payment::with(['order.customer', 'receivedBy'])
+            ->whereBetween('payment_date', [$from, $to]);
 
-    public function pending(Request $request): View
-    {
-        $status = $request->input('status', '');
+        $this->branchQuery($query);
 
-        $query = Suit::with(['customer', 'worker', 'order'])
-            ->whereNotIn('status', ['delivered']);
-
-        if ($status) {
-            $query->where('status', $status);
+        if ($method) {
+            $query->where('method', $method);
         }
 
-        $suits = $query->oldest()->get();
+        $payments     = $query->latest('payment_date')->get();
+        $totalAmount  = $payments->sum('amount');
+        $byMethod     = $payments->groupBy('method')->map->sum('amount');
+        $methods      = \App\Models\Payment::METHODS;
 
-        return view('reports.pending', compact('suits', 'status'));
-    }
-
-    public function delivered(Request $request): View
-    {
-        $from = $request->input('from', today()->toDateString());
-        $to   = $request->input('to', today()->toDateString());
-
-        $suits = Suit::with(['customer', 'worker', 'order'])
-            ->where('status', 'delivered')
-            ->whereBetween('delivered_at', [
-                $from . ' 00:00:00',
-                $to   . ' 23:59:59',
-            ])
-            ->latest('delivered_at')
-            ->get();
-
-        return view('reports.delivered', compact('suits', 'from', 'to'));
-    }
-
-    /**
-     * Worker salary report — suits grouped by worker (piece-rate).
-     */
-    public function salary(Request $request): View
-    {
-        $from = $request->input('from', today()->startOfMonth()->toDateString());
-        $to   = $request->input('to', today()->toDateString());
-
-        $workers = Worker::with(['suits' => function ($q) use ($from, $to) {
-            $q->whereNotNull('stitching_started_at')
-              ->whereBetween('stitching_started_at', [
-                  $from . ' 00:00:00',
-                  $to   . ' 23:59:59',
-              ])
-              ->with('customer');
-        }])->where('is_active', true)->get()
-          ->filter(fn($w) => $w->suits->isNotEmpty());
-
-        $totalPayout = $workers->sum(fn($w) => $w->suits->sum('worker_earning'));
-
-        return view('reports.salary', compact('workers', 'from', 'to', 'totalPayout'));
-    }
-
-    /**
-     * Pending balances — customers with outstanding dues.
-     */
-    public function pendingBalances(Request $request): View
-    {
-        $customers = Customer::with(['orders' => fn($q) => $q->where('balance_amount', '>', 0)])
-            ->whereHas('orders', fn($q) => $q->where('balance_amount', '>', 0))
-            ->get()
-            ->map(function ($c) {
-                $c->total_outstanding = $c->orders->sum('balance_amount');
-                return $c;
-            })
-            ->sortByDesc('total_outstanding');
-
-        $grandTotal = $customers->sum('total_outstanding');
-
-        return view('reports.pending-balances', compact('customers', 'grandTotal'));
+        return view('reports.payments', compact('payments', 'from', 'to', 'method', 'totalAmount', 'byMethod', 'methods'));
     }
 }

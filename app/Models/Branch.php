@@ -19,6 +19,11 @@ class Branch extends Model
         return $this->hasMany(User::class);
     }
 
+    public function managers(): HasMany
+    {
+        return $this->hasMany(User::class)->where('role', 'branch_manager');
+    }
+
     public function customers(): HasMany
     {
         return $this->hasMany(Customer::class);

@@ -56,6 +56,11 @@ class Suit extends Model
         return $this->belongsTo(Worker::class);
     }
 
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
+    }
+
     public function getStatusBadgeAttribute(): string
     {
         return match ($this->status) {

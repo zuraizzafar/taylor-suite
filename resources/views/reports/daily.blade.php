@@ -41,8 +41,14 @@
                         Rs {{ number_format($order->balance_amount) }}
                     </td>
                     <td class="px-4 py-2">
+                        <div class="flex gap-1">
                         <a href="{{ route('orders.show', $order) }}"
                            class="text-xs bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded">View</a>
+                        @if($order->balance_amount > 0)
+                        <button onclick="openPayModal({{ $order->id }}, '{{ $order->order_number }}', {{ $order->balance_amount }})"
+                            class="text-xs bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded">+ Pay</button>
+                        @endif
+                        </div>
                     </td>
                 </tr>
                 @empty

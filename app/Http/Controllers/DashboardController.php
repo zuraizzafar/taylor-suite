@@ -2,20 +2,30 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Branch;
 use App\Models\Customer;
 use App\Models\Expense;
 use App\Models\Order;
 use App\Models\Suit;
 use App\Traits\HasBranchScope;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
     use HasBranchScope;
 
-    public function index(): View
+    public function index(Request $request): View
     {
+        // Admin can pick a branch via ?branch_id=; branch_manager is always scoped to their own
         $bid = $this->currentBranchId();
+        if (auth()->user()->isAdmin() && $request->filled('branch_id')) {
+            $bid = (int) $request->input('branch_id');
+        }
+
+        $branches = auth()->user()->isAdmin()
+            ? Branch::where('is_active', true)->orderBy('name')->get()
+            : collect();
 
         $statsBase = fn($model) => $bid ? $model::where('branch_id', $bid) : $model::query();
 
@@ -28,9 +38,9 @@ class DashboardController extends Controller
             'total_suits'     => (clone $statsBase(Suit::class))->count(),
         ];
 
-        // ── Finance Overview (scoped to branch) ───────────────
-        $orderQ   = $bid ? Order::where('branch_id', $bid) : Order::query();
-        $suitQ    = $bid ? Suit::where('branch_id', $bid)  : Suit::query();
+        // Finance Overview (scoped to selected branch)
+        $orderQ   = $bid ? Order::where('branch_id', $bid)   : Order::query();
+        $suitQ    = $bid ? Suit::where('branch_id', $bid)    : Suit::query();
         $expenseQ = $bid ? Expense::where('branch_id', $bid) : Expense::query();
 
         $totalRevenue     = (float) (clone $orderQ)->sum('total_amount');
@@ -53,6 +63,13 @@ class DashboardController extends Controller
             ->take(10)
             ->get();
 
-        return view('dashboard', compact('stats', 'finance', 'recent_orders', 'pending_suits'));
+        $selectedBranch = $bid && auth()->user()->isAdmin()
+            ? $branches->firstWhere('id', $bid)
+            : null;
+
+        return view('dashboard', compact(
+            'stats', 'finance', 'recent_orders', 'pending_suits',
+            'branches', 'selectedBranch'
+        ));
     }
 }

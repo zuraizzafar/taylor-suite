@@ -34,9 +34,31 @@ class Order extends Model
         return $this->belongsTo(Customer::class);
     }
 
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
+    }
+
     public function suits(): HasMany
     {
         return $this->hasMany(Suit::class);
+    }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    /**
+     * Recalculate advance_amount and balance_amount from all payments + original advance.
+     * Call this after adding/removing a payment.
+     */
+    public function recalculateBalance(): void
+    {
+        $paid = $this->payments()->sum('amount');
+        $this->advance_amount = $paid;
+        $this->balance_amount = max(0, $this->total_amount - $paid);
+        $this->saveQuietly();
     }
 
     /**
