@@ -19,10 +19,16 @@
                 <div class="flex gap-2 mt-2 justify-end">
                     <a href="{{ route('suits.edit', $suit) }}"
                        class="text-xs bg-slate-100 hover:bg-slate-200 px-3 py-1 rounded-lg">Edit</a>
-                    <a href="{{ route('suits.tag', $suit) }}"
-                       class="text-xs bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg">🏷 Print Tag</a>
-                    <a href="{{ route('scan.show', $suit->suit_code) }}" target="_blank"
-                       class="text-xs bg-slate-700 hover:bg-slate-800 text-white px-3 py-1 rounded-lg">🔗 Public Link</a>
+                    <a href="{{ route('suits.tag', $suit) }}" target="_blank"
+                       class="text-xs bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg">Print Tag</a>
+                    {{-- Copy public link button --}}
+                    <button
+                        id="copy-link-btn"
+                        data-url="{{ route('scan.show', $suit->suit_code) }}"
+                        onclick="copyPublicLink(this)"
+                        class="text-xs bg-slate-700 hover:bg-slate-800 text-white px-3 py-1 rounded-lg transition">
+                        Copy Public Link
+                    </button>
                 </div>
             </div>
         </div>
@@ -116,22 +122,25 @@
     {{-- QR Code display --}}
     @if($suit->qr_code_path && Storage::disk('public')->exists($suit->qr_code_path))
     <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-5">
-        <h3 class="font-semibold text-slate-700 mb-3">📱 QR Code</h3>
+        <h3 class="font-semibold text-slate-700 mb-3">QR Code</h3>
         <div class="flex items-start gap-6">
             <img src="{{ Storage::url($suit->qr_code_path) }}" alt="QR Code" class="w-32 h-32">
-            <div>
-                <p class="text-sm text-slate-600 mb-2">Scan to view status on any device</p>
-                <p class="text-xs font-mono bg-slate-100 px-2 py-1 rounded">
-                    {{ $suit->suit_code }} | {{ $suit->customer->name }} | {{ $suit->customer->mobile }}
-                </p>
+            <div class="flex-1">
+                <p class="text-sm text-slate-600 mb-2">Scan to open the public status page.</p>
+                <div class="flex items-center gap-2">
+                    <code id="public-url-display" class="text-xs font-mono bg-slate-100 px-2 py-1.5 rounded flex-1 break-all">{{ route('scan.show', $suit->suit_code) }}</code>
+                    <button onclick="copyPublicLink(document.getElementById('copy-link-btn'))"
+                        class="text-xs bg-slate-700 hover:bg-slate-800 text-white px-3 py-1.5 rounded-lg whitespace-nowrap">Copy</button>
+                </div>
+                <a href="{{ route('scan.show', $suit->suit_code) }}" target="_blank"
+                    class="mt-2 inline-block text-xs text-blue-600 hover:underline">Open in new tab</a>
             </div>
         </div>
     </div>
     @endif
 
     {{-- Measurements --}}
-    @if($suit->measurement)
-    <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-5">
+    @if($suit->measurement)    <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-5">
         <h3 class="font-semibold text-slate-700 mb-3">📏 Measurements – {{ $suit->measurement->label }}</h3>
         <div class="grid grid-cols-2 gap-4">
             <div>
@@ -166,3 +175,32 @@
 
 </div>
 @endsection
+
+@push('scripts')
+<script>
+function copyPublicLink(btn) {
+    const url = btn.dataset.url || '{{ route('scan.show', $suit->suit_code) }}';
+    navigator.clipboard.writeText(url).then(function () {
+        const original = btn.textContent;
+        btn.textContent = 'Copied!';
+        btn.classList.remove('bg-slate-700', 'hover:bg-slate-800');
+        btn.classList.add('bg-green-600');
+        setTimeout(function () {
+            btn.textContent = original;
+            btn.classList.add('bg-slate-700', 'hover:bg-slate-800');
+            btn.classList.remove('bg-green-600');
+        }, 2000);
+    }).catch(function () {
+        // fallback for older browsers
+        const ta = document.createElement('textarea');
+        ta.value = url;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        btn.textContent = 'Copied!';
+        setTimeout(function () { btn.textContent = 'Copy Public Link'; }, 2000);
+    });
+}
+</script>
+@endpush

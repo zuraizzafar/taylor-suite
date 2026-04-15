@@ -6,6 +6,7 @@ use App\Models\Customer;
 use App\Models\Order;
 use App\Models\Suit;
 use App\Models\Worker;
+use App\Traits\HasBranchScope;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -17,9 +18,11 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class SuitController extends Controller
 {
+    use HasBranchScope;
+
     public function index(Request $request): View
     {
-        $query = Suit::with(['customer', 'worker', 'order'])
+        $query = Suit::with(['customer', 'worker', 'order', 'branch'])
             ->when($request->input('status'), fn($q, $s) => $q->where('status', $s))
             ->when($request->input('search'), function ($q, $s) {
                 $q->where('suit_code', 'like', "%{$s}%")
@@ -29,6 +32,8 @@ class SuitController extends Controller
                   );
             });
 
+        $this->branchQuery($query);
+
         $suits = $query->latest()->paginate(25)->withQueryString();
 
         return view('suits.index', compact('suits'));
@@ -36,8 +41,15 @@ class SuitController extends Controller
 
     public function create(Request $request): View
     {
-        $customers    = Customer::orderBy('name')->get();
-        $workers      = Worker::where('is_active', true)->get();
+        // Scope customers and workers to branch for branch managers
+        $customersQuery = Customer::orderBy('name');
+        $this->branchQuery($customersQuery);
+        $customers = $customersQuery->get();
+
+        $workersQuery = Worker::where('is_active', true);
+        $this->branchQuery($workersQuery);
+        $workers = $workersQuery->get();
+
         $selectedCustomer = $request->input('customer_id')
             ? Customer::with('measurements')->find($request->input('customer_id'))
             : null;
@@ -51,17 +63,21 @@ class SuitController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'customer_id'       => ['required', 'exists:customers,id'],
-            'order_id'          => ['nullable', 'exists:orders,id'],
-            'measurement_id'    => ['nullable', 'exists:measurements,id'],
-            'worker_id'         => ['nullable', 'exists:workers,id'],
-            'suit_type'         => ['required', 'string', 'max:100'],
-            'fabric_meter'      => ['required', 'numeric', 'min:0.1'],
-            'fabric_description'=> ['nullable', 'string', 'max:255'],
-            'notes'             => ['nullable', 'string'],
+            'customer_id'        => ['required', 'exists:customers,id'],
+            'order_id'           => ['nullable', 'exists:orders,id'],
+            'measurement_id'     => ['nullable', 'exists:measurements,id'],
+            'worker_id'          => ['nullable', 'exists:workers,id'],
+            'suit_type'          => ['required', 'string', 'max:100'],
+            'fabric_meter'       => ['required', 'numeric', 'min:0.1'],
+            'fabric_description' => ['nullable', 'string', 'max:255'],
+            'notes'              => ['nullable', 'string'],
         ]);
 
-        // Generate suit_code atomically
+        // Inherit branch from customer when branch manager creates a suit
+        if ($branchId = $this->currentBranchId()) {
+            $data['branch_id'] = $branchId;
+        }
+
         $suit = DB::transaction(function () use ($data) {
             $customer   = Customer::lockForUpdate()->find($data['customer_id']);
             $suitNumber = $customer->suits()->count() + 1;
@@ -72,7 +88,6 @@ class SuitController extends Controller
 
             $suit = Suit::create($data);
 
-            // Generate QR code
             $suit->qr_code_path = $this->generateQrCode($suit, $customer);
             $suit->saveQuietly();
 
@@ -127,11 +142,18 @@ class SuitController extends Controller
             return back()->with('error', 'Delivered suits cannot be changed.');
         }
 
+        // Calculate worker earning when suit moves to stitching for the first time
+        if ($data['status'] === 'stitching' && $suit->status !== 'stitching' && ! $suit->stitching_started_at) {
+            $suit->stitching_started_at = now();
+            $suit->worker_earning = $suit->worker?->rate_per_suit ?? 0;
+        }
+
         if ($data['status'] === 'delivered') {
             $suit->delivered_at = now();
         }
 
-        $suit->update($data);
+        $suit->status = $data['status'];
+        $suit->save();
 
         return back()->with('success', "Status updated to " . ucfirst($data['status']) . ".");
     }
@@ -157,9 +179,13 @@ class SuitController extends Controller
         }
 
         $pdf = Pdf::loadView('suits.tag-pdf', compact('suit', 'qrImage'))
-            ->setPaper([0, 0, 226.77, 226.77]); // ~8cm x 8cm
+            ->setPaper('a4', 'portrait');
 
-        return $pdf->download("tag-{$suit->suit_code}.pdf");
+        $filename = "tag-{$suit->suit_code}.pdf";
+
+        return env('PDF_MODE', 'download') === 'stream'
+            ? $pdf->stream($filename)
+            : $pdf->download($filename);
     }
 
     public function destroy(Suit $suit): RedirectResponse
@@ -174,7 +200,8 @@ class SuitController extends Controller
 
     private function generateQrCode(Suit $suit, Customer $customer): string
     {
-        $content = "{$suit->suit_code} | {$customer->name} | {$customer->mobile}";
+        // Encode the public scan URL so scanning opens the status page directly
+        $content = route('scan.show', $suit->suit_code);
         $path    = "qrcodes/{$suit->suit_code}.svg";
 
         Storage::disk('public')->makeDirectory('qrcodes');

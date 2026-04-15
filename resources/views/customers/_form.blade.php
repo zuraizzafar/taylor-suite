@@ -21,6 +21,22 @@
             class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
     </div>
 
+    @if(auth()->user()->isAdmin() && isset($branches) && $branches->isNotEmpty())
+    <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Branch</label>
+        <select name="branch_id"
+            class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">— No branch / All —</option>
+            @foreach($branches as $branch)
+            <option value="{{ $branch->id }}"
+                {{ old('branch_id', $customer->branch_id ?? '') == $branch->id ? 'selected' : '' }}>
+                {{ $branch->name }}
+            </option>
+            @endforeach
+        </select>
+    </div>
+    @endif
+
     <div>
         <label class="block text-sm font-medium text-slate-700 mb-1">Notes</label>
         <textarea name="notes" rows="2"

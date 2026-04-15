@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -18,6 +19,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'branch_id',
     ];
 
     protected $hidden = [
@@ -38,8 +40,23 @@ class User extends Authenticatable
         return $this->role === 'admin';
     }
 
+    public function isBranchManager(): bool
+    {
+        return $this->role === 'branch_manager';
+    }
+
+    public function canManageAll(): bool
+    {
+        return $this->role === 'admin';
+    }
+
     public function worker(): HasOne
     {
         return $this->hasOne(Worker::class);
+    }
+
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
     }
 }

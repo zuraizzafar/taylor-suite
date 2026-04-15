@@ -15,6 +15,7 @@ class Suit extends Model
         'order_id',
         'measurement_id',
         'worker_id',
+        'branch_id',
         'suit_number',
         'suit_code',
         'suit_type',
@@ -24,10 +25,13 @@ class Suit extends Model
         'notes',
         'qr_code_path',
         'delivered_at',
+        'worker_earning',
+        'stitching_started_at',
     ];
 
     protected $casts = [
-        'delivered_at' => 'datetime',
+        'delivered_at'         => 'datetime',
+        'stitching_started_at' => 'datetime',
     ];
 
     public const STATUSES = ['pending', 'cutting', 'stitching', 'ready', 'delivered'];

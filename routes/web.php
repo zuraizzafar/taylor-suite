@@ -1,13 +1,16 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BranchController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\MeasurementController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ScanController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\SettingController;
 use App\Http\Controllers\SuitController;
 use App\Http\Controllers\WorkerController;
 use App\Http\Controllers\WorkerPortalController;
@@ -30,11 +33,11 @@ Route::middleware('auth')->group(function () {
     // Worker portal (worker role only)
     Route::get('/worker/suits', [WorkerPortalController::class, 'suits'])->name('worker.suits');
 
-    // Suit status update (both admin + worker can do this)
+    // Suit status update (admin + branch_manager + worker)
     Route::patch('/suits/{suit}/status', [SuitController::class, 'updateStatus'])->name('suits.status');
 
-    // ── Admin-only routes ──────────────────────────────────────────────────────
-    Route::middleware('role:admin')->group(function () {
+    // ── Admin + Branch Manager routes ──────────────────────────────────────────
+    Route::middleware('role:admin,branch_manager')->group(function () {
 
         // Customers
         Route::resource('customers', CustomerController::class);
@@ -69,6 +72,18 @@ Route::middleware('auth')->group(function () {
         Route::get('/reports/daily', [ReportController::class, 'daily'])->name('reports.daily');
         Route::get('/reports/pending', [ReportController::class, 'pending'])->name('reports.pending');
         Route::get('/reports/delivered', [ReportController::class, 'delivered'])->name('reports.delivered');
+        Route::get('/reports/salary', [ReportController::class, 'salary'])->name('reports.salary');
+        Route::get('/reports/pending-balances', [ReportController::class, 'pendingBalances'])->name('reports.pending-balances');
+
+        // Expenses
+        Route::resource('expenses', ExpenseController::class);
+    });
+
+    // ── Admin-only routes ──────────────────────────────────────────────────────
+    Route::middleware('role:admin')->group(function () {
+        Route::resource('branches', BranchController::class);
+        Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
+        Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
     });
 });
 

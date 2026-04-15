@@ -18,7 +18,13 @@ class Customer extends Model
         'mobile',
         'address',
         'notes',
+        'branch_id',
     ];
+
+    public function branch(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
+    }
 
     public function measurements(): HasMany
     {
@@ -33,6 +39,17 @@ class Customer extends Model
     public function suits(): HasMany
     {
         return $this->hasMany(Suit::class);
+    }
+
+    /**
+     * Total unpaid balance across all orders, optionally excluding one order.
+     */
+    public function outstandingBalance(?int $excludeOrderId = null): float
+    {
+        return (float) $this->orders()
+            ->when($excludeOrderId, fn($q) => $q->where('id', '!=', $excludeOrderId))
+            ->where('balance_amount', '>', 0)
+            ->sum('balance_amount');
     }
 
     /**

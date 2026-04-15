@@ -44,6 +44,8 @@ class MeasurementController extends Controller
         ]);
 
         $data['customer_id'] = $customer->id;
+        $data['meta']        = $this->extractMeta($request);
+
         Measurement::create($data);
 
         return redirect()->route('customers.show', $customer)
@@ -82,9 +84,25 @@ class MeasurementController extends Controller
             'notes'          => ['nullable', 'string'],
         ]);
 
+        $data['meta'] = $this->extractMeta($request);
         $measurement->update($data);
 
         return redirect()->route('customers.show', $customer)
             ->with('success', 'Measurement updated.');
+    }
+
+    private function extractMeta(Request $request): array
+    {
+        return array_filter([
+            'collar_style'    => $request->input('meta_collar_style'),
+            'button_type'     => $request->input('meta_button_type'),
+            'ghera_style'     => $request->input('meta_ghera_style'),
+            'stitching_style' => $request->input('meta_stitching_style'),
+            'chak_patti'      => $request->input('meta_chak_patti'),
+            'kaj_hale'        => $request->input('meta_kaj_hale'),
+            'pahuncha_style'  => $request->input('meta_pahuncha_style'),
+            'front_patti_size'=> $request->input('meta_front_patti_size'),
+            'design_number'   => $request->input('meta_design_number'),
+        ], fn($v) => $v !== null && $v !== '');
     }
 }

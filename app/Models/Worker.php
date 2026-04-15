@@ -15,16 +15,24 @@ class Worker extends Model
         'name',
         'mobile',
         'is_active',
+        'rate_per_suit',
         'user_id',
+        'branch_id',
     ];
 
     protected $casts = [
-        'is_active' => 'boolean',
+        'is_active'      => 'boolean',
+        'rate_per_suit'  => 'decimal:2',
     ];
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
     }
 
     public function suits(): HasMany

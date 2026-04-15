@@ -18,7 +18,11 @@ class Measurement extends Model
         'q_armhole', 'q_cuff',
         's_length', 's_waist', 's_seat', 's_thigh', 's_knee',
         's_bottom', 's_crotch', 's_ankle',
-        'notes',
+        'notes', 'meta',
+    ];
+
+    protected $casts = [
+        'meta' => 'array',
     ];
 
     public function customer(): BelongsTo

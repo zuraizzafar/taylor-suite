@@ -7,7 +7,7 @@
 <div class="pt-2">
 
     {{-- Stats cards --}}
-    <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-8">
+    <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
         <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-100">
             <p class="text-xs text-slate-500 mb-1">Total Customers</p>
             <p class="text-2xl font-bold text-slate-800">{{ $stats['total_customers'] }}</p>
@@ -33,6 +33,48 @@
             <p class="text-2xl font-bold text-slate-800">{{ $stats['total_suits'] }}</p>
         </div>
     </div>
+
+    {{-- Finance Overview --}}
+    @if(auth()->user()->isAdmin() || auth()->user()->isBranchManager())
+    <div class="mb-6">
+        <h3 class="text-sm font-semibold text-slate-600 mb-3 uppercase tracking-wide">💰 Financial Overview</h3>
+        <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+            <div class="bg-blue-50 border border-blue-100 rounded-xl p-4">
+                <p class="text-xs text-blue-600 font-medium mb-1">Total Revenue</p>
+                <p class="text-xl font-bold text-blue-800">Rs {{ number_format($finance['totalRevenue']) }}</p>
+                <p class="text-xs text-blue-400 mt-1">All-time billed</p>
+            </div>
+            <div class="bg-green-50 border border-green-100 rounded-xl p-4">
+                <p class="text-xs text-green-600 font-medium mb-1">Total Collected</p>
+                <p class="text-xl font-bold text-green-800">Rs {{ number_format($finance['totalCollected']) }}</p>
+                <p class="text-xs text-green-400 mt-1">Advance payments</p>
+            </div>
+            <div class="bg-red-50 border border-red-100 rounded-xl p-4">
+                <p class="text-xs text-red-600 font-medium mb-1">Outstanding Dues</p>
+                <p class="text-xl font-bold text-red-800">Rs {{ number_format($finance['totalOutstanding']) }}</p>
+                <a href="{{ route('reports.pending-balances') }}" class="text-xs text-red-400 mt-1 hover:underline block">View details →</a>
+            </div>
+            <div class="bg-orange-50 border border-orange-100 rounded-xl p-4">
+                <p class="text-xs text-orange-600 font-medium mb-1">Worker Salaries</p>
+                <p class="text-xl font-bold text-orange-800">Rs {{ number_format($finance['workerSalaries']) }}</p>
+                <a href="{{ route('reports.salary') }}" class="text-xs text-orange-400 mt-1 hover:underline block">Salary report →</a>
+            </div>
+            <div class="bg-purple-50 border border-purple-100 rounded-xl p-4">
+                <p class="text-xs text-purple-600 font-medium mb-1">Total Expenses</p>
+                <p class="text-xl font-bold text-purple-800">Rs {{ number_format($finance['totalExpenses']) }}</p>
+                <a href="{{ route('expenses.index') }}" class="text-xs text-purple-400 mt-1 hover:underline block">View expenses →</a>
+            </div>
+            <div class="{{ $finance['netProfit'] >= 0 ? 'bg-emerald-50 border-emerald-100' : 'bg-rose-50 border-rose-100' }} border rounded-xl p-4">
+                <p class="text-xs {{ $finance['netProfit'] >= 0 ? 'text-emerald-600' : 'text-rose-600' }} font-medium mb-1">Net Profit</p>
+                <p class="text-xl font-bold {{ $finance['netProfit'] >= 0 ? 'text-emerald-800' : 'text-rose-800' }}">
+                    Rs {{ number_format(abs($finance['netProfit'])) }}
+                    <span class="text-sm font-normal">{{ $finance['netProfit'] >= 0 ? '▲' : '▼' }}</span>
+                </p>
+                <p class="text-xs {{ $finance['netProfit'] >= 0 ? 'text-emerald-400' : 'text-rose-400' }} mt-1">Collected − Salaries − Expenses</p>
+            </div>
+        </div>
+    </div>
+    @endif
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 

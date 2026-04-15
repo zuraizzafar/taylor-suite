@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'The Suit Tailor')</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     @vite(['resources/css/app.css'])
 </head>
 <body class="bg-slate-100 min-h-screen flex">
@@ -21,7 +22,7 @@
                 <span>📊</span> Dashboard
             </a>
 
-            @if(auth()->user()->isAdmin())
+            @if(auth()->user()->isAdmin() || auth()->user()->isBranchManager())
             <div class="pt-3 pb-1 px-3">
                 <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Customers</p>
             </div>
@@ -51,6 +52,14 @@
             </a>
 
             <div class="pt-3 pb-1 px-3">
+                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Finance</p>
+            </div>
+            <a href="{{ route('expenses.index') }}"
+               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('expenses.*') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">
+                <span>💸</span> Expenses
+            </a>
+
+            <div class="pt-3 pb-1 px-3">
                 <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Reports</p>
             </div>
             <a href="{{ route('reports.daily') }}"
@@ -63,8 +72,31 @@
             </a>
             <a href="{{ route('reports.delivered') }}"
                class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('reports.delivered') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">
-                <span>✅</span> Delivered Orders
+                <span>✅</span> Delivered
             </a>
+            <a href="{{ route('reports.salary') }}"
+               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('reports.salary') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">
+                <span>💼</span> Salary Report
+            </a>
+            <a href="{{ route('reports.pending-balances') }}"
+               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('reports.pending-balances') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">
+                <span>🔴</span> Pending Balances
+            </a>
+
+            @if(auth()->user()->isAdmin())
+            <div class="pt-3 pb-1 px-3">
+                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Admin</p>
+            </div>
+            <a href="{{ route('branches.index') }}"
+               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('branches.*') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">
+                <span>🏢</span> Branches
+            </a>
+            <a href="{{ route('settings.index') }}"
+               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('settings.*') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">
+                <span>⚙️</span> Settings
+            </a>
+            @endif
+
             @else
             {{-- Worker navigation --}}
             <a href="{{ route('worker.suits') }}"
@@ -101,6 +133,11 @@
                         class="bg-blue-600 text-white text-sm px-3 py-1.5 rounded-r-lg hover:bg-blue-700">🔍</button>
                 </form>
                 @endif
+                @if(auth()->user()->isBranchManager() && auth()->user()->branch)
+                <span class="text-xs text-blue-700 bg-blue-50 border border-blue-200 px-2 py-1 rounded-full font-medium">
+                    {{ auth()->user()->branch->name }}
+                </span>
+                @endif
                 <span class="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-full">
                     {{ ucfirst(auth()->user()->role) }}
                 </span>
@@ -126,5 +163,6 @@
         </main>
     </div>
 
+    @stack('scripts')
 </body>
 </html>

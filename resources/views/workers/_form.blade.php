@@ -14,6 +14,30 @@
     </div>
 
     <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Rate Per Suit (Rs)</label>
+        <input type="number" name="rate_per_suit" value="{{ old('rate_per_suit', $worker->rate_per_suit ?? 0) }}"
+            step="0.01" min="0" placeholder="0.00"
+            class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <p class="text-xs text-slate-400 mt-1">Piece-rate salary per suit stitched.</p>
+    </div>
+
+    @if(auth()->user()->isAdmin() && isset($branches) && $branches->isNotEmpty())
+    <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Branch</label>
+        <select name="branch_id"
+            class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">— No branch —</option>
+            @foreach($branches as $branch)
+            <option value="{{ $branch->id }}"
+                {{ old('branch_id', $worker->branch_id ?? '') == $branch->id ? 'selected' : '' }}>
+                {{ $branch->name }}
+            </option>
+            @endforeach
+        </select>
+    </div>
+    @endif
+
+    <div>
         <label class="block text-sm font-medium text-slate-700 mb-1">Link to Login User (optional)</label>
         <select name="user_id"
             class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
