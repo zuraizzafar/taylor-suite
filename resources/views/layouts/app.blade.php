@@ -10,13 +10,20 @@
 <body class="bg-slate-100 min-h-screen flex">
 
     {{-- Sidebar --}}
-    <aside class="w-64 bg-slate-900 text-white flex flex-col min-h-screen fixed top-0 left-0 z-20">
-        <div class="px-6 py-5 border-b border-slate-700">
+    <aside class="w-64 bg-slate-900 text-white flex flex-col fixed top-0 left-0 bottom-0 z-20">
+        {{-- Brand – fixed at top --}}
+        <div class="shrink-0 px-6 py-5 border-b border-slate-700">
             <h1 class="text-lg font-bold tracking-wide">✂️ Suit Tailor</h1>
             <p class="text-xs text-slate-400 mt-0.5">Management System</p>
         </div>
 
-        <nav class="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+        {{-- Scrollable nav –– fills remaining height --}}
+        <nav class="flex-1 min-h-0 px-3 py-4 space-y-0.5 overflow-y-auto
+                    [&::-webkit-scrollbar]:w-1.5
+                    [&::-webkit-scrollbar-track]:bg-slate-800
+                    [&::-webkit-scrollbar-thumb]:bg-slate-600
+                    [&::-webkit-scrollbar-thumb]:rounded-full
+                    [&::-webkit-scrollbar-thumb:hover]:bg-slate-500">
             <a href="{{ route('dashboard') }}"
                class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('dashboard') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">
                 <span>📊</span> Dashboard
@@ -118,7 +125,8 @@
             @endif
         </nav>
 
-        <div class="px-3 py-4 border-t border-slate-700">
+        {{-- Logout – pinned at bottom --}}
+        <div class="shrink-0 px-3 py-4 border-t border-slate-700 bg-slate-900">
             <div class="text-xs text-slate-400 mb-2 px-3">{{ auth()->user()->name }}</div>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
@@ -133,7 +141,7 @@
     {{-- Main content --}}
     <div class="flex-1 ml-64 flex flex-col min-h-screen">
         {{-- Topbar --}}
-        <header class="bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between sticky top-0 z-10">
+        <header class="bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between sticky top-0 z-10 shrink-0">
             <h2 class="text-base font-semibold text-slate-700">@yield('page-title', 'Dashboard')</h2>
             <div class="flex items-center gap-4">
                 @if(auth()->user()->isAdmin())
