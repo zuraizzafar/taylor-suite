@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Branch;
 use App\Models\Customer;
 use App\Models\Order;
+use App\Models\Payment;
 use App\Models\Setting;
 use App\Traits\HasBranchScope;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -66,14 +67,33 @@ class OrderController extends Controller
             'notes'          => ['nullable', 'string'],
         ]);
 
+        $advanceAmount = (float) $data['advance_amount'];
+        unset($data['advance_amount']); // managed via Payment record below
+
         $data['order_number']   = Order::nextOrderNumber();
-        $data['balance_amount'] = $data['total_amount'] - $data['advance_amount'];
+        $data['advance_amount'] = 0;
+        $data['balance_amount'] = $data['total_amount'];
 
         if (empty($data['branch_id']) && $branchId = $this->currentBranchId()) {
             $data['branch_id'] = $branchId;
         }
 
         $order = Order::create($data);
+
+        // Create initial advance as a Payment so recalculateBalance() tracks it correctly
+        if ($advanceAmount > 0) {
+            Payment::create([
+                'order_id'     => $order->id,
+                'branch_id'    => $order->branch_id,
+                'received_by'  => auth()->id(),
+                'amount'       => $advanceAmount,
+                'method'       => 'cash',
+                'payment_date' => $order->order_date,
+                'reference'    => 'INITIAL_ADVANCE',
+                'note'         => 'Initial advance',
+            ]);
+        }
+        $order->recalculateBalance();
 
         return redirect()->route('orders.show', $order)
             ->with('success', "Order {$order->order_number} created.");
@@ -87,9 +107,10 @@ class OrderController extends Controller
 
     public function edit(Order $order): View
     {
-        $customers = Customer::orderBy('name')->get();
-        $branches  = Branch::where('is_active', true)->orderBy('name')->get();
-        return view('orders.edit', compact('order', 'customers', 'branches'));
+        $customers      = Customer::orderBy('name')->get();
+        $branches       = Branch::where('is_active', true)->orderBy('name')->get();
+        $initialAdvance = (float) $order->payments()->where('reference', 'INITIAL_ADVANCE')->sum('amount');
+        return view('orders.edit', compact('order', 'customers', 'branches', 'initialAdvance'));
     }
 
     public function update(Request $request, Order $order): RedirectResponse
@@ -103,8 +124,33 @@ class OrderController extends Controller
             'notes'          => ['nullable', 'string'],
         ]);
 
-        $data['balance_amount'] = $data['total_amount'] - $data['advance_amount'];
+        $newAdvance = (float) $data['advance_amount'];
+        unset($data['advance_amount'], $data['balance_amount']); // computed by recalculateBalance
+
         $order->update($data);
+
+        // Sync the INITIAL_ADVANCE payment record
+        $advancePayment = $order->payments()->where('reference', 'INITIAL_ADVANCE')->first();
+        if ($newAdvance > 0) {
+            if ($advancePayment) {
+                $advancePayment->update(['amount' => $newAdvance]);
+            } else {
+                Payment::create([
+                    'order_id'     => $order->id,
+                    'branch_id'    => $order->branch_id,
+                    'received_by'  => auth()->id(),
+                    'amount'       => $newAdvance,
+                    'method'       => 'cash',
+                    'payment_date' => $order->order_date,
+                    'reference'    => 'INITIAL_ADVANCE',
+                    'note'         => 'Initial advance',
+                ]);
+            }
+        } else {
+            $advancePayment?->delete();
+        }
+
+        $order->recalculateBalance();
 
         return redirect()->route('orders.show', $order)
             ->with('success', 'Order updated.');
