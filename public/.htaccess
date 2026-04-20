@@ -4,6 +4,7 @@
     </IfModule>
 
     RewriteEngine On
+    RewriteBase /admin/public/
 
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .

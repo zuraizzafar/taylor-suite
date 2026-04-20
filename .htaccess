@@ -1,7 +1,11 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # Route all requests into the public/ subdirectory
-    RewriteRule ^$ public/ [L]
-    RewriteRule ^((?!public/).*)$ public/$1 [L,NC]
+    RewriteCond %{REQUEST_URI} !^/admin/public/
+    RewriteRule ^admin/(.*)$ /admin/public/$1 [L,NC]
+
+    RewriteRule ^$ public/index.php [L]
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ public/index.php [L]
 </IfModule>
