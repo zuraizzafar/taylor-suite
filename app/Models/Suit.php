@@ -15,6 +15,7 @@ class Suit extends Model
         'order_id',
         'measurement_id',
         'worker_id',
+        'stitch_type_id',
         'branch_id',
         'suit_number',
         'suit_code',
@@ -54,6 +55,11 @@ class Suit extends Model
     public function worker(): BelongsTo
     {
         return $this->belongsTo(Worker::class);
+    }
+
+    public function stitchType(): BelongsTo
+    {
+        return $this->belongsTo(StitchType::class);
     }
 
     public function branch(): BelongsTo

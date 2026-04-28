@@ -97,6 +97,10 @@
                class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('payments.create') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">
                 <span>➕</span> Add Payment
             </a>
+            <a href="{{ route('reports.workers') }}"
+               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('reports.workers') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">
+                <span>👷</span> Workers Report
+            </a>
 
             @if(auth()->user()->isAdmin())
             <div class="pt-3 pb-1 px-3">
@@ -105,6 +109,10 @@
             <a href="{{ route('branches.index') }}"
                class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('branches.*') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">
                 <span>🏢</span> Branches
+            </a>
+            <a href="{{ route('stitch-types.index') }}"
+               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('stitch-types.*') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">
+                <span>🧵</span> Stitch Types
             </a>
             <a href="{{ route('users.index') }}"
                class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('users.*') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">

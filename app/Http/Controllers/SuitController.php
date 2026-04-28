@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Customer;
 use App\Models\Order;
+use App\Models\StitchType;
 use App\Models\Suit;
 use App\Models\Worker;
 use App\Traits\HasBranchScope;
@@ -50,6 +51,8 @@ class SuitController extends Controller
         $this->branchQuery($workersQuery);
         $workers = $workersQuery->get();
 
+        $stitchTypes = StitchType::where('is_active', true)->orderBy('name')->get();
+
         $selectedCustomer = $request->input('customer_id')
             ? Customer::with('measurements')->find($request->input('customer_id'))
             : null;
@@ -57,7 +60,7 @@ class SuitController extends Controller
             ? Order::find($request->input('order_id'))
             : null;
 
-        return view('suits.create', compact('customers', 'workers', 'selectedCustomer', 'selectedOrder'));
+        return view('suits.create', compact('customers', 'workers', 'stitchTypes', 'selectedCustomer', 'selectedOrder'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -67,6 +70,7 @@ class SuitController extends Controller
             'order_id'           => ['nullable', 'exists:orders,id'],
             'measurement_id'     => ['nullable', 'exists:measurements,id'],
             'worker_id'          => ['nullable', 'exists:workers,id'],
+            'stitch_type_id'     => ['nullable', 'exists:stitch_types,id'],
             'suit_type'          => ['required', 'string', 'max:100'],
             'fabric_meter'       => ['required', 'numeric', 'min:0.1'],
             'fabric_description' => ['nullable', 'string', 'max:255'],
@@ -85,6 +89,16 @@ class SuitController extends Controller
             $data['suit_number'] = $suitNumber;
             $data['suit_code']   = $customer->file_number . '-' . $suitNumber;
             $data['status']      = 'pending';
+
+            // Pre-calculate worker_earning if both worker and stitch type are set
+            if (! empty($data['worker_id']) && ! empty($data['stitch_type_id'])) {
+                $worker     = Worker::find($data['worker_id']);
+                $stitchType = StitchType::find($data['stitch_type_id']);
+                $data['worker_earning'] = $stitchType ? $stitchType->priceForWorker($worker) : null;
+            } elseif (! empty($data['worker_id'])) {
+                $worker = Worker::find($data['worker_id']);
+                $data['worker_earning'] = $worker?->rate_per_suit ?? null;
+            }
 
             $suit = Suit::create($data);
 
@@ -108,10 +122,11 @@ class SuitController extends Controller
 
     public function edit(Suit $suit): View
     {
-        $workers     = Worker::where('is_active', true)->get();
+        $workers      = Worker::where('is_active', true)->get();
         $measurements = $suit->customer->measurements;
+        $stitchTypes  = StitchType::where('is_active', true)->orderBy('name')->get();
 
-        return view('suits.edit', compact('suit', 'workers', 'measurements'));
+        return view('suits.edit', compact('suit', 'workers', 'measurements', 'stitchTypes'));
     }
 
     public function update(Request $request, Suit $suit): RedirectResponse
@@ -119,11 +134,26 @@ class SuitController extends Controller
         $data = $request->validate([
             'measurement_id'    => ['nullable', 'exists:measurements,id'],
             'worker_id'         => ['nullable', 'exists:workers,id'],
+            'stitch_type_id'    => ['nullable', 'exists:stitch_types,id'],
             'suit_type'         => ['required', 'string', 'max:100'],
             'fabric_meter'      => ['required', 'numeric', 'min:0.1'],
             'fabric_description'=> ['nullable', 'string', 'max:255'],
             'notes'             => ['nullable', 'string'],
         ]);
+
+        // Recalculate worker_earning if stitch type or worker changed
+        $workerId      = $data['worker_id'] ?? null;
+        $stitchTypeId  = $data['stitch_type_id'] ?? null;
+        if ($workerId && $stitchTypeId) {
+            $worker     = Worker::find($workerId);
+            $stitchType = StitchType::find($stitchTypeId);
+            $data['worker_earning'] = $stitchType ? $stitchType->priceForWorker($worker) : null;
+        } elseif ($workerId) {
+            $worker = Worker::find($workerId);
+            $data['worker_earning'] = $worker?->rate_per_suit ?? null;
+        } else {
+            $data['worker_earning'] = null;
+        }
 
         $suit->update($data);
 
@@ -145,7 +175,16 @@ class SuitController extends Controller
         // Calculate worker earning when suit moves to stitching for the first time
         if ($data['status'] === 'stitching' && $suit->status !== 'stitching' && ! $suit->stitching_started_at) {
             $suit->stitching_started_at = now();
-            $suit->worker_earning = $suit->worker?->rate_per_suit ?? 0;
+            // Priority: stitch type override > stitch type base > worker rate_per_suit
+            if ($suit->stitch_type_id && $suit->worker_id) {
+                $stitchType = StitchType::find($suit->stitch_type_id);
+                $suit->worker_earning = $stitchType ? $stitchType->priceForWorker($suit->worker) : ($suit->worker?->rate_per_suit ?? 0);
+            } elseif ($suit->stitch_type_id) {
+                $stitchType = StitchType::find($suit->stitch_type_id);
+                $suit->worker_earning = $stitchType?->base_price ?? 0;
+            } else {
+                $suit->worker_earning = $suit->worker?->rate_per_suit ?? 0;
+            }
         }
 
         if ($data['status'] === 'delivered') {
@@ -164,7 +203,19 @@ class SuitController extends Controller
             'worker_id' => ['nullable', 'exists:workers,id'],
         ]);
 
-        $suit->update($data);
+        $suit->fill($data);
+
+        // Recalculate pending earning when worker changes
+        if ($data['worker_id'] && $suit->stitch_type_id) {
+            $worker     = Worker::find($data['worker_id']);
+            $stitchType = StitchType::find($suit->stitch_type_id);
+            $suit->worker_earning = $stitchType ? $stitchType->priceForWorker($worker) : ($worker?->rate_per_suit ?? 0);
+        } elseif ($data['worker_id']) {
+            $worker = Worker::find($data['worker_id']);
+            $suit->worker_earning = $worker?->rate_per_suit ?? null;
+        }
+
+        $suit->save();
 
         return back()->with('success', 'Worker assigned.');
     }

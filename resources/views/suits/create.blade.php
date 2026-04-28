@@ -61,6 +61,20 @@
                 @error('suit_type')<p class="text-xs text-red-600 mt-1">{{ $message }}</p>@enderror
             </div>
 
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-slate-700 mb-1">Stitch Type</label>
+                <select name="stitch_type_id"
+                    class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">— Select stitch type —</option>
+                    @foreach($stitchTypes as $st)
+                    <option value="{{ $st->id }}" {{ old('stitch_type_id') == $st->id ? 'selected' : '' }}>
+                        {{ $st->name }} — Rs {{ number_format($st->base_price) }} base
+                    </option>
+                    @endforeach
+                </select>
+                <p class="text-xs text-slate-400 mt-1">Worker override price will be used if set.</p>
+            </div>
+
             <div class="grid grid-cols-2 gap-4 mb-4">
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">Fabric Meter *</label>

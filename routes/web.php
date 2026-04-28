@@ -12,8 +12,10 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ScanController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\StitchTypeController;
 use App\Http\Controllers\SuitController;
 use App\Http\Controllers\WorkerController;
+use App\Http\Controllers\WorkerSalaryController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WorkerPortalController;
 use Illuminate\Support\Facades\Route;
@@ -85,6 +87,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/reports/salary', [ReportController::class, 'salary'])->name('reports.salary');
         Route::get('/reports/pending-balances', [ReportController::class, 'pendingBalances'])->name('reports.pending-balances');
         Route::get('/reports/payments', [ReportController::class, 'payments'])->name('reports.payments');
+        Route::get('/reports/workers', [ReportController::class, 'workers'])->name('reports.workers');
+
+        // Worker Report & Salary Payments
+        Route::get('/workers/{worker}/report', [WorkerController::class, 'report'])->name('workers.report');
+        Route::post('/workers/{worker}/salary-payments', [WorkerSalaryController::class, 'store'])->name('workers.salary-payments.store');
+        Route::delete('/salary-payments/{salaryPayment}', [WorkerSalaryController::class, 'destroy'])->name('workers.salary-payments.destroy');
 
         // Expenses
         Route::resource('expenses', ExpenseController::class);
@@ -93,6 +101,7 @@ Route::middleware('auth')->group(function () {
     // ── Admin-only routes ──────────────────────────────────────────────────────
     Route::middleware('role:admin')->group(function () {
         Route::resource('branches', BranchController::class);
+        Route::resource('stitch-types', StitchTypeController::class)->only(['index', 'store', 'update', 'destroy']);
         Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
         Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
 

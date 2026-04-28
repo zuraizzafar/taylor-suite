@@ -113,4 +113,36 @@ class ReportController extends Controller
 
         return view('reports.payments', compact('payments', 'from', 'to', 'method', 'totalAmount', 'byMethod', 'methods'));
     }
+
+    public function workers(Request $request): View
+    {
+        $from = $request->input('from', today()->startOfMonth()->toDateString());
+        $to   = $request->input('to', today()->toDateString());
+
+        $workerQuery = Worker::with([
+            'branch',
+            'suits' => function ($q) use ($from, $to) {
+                $q->whereNotNull('stitching_started_at')
+                  ->whereBetween('stitching_started_at', [$from . ' 00:00:00', $to . ' 23:59:59']);
+            },
+            'salaryPayments',
+        ])->where('is_active', true);
+
+        $this->branchQuery($workerQuery);
+
+        $workers = $workerQuery->get()->map(function ($w) {
+            $w->period_suits   = $w->suits->count();
+            $w->period_earned  = (float) $w->suits->sum('worker_earning');
+            $w->total_paid     = (float) $w->salaryPayments->sum('amount_paid');
+            $w->balance_due    = max(0, $w->period_earned - $w->total_paid);
+            return $w;
+        })->sortByDesc('period_suits');
+
+        $totalSuits  = $workers->sum('period_suits');
+        $totalEarned = $workers->sum('period_earned');
+        $totalPaid   = $workers->sum('total_paid');
+
+        return view('reports.workers', compact('workers', 'from', 'to', 'totalSuits', 'totalEarned', 'totalPaid'));
+    }
 }
+

@@ -39,4 +39,14 @@ class Worker extends Model
     {
         return $this->hasMany(Suit::class);
     }
+
+    public function stitchRates(): HasMany
+    {
+        return $this->hasMany(WorkerStitchRate::class);
+    }
+
+    public function salaryPayments(): HasMany
+    {
+        return $this->hasMany(WorkerSalaryPayment::class);
+    }
 }

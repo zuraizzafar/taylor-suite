@@ -58,8 +58,8 @@ class CustomerController extends Controller
 
         $customer = Customer::create($data);
 
-        return redirect()->route('customers.show', $customer)
-            ->with('success', "Customer {$customer->file_number} created successfully.");
+        return redirect()->route('measurements.create', $customer)
+            ->with('success', "Customer {$customer->file_number} created. Now add their measurements.");
     }
 
     public function show(Customer $customer): View
