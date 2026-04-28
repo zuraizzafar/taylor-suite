@@ -14,6 +14,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
         ]);
+        // Kill switch runs before everything — including auth
+        $middleware->prepend(\App\Http\Middleware\KillSwitchMiddleware::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
