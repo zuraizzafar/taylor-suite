@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Branch;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\Suit;
 use App\Models\Worker;
+use App\Models\WorkerSalaryPayment;
 use App\Traits\HasBranchScope;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -143,6 +146,127 @@ class ReportController extends Controller
         $totalPaid   = $workers->sum('total_paid');
 
         return view('reports.workers', compact('workers', 'from', 'to', 'totalSuits', 'totalEarned', 'totalPaid'));
+    }
+
+    // ── Comprehensive Salary Report ──────────────────────────────────────────
+    public function salaryReport(Request $request): View
+    {
+        [$from, $to, $preset] = $this->resolvePeriod($request);
+
+        $workerQuery = Worker::with([
+            'branch',
+            'suits' => function ($q) use ($from, $to) {
+                $q->whereNotNull('stitching_started_at')
+                  ->whereBetween('stitching_started_at', [$from . ' 00:00:00', $to . ' 23:59:59'])
+                  ->with('stitchType', 'customer', 'order');
+            },
+            'salaryPayments' => function ($q) use ($from, $to) {
+                $q->orderBy('paid_at');
+            },
+        ])->where('is_active', true);
+
+        $this->branchQuery($workerQuery);
+        $branches = Branch::where('is_active', true)->orderBy('name')->get();
+
+        $workers = $workerQuery->orderBy('name')->get()->map(function ($w) use ($from, $to) {
+            // Period suits + earned
+            $w->period_suits   = $w->suits->count();
+            $w->period_earned  = (float) $w->suits->sum('worker_earning');
+
+            // Group suits by stitch type for breakdown
+            $w->by_stitch_type = $w->suits->groupBy(fn($s) => $s->stitchType?->name ?? 'Unspecified')
+                ->map(fn($suits) => [
+                    'count'  => $suits->count(),
+                    'earned' => (float) $suits->sum('worker_earning'),
+                ]);
+
+            // All-time paid
+            $w->total_paid_alltime = (float) $w->salaryPayments->sum('amount_paid');
+
+            // Paid within this period
+            $w->period_paid = (float) $w->salaryPayments
+                ->filter(fn($p) => $p->paid_at && $p->paid_at->between(
+                    \Carbon\Carbon::parse($from)->startOfDay(),
+                    \Carbon\Carbon::parse($to)->endOfDay()
+                ))
+                ->sum('amount_paid');
+
+            // Balance = all time earned – all time paid (running balance)
+            // Recalculate all-time earned for accurate balance
+            $allTimeEarned = (float) $w->suits()
+                ->whereNotNull('stitching_started_at')
+                ->sum('worker_earning');
+            $w->balance_due = max(0, $allTimeEarned - $w->total_paid_alltime);
+
+            return $w;
+        })->sortByDesc('period_suits');
+
+        $totalSuits   = $workers->sum('period_suits');
+        $totalEarned  = $workers->sum('period_earned');
+        $totalPaid    = $workers->sum('period_paid');
+        $totalBalance = $workers->sum('balance_due');
+
+        return view('reports.salary-report', compact(
+            'workers', 'from', 'to', 'preset',
+            'totalSuits', 'totalEarned', 'totalPaid', 'totalBalance',
+            'branches'
+        ));
+    }
+
+    public function salaryReportPdf(Request $request)
+    {
+        [$from, $to] = $this->resolvePeriod($request);
+
+        $workerQuery = Worker::with([
+            'branch',
+            'suits' => function ($q) use ($from, $to) {
+                $q->whereNotNull('stitching_started_at')
+                  ->whereBetween('stitching_started_at', [$from . ' 00:00:00', $to . ' 23:59:59'])
+                  ->with('stitchType');
+            },
+            'salaryPayments',
+        ])->where('is_active', true);
+
+        $this->branchQuery($workerQuery);
+
+        $workers = $workerQuery->orderBy('name')->get()->map(function ($w) {
+            $w->period_suits   = $w->suits->count();
+            $w->period_earned  = (float) $w->suits->sum('worker_earning');
+            $allTimeEarned     = (float) $w->suits()->whereNotNull('stitching_started_at')->sum('worker_earning');
+            $w->total_paid     = (float) $w->salaryPayments->sum('amount_paid');
+            $w->balance_due    = max(0, $allTimeEarned - $w->total_paid);
+            return $w;
+        });
+
+        $totalSuits   = $workers->sum('period_suits');
+        $totalEarned  = $workers->sum('period_earned');
+        $totalBalance = $workers->sum('balance_due');
+        $setting      = \App\Models\Setting::pluck('value', 'key');
+
+        $pdf = Pdf::loadView('reports.salary-report-pdf', compact(
+            'workers', 'from', 'to', 'totalSuits', 'totalEarned', 'totalBalance', 'setting'
+        ))->setPaper('a4', 'landscape');
+
+        return $pdf->stream("salary-report-{$from}-{$to}.pdf");
+    }
+
+    // ── Helper ───────────────────────────────────────────────────────────────
+    private function resolvePeriod(Request $request): array
+    {
+        $preset = $request->input('preset', 'month');
+        $from   = $request->input('from');
+        $to     = $request->input('to');
+
+        if (! $from || ! $to) {
+            [$from, $to] = match ($preset) {
+                'today'      => [today()->toDateString(), today()->toDateString()],
+                'week'       => [today()->startOfWeek()->toDateString(), today()->endOfWeek()->toDateString()],
+                'last_month' => [today()->subMonth()->startOfMonth()->toDateString(), today()->subMonth()->endOfMonth()->toDateString()],
+                default      => [today()->startOfMonth()->toDateString(), today()->toDateString()],
+            };
+        }
+
+        return [$from, $to, $preset];
     }
 }
 

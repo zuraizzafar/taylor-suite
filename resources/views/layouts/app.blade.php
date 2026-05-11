@@ -11,6 +11,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="SuitTailor">
     <link rel="apple-touch-icon" href="/icons/icon.svg">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-slate-100 min-h-screen flex">
@@ -58,8 +59,12 @@
             <div class="pt-3 pb-1 px-3">
                 <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Orders</p>
             </div>
+            <a href="{{ route('pos.index') }}"
+               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('pos.*') ? 'bg-green-600 text-white' : 'text-green-400 hover:bg-slate-800' }}">
+                <span>🛒</span> New Order (POS)
+            </a>
             <a href="{{ route('orders.index') }}"
-               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('orders.*') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">
+               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('orders.*') && !request()->routeIs('pos.*') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">
                 <span>🧾</span> Orders
             </a>
             <a href="{{ route('suits.index') }}"
@@ -101,6 +106,10 @@
             <a href="{{ route('reports.salary') }}"
                class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('reports.salary') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">
                 <span>💼</span> Salary Report
+            </a>
+            <a href="{{ route('reports.salary-report') }}"
+               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('reports.salary-report*') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">
+                <span>💰</span> Salary Disbursement
             </a>
             <a href="{{ route('reports.pending-balances') }}"
                class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('reports.pending-balances') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">

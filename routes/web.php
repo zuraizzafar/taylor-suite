@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\KillSwitchController;
+use App\Http\Controllers\PosController;
 use App\Http\Controllers\SyncController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
@@ -93,9 +94,16 @@ Route::middleware('auth')->group(function () {
         Route::get('/reports/pending', [ReportController::class, 'pending'])->name('reports.pending');
         Route::get('/reports/delivered', [ReportController::class, 'delivered'])->name('reports.delivered');
         Route::get('/reports/salary', [ReportController::class, 'salary'])->name('reports.salary');
+        Route::get('/reports/salary-report', [ReportController::class, 'salaryReport'])->name('reports.salary-report');
+        Route::get('/reports/salary-report/pdf', [ReportController::class, 'salaryReportPdf'])->name('reports.salary-report-pdf');
         Route::get('/reports/pending-balances', [ReportController::class, 'pendingBalances'])->name('reports.pending-balances');
         Route::get('/reports/payments', [ReportController::class, 'payments'])->name('reports.payments');
         Route::get('/reports/workers', [ReportController::class, 'workers'])->name('reports.workers');
+
+        // POS — quick order creation
+        Route::get('/pos', [PosController::class, 'index'])->name('pos.index');
+        Route::post('/pos', [PosController::class, 'store'])->name('pos.store');
+        Route::get('/pos/customers/search', [PosController::class, 'searchCustomers'])->name('pos.customers.search');
 
         // Worker Report & Salary Payments
         Route::get('/workers/{worker}/report', [WorkerController::class, 'report'])->name('workers.report');
