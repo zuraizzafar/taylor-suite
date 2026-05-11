@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\KillSwitchController;
+use App\Http\Controllers\SyncController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExpenseController;
@@ -28,6 +29,12 @@ Route::get('/scan/{code}', [ScanController::class, 'show'])->name('scan.show');
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login')->middleware('guest');
 Route::post('/login', [AuthController::class, 'login'])->middleware('guest');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// ─── PWA sync (requires auth, JSON only) ──────────────────────────────────────
+Route::middleware('auth')->group(function () {
+    Route::get('/sync/pull', [SyncController::class, 'pull'])->name('sync.pull');
+    Route::post('/sync/push', [SyncController::class, 'push'])->name('sync.push');
+});
 
 // ─── Authenticated area ────────────────────────────────────────────────────────
 Route::middleware('auth')->group(function () {

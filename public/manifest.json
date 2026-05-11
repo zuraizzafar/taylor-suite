@@ -1,0 +1,42 @@
+{
+    "name": "The Suit Tailor",
+    "short_name": "SuitTailor",
+    "description": "Tailor Management System — customers, orders, suits, workers",
+    "start_url": "/",
+    "scope": "/",
+    "display": "standalone",
+    "orientation": "any",
+    "background_color": "#0f172a",
+    "theme_color": "#1e40af",
+    "lang": "en",
+    "icons": [
+        {
+            "src": "/icons/icon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any maskable"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "New Customer",
+            "short_name": "New Customer",
+            "url": "/customers/create",
+            "icons": [{ "src": "/icons/icon.svg", "sizes": "any" }]
+        },
+        {
+            "name": "New Order",
+            "short_name": "New Order",
+            "url": "/orders/create",
+            "icons": [{ "src": "/icons/icon.svg", "sizes": "any" }]
+        },
+        {
+            "name": "Suits",
+            "short_name": "Suits",
+            "url": "/suits",
+            "icons": [{ "src": "/icons/icon.svg", "sizes": "any" }]
+        }
+    ],
+    "categories": ["business", "productivity"],
+    "screenshots": []
+}

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline — The Suit Tailor</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: #0f172a;
+            color: #94a3b8;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1rem;
+        }
+
+        .logo {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        .card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 1.25rem;
+            padding: 2.5rem 2rem;
+            max-width: 520px;
+            width: 100%;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            background: #0f172a;
+            border: 1px solid #475569;
+            border-radius: 999px;
+            padding: .3rem .9rem;
+            font-size: .7rem;
+            font-weight: 600;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: #f59e0b;
+            margin-bottom: 1.5rem;
+        }
+
+        .dot {
+            width: 6px; height: 6px;
+            background: #f59e0b;
+            border-radius: 50%;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .2; }
+        }
+
+        h1 { color: #e2e8f0; font-size: 1.4rem; font-weight: 700; margin-bottom: .5rem; }
+        p  { font-size: .875rem; line-height: 1.6; color: #64748b; }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            padding: .6rem 1.4rem;
+            border-radius: .6rem;
+            font-size: .85rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            text-decoration: none;
+            transition: opacity .15s;
+        }
+
+        .btn:hover { opacity: .85; }
+
+        .btn-primary { background: #1d4ed8; color: #fff; }
+        .btn-ghost   { background: #1e293b; color: #94a3b8; border: 1px solid #334155; }
+
+        .actions { display: flex; gap: .75rem; justify-content: center; flex-wrap: wrap; margin-top: 1.5rem; }
+
+        /* Pending mutations section */
+        .pending-section {
+            max-width: 520px;
+            width: 100%;
+        }
+
+        .section-title {
+            font-size: .75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: #475569;
+            margin-bottom: .75rem;
+        }
+
+        .mutation-item {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: .75rem;
+            padding: .75rem 1rem;
+            margin-bottom: .5rem;
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            text-align: left;
+        }
+
+        .mutation-icon { font-size: 1.1rem; flex-shrink: 0; }
+
+        .mutation-label { font-size: .8rem; color: #cbd5e1; font-weight: 500; }
+        .mutation-meta  { font-size: .7rem; color: #475569; margin-top: .15rem; }
+
+        .mutation-badge {
+            margin-left: auto;
+            background: #f59e0b22;
+            color: #f59e0b;
+            border: 1px solid #f59e0b44;
+            border-radius: 999px;
+            font-size: .65rem;
+            font-weight: 700;
+            padding: .15rem .5rem;
+            white-space: nowrap;
+        }
+
+        #no-pending { display: none; text-align: center; color: #334155; font-size: .85rem; padding: 1rem; }
+    </style>
+</head>
+<body>
+    <div class="logo">✂️</div>
+
+    <div class="card">
+        <div class="badge">
+            <span class="dot"></span>
+            No Connection
+        </div>
+        <h1>You're Offline</h1>
+        <p>The Suit Tailor is running in offline mode.<br>
+        Any changes you make will sync automatically when you reconnect.</p>
+
+        <div class="actions">
+            <a href="/" class="btn btn-primary">↩ Back to App</a>
+            <button class="btn btn-ghost" onclick="location.reload()">↺ Retry</button>
+        </div>
+    </div>
+
+    <div class="pending-section" id="pending-section" style="display:none">
+        <p class="section-title" id="pending-title">⏳ Pending Changes (0)</p>
+        <div id="pending-list"></div>
+        <p id="no-pending">No pending changes.</p>
+    </div>
+
+    <script>
+    const IDB_NAME    = 'suit-tailor-pwa';
+    const IDB_VERSION = 1;
+    const IDB_STORES  = ['customers','orders','suits','workers','branches','stitch_types','mutations','meta'];
+
+    const TYPE_LABELS = {
+        create_customer:      { icon: '👤', label: 'New Customer' },
+        create_order:         { icon: '🧾', label: 'New Order' },
+        create_measurement:   { icon: '📏', label: 'Measurement Update' },
+        update_suit_status:   { icon: '👔', label: 'Suit Status Update' },
+        create_payment:       { icon: '💳', label: 'Payment Recorded' },
+    };
+
+    function openDB() {
+        return new Promise((resolve, reject) => {
+            const req = indexedDB.open(IDB_NAME, IDB_VERSION);
+            req.onsuccess  = () => resolve(req.result);
+            req.onerror    = () => reject(req.error);
+            req.onupgradeneeded = e => {
+                const db = e.target.result;
+                for (const name of IDB_STORES) {
+                    if (!db.objectStoreNames.contains(name)) {
+                        if (name === 'mutations') db.createObjectStore(name, { keyPath: 'id', autoIncrement: true });
+                        else if (name === 'meta') db.createObjectStore(name, { keyPath: 'key' });
+                        else db.createObjectStore(name, { keyPath: 'id' });
+                    }
+                }
+            };
+        });
+    }
+
+    async function loadPending() {
+        try {
+            const db = await openDB();
+            const tx  = db.transaction('mutations', 'readonly');
+            const req = tx.objectStore('mutations').getAll();
+            req.onsuccess = () => {
+                const mutations = req.result || [];
+                const section = document.getElementById('pending-section');
+                const list    = document.getElementById('pending-list');
+                const title   = document.getElementById('pending-title');
+
+                section.style.display = 'block';
+                title.textContent = `⏳ Pending Changes (${mutations.length})`;
+
+                if (mutations.length === 0) {
+                    document.getElementById('no-pending').style.display = 'block';
+                    return;
+                }
+
+                list.innerHTML = '';
+                mutations.forEach(m => {
+                    const meta  = TYPE_LABELS[m.type] || { icon: '🔄', label: m.type };
+                    const time  = m.created_at ? new Date(m.created_at).toLocaleString() : '';
+                    const div   = document.createElement('div');
+                    div.className = 'mutation-item';
+                    div.innerHTML = `
+                        <span class="mutation-icon">${meta.icon}</span>
+                        <div>
+                            <div class="mutation-label">${meta.label}</div>
+                            <div class="mutation-meta">${time}</div>
+                        </div>
+                        <span class="mutation-badge">Pending</span>
+                    `;
+                    list.appendChild(div);
+                });
+            };
+        } catch (e) {
+            console.warn('Could not read offline queue:', e);
+        }
+    }
+
+    loadPending();
+
+    // Auto-redirect when connection restores
+    window.addEventListener('online', () => {
+        setTimeout(() => { window.location.href = '/'; }, 1000);
+    });
+    </script>
+</body>
+</html>

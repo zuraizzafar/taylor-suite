@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background -->
+  <rect width="512" height="512" rx="96" fill="#1e40af"/>
+  <!-- Tailor scissors path -->
+  <g transform="translate(256,256) scale(9,-9)" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Scissors blades -->
+    <circle cx="-7" cy="7" r="4.5"/>
+    <circle cx="7" cy="7" r="4.5"/>
+    <line x1="-4.2" y1="4.2" x2="12" y2="-12"/>
+    <line x1="4.2" y1="4.2" x2="-12" y2="-12"/>
+  </g>
+  <!-- "ST" text -->
+  <text x="256" y="390" font-family="Georgia, 'Times New Roman', serif" font-size="88" font-weight="bold" fill="rgba(255,255,255,0.35)" text-anchor="middle" letter-spacing="8">TAILOR</text>
+</svg>

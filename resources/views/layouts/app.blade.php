@@ -5,9 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'The Suit Tailor')</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    @vite(['resources/css/app.css'])
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#1e40af">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SuitTailor">
+    <link rel="apple-touch-icon" href="/icons/icon.svg">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-slate-100 min-h-screen flex">
+
+    {{-- ── PWA: Offline banner ─────────────────────────────────────────────── --}}
+    <div id="offline-bar"
+         class="hidden fixed top-0 left-0 right-0 z-50 bg-amber-500 text-white text-xs font-semibold text-center py-1.5 flex items-center justify-center gap-2">
+        <span>📴</span> You're offline — changes will sync when you reconnect
+    </div>
+
+    {{-- ── PWA: Toast container ────────────────────────────────────────────── --}}
+    <div id="toast-container"
+         class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 items-end pointer-events-none">
+    </div>
 
     {{-- Sidebar --}}
     <aside class="w-64 bg-slate-900 text-white flex flex-col fixed top-0 left-0 bottom-0 z-20">
@@ -169,6 +186,19 @@
                 <span class="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-full">
                     {{ ucfirst(auth()->user()->role) }}
                 </span>
+                {{-- PWA: Sync & install buttons --}}
+                <button id="sync-now-btn"
+                    title="Sync offline data"
+                    class="relative text-xs text-slate-500 hover:text-slate-700 bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded-full transition">
+                    🔄 <span id="sync-timestamp" class="hidden sm:inline"></span>
+                    <span id="sync-badge"
+                          class="hidden absolute -top-1 -right-1 bg-amber-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                    </span>
+                </button>
+                <button id="pwa-install-btn"
+                    class="hidden text-xs bg-blue-600 hover:bg-blue-700 text-white font-semibold px-3 py-1 rounded-full transition">
+                    ⬇ Install App
+                </button>
             </div>
         </header>
 
