@@ -1,6 +1,6 @@
 @extends('layouts.app')
-@section('title', 'Edit Worker')
-@section('page-title', 'Edit Worker')
+@section('title', __('Edit Worker'))
+@section('page-title', __('Edit Worker'))
 @section('content')
 <div class="max-w-2xl pt-4 space-y-5">
 
@@ -10,8 +10,8 @@
             @csrf @method('PUT')
             @include('workers._form')
             <div class="flex gap-3 mt-6">
-                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2 rounded-lg text-sm">Update Worker</button>
-                <a href="{{ route('workers.index') }}" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium px-5 py-2 rounded-lg text-sm">Cancel</a>
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2 rounded-lg text-sm">{{ __('Update') }}</button>
+                <a href="{{ route('workers.index') }}" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium px-5 py-2 rounded-lg text-sm">{{ __('Cancel') }}</a>
             </div>
         </form>
     </div>
@@ -49,7 +49,7 @@
                 @endforeach
             </div>
             <button type="submit" class="mt-4 bg-slate-700 hover:bg-slate-800 text-white text-sm font-medium px-5 py-2 rounded-lg">
-                Save Override Rates
+                {{ __('Save Override Rates') }}
             </button>
         </form>
     </div>
@@ -57,7 +57,7 @@
 
     <div class="flex justify-end">
         <a href="{{ route('workers.report', $worker) }}"
-            class="text-sm text-blue-600 hover:underline">📊 View Worker Report →</a>
+            class="text-sm text-blue-600 hover:underline">📊 {{ __('View Worker Report') }} →</a>
     </div>
 </div>
 @endsection

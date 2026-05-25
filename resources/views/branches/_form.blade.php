@@ -41,6 +41,6 @@
     <div class="flex items-center gap-2">
         <input type="checkbox" name="is_active" id="is_active" value="1"
             {{ old('is_active', $branch->is_active ?? true) ? 'checked' : '' }}>
-        <label for="is_active" class="text-sm text-slate-700">Active</label>
+        <label for="is_active" class="text-sm text-slate-700">{{ __('Active') }}</label>
     </div>
 </div>

@@ -16,7 +16,7 @@
                     <th class="px-4 py-3 text-left font-medium">Type</th>
                     <th class="px-4 py-3 text-left font-medium">Fabric</th>
                     <th class="px-4 py-3 text-left font-medium">Status</th>
-                    <th class="px-4 py-3 text-left font-medium">Update Status</th>
+                    <th class="px-4 py-3 text-left font-medium">{{ __('Update Status') }}</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-50">
@@ -45,7 +45,7 @@
                                 @endforeach
                             </select>
                             <button type="submit"
-                                class="text-xs bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded">Update</button>
+                                class="text-xs bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded">{{ __('Update') }}</button>
                         </form>
                         @else
                         <span class="text-xs text-slate-400">Delivered</span>
@@ -53,7 +53,7 @@
                     </td>
                 </tr>
                 @empty
-                <tr><td colspan="6" class="px-4 py-8 text-center text-slate-400">No suits assigned yet.</td></tr>
+                <tr><td colspan="6" class="px-4 py-8 text-center text-slate-400">{{ __('No suits assigned yet.') }}</td></tr>
                 @endforelse
             </tbody>
         </table>

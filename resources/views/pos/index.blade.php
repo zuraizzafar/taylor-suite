@@ -1,6 +1,6 @@
 @extends('layouts.app')
-@section('title', 'New Order — POS')
-@section('page-title', '🛒 New Order')
+@section('title', __('New Order (POS)'))
+@section('page-title', '🛒 ' . __('New Order (POS)'))
 
 @push('scripts')
 <script>
@@ -146,16 +146,16 @@ function posApp() {
         {{-- Customer Card --}}
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
             <div class="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
-                <h3 class="text-sm font-semibold text-slate-700">👤 Customer</h3>
+                <h3 class="text-sm font-semibold text-slate-700">👤 {{ __('Customer') }}</h3>
                 <div class="flex gap-1.5 text-xs">
                     <button type="button"
                         @click="customerMode = 'search'; clearCustomer()"
                         :class="customerMode !== 'new' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'"
-                        class="px-2.5 py-1 rounded-full font-medium transition">Search</button>
+                        class="px-2.5 py-1 rounded-full font-medium transition">{{ __('Search') }}</button>
                     <button type="button"
-                        @click="customerMode = 'new'"
+                        @click="customer = null; newCustomer = { name:'', mobile:'', address:'' }; customerMode = 'new'"
                         :class="customerMode === 'new' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'"
-                        class="px-2.5 py-1 rounded-full font-medium transition">+ New</button>
+                        class="px-2.5 py-1 rounded-full font-medium transition">+ {{ __('New') }}</button>
                 </div>
             </div>
 
@@ -184,7 +184,7 @@ function posApp() {
                     </div>
                     <p x-show="searchQuery.length > 1 && !searching && searchResults.length === 0"
                        class="text-xs text-slate-400 mt-2 text-center py-2">
-                       No customers found. <button type="button" @click="customerMode = 'new'" class="text-blue-600 underline">Create new?</button>
+                       No customers found. <button type="button" @click="customer = null; newCustomer = { name:'', mobile:'', address:'' }; customerMode = 'new'" class="text-blue-600 underline">{{ __('Create new?') }}</button>
                     </p>
                 </div>
 
@@ -202,32 +202,32 @@ function posApp() {
                         <button type="button" @click="clearCustomer()"
                             class="text-slate-400 hover:text-red-500 text-lg leading-none">✕</button>
                     </div>
-                    <input type="hidden" name="customer_id" :value="customer?.id">
+                    <input type="hidden" name="customer_id" :value="customer?.id" :disabled="customerMode !== 'selected' || !customer">
                 </div>
 
                 {{-- New customer form --}}
                 <div x-show="customerMode === 'new'" class="space-y-2.5">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Full Name *</label>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">{{ __('Full Name') }} *</label>
                         <input type="text" name="customer_name" x-model="newCustomer.name" required
                             class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder="Customer name">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Mobile *</label>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">{{ __('Mobile') }} *</label>
                         <input type="text" name="customer_mobile" x-model="newCustomer.mobile" required
                             class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder="03XX-XXXXXXX">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Address</label>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">{{ __('Address') }}</label>
                         <input type="text" name="customer_address" x-model="newCustomer.address"
                             class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder="Optional">
                     </div>
                     @if(auth()->user()->isAdmin())
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Branch</label>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">{{ __('Branch') }}</label>
                         <select name="branch_id" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                             <option value="">— Select branch —</option>
                             @foreach($branches as $b)
@@ -245,13 +245,13 @@ function posApp() {
             <button type="button"
                 @click="showMeasurements = !showMeasurements"
                 class="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition">
-                <span>📏 Measurements <span class="text-xs text-slate-400 font-normal">(optional)</span></span>
+                <span>📏 {{ __('Measurements') }} <span class="text-xs text-slate-400 font-normal">({{ __('optional') }})</span></span>
                 <span x-text="showMeasurements ? '▲' : '▼'" class="text-slate-400 text-xs"></span>
             </button>
 
             <div x-show="showMeasurements" x-cloak class="px-4 pb-4 space-y-3 border-t border-slate-100">
                 <div class="pt-3">
-                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Qameez / Kameez</p>
+                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">{{ __('Qameez') }} / Kameez</p>
                     <div class="grid grid-cols-3 gap-2">
                         @foreach([
                             ['q_length','Length'],['q_shoulder','Shoulder'],['q_chest','Chest'],
@@ -269,7 +269,7 @@ function posApp() {
                     </div>
                 </div>
                 <div>
-                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Shalwar / Trouser</p>
+                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">{{ __('Shalwar') }} / Trouser</p>
                     <div class="grid grid-cols-3 gap-2">
                         @foreach([
                             ['s_length','Length'],['s_waist','Waist'],['s_seat','Seat'],
@@ -303,16 +303,16 @@ function posApp() {
 
         {{-- Order Details --}}
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 space-y-3">
-            <h3 class="text-sm font-semibold text-slate-700 pb-1 border-b border-slate-100">🧾 Order Details</h3>
+            <h3 class="text-sm font-semibold text-slate-700 pb-1 border-b border-slate-100">🧾 {{ __('Order Details') }}</h3>
 
             <div class="grid grid-cols-2 gap-3">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Order Date *</label>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">{{ __('Order Date') }} *</label>
                     <input type="date" name="order_date" x-model="orderDate" required
                         class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Delivery Date *</label>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">{{ __('Delivery Date') }} *</label>
                     <input type="date" name="delivery_date" x-model="deliveryDate" required
                         class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
@@ -320,19 +320,19 @@ function posApp() {
 
             <div class="grid grid-cols-3 gap-3">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Total Amount (Rs) *</label>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">{{ __('Total Amount') }} (Rs) *</label>
                     <input type="number" name="total_amount" x-model="totalAmount" min="0" step="50" required
                         class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="0">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Advance Paid (Rs)</label>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">{{ __('Advance') }} (Rs)</label>
                     <input type="number" name="advance_amount" x-model="advanceAmount" min="0" step="50"
                         class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="0">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Balance</label>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">{{ __('Balance') }}</label>
                     <div class="border border-slate-200 rounded-lg px-3 py-2 text-sm bg-slate-50 font-semibold"
                          :class="balance > 0 ? 'text-red-600' : 'text-green-600'">
                         Rs <span x-text="balance.toLocaleString()"></span>
@@ -342,7 +342,7 @@ function posApp() {
 
             <div class="grid grid-cols-2 gap-3">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Payment Method</label>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">{{ __('Payment Method') }}</label>
                     <select name="payment_method" x-model="paymentMethod"
                         class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <option value="cash">Cash</option>
@@ -352,7 +352,7 @@ function posApp() {
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Order Notes</label>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">{{ __('Order Notes') }}</label>
                     <input type="text" name="order_notes" x-model="orderNotes"
                         class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="Optional">
@@ -368,7 +368,7 @@ function posApp() {
                 </h3>
                 <button type="button" @click="addSuit()"
                     class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition">
-                    + Add Suit
+                    + {{ __('Add Suit') }}
                 </button>
             </div>
 
@@ -380,14 +380,14 @@ function posApp() {
                             <div class="text-xs font-bold text-slate-400 w-5 pt-2.5 shrink-0" x-text="idx+1"></div>
                             <div class="flex-1 grid grid-cols-2 gap-2">
                                 <div>
-                                    <label class="block text-xs font-semibold text-slate-500 mb-1">Suit Type *</label>
+                                    <label class="block text-xs font-semibold text-slate-500 mb-1">{{ __('Suit Type') }} *</label>
                                     <input type="text" :name="'suits['+idx+'][suit_type]'" x-model="suit.suit_type"
                                         required placeholder="Kameez Shalwar, Sherwani…"
                                         list="suit-type-list"
                                         class="w-full border border-slate-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-semibold text-slate-500 mb-1">Fabric (m) *</label>
+                                    <label class="block text-xs font-semibold text-slate-500 mb-1">{{ __('Fabric') }} (m) *</label>
                                     <input type="number" :name="'suits['+idx+'][fabric_meter]'" x-model="suit.fabric_meter"
                                         required min="0.5" step="0.5"
                                         class="w-full border border-slate-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -401,7 +401,7 @@ function posApp() {
                         {{-- Row 2: stitch type + worker --}}
                         <div class="grid grid-cols-2 gap-2 pl-7">
                             <div>
-                                <label class="block text-xs font-semibold text-slate-500 mb-1">Stitch Type</label>
+                                <label class="block text-xs font-semibold text-slate-500 mb-1">{{ __('Stitch Type') }}</label>
                                 <select :name="'suits['+idx+'][stitch_type_id]'" x-model="suit.stitch_type_id"
                                     class="w-full border border-slate-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                                     <option value="">— None —</option>
@@ -411,7 +411,7 @@ function posApp() {
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-slate-500 mb-1">Assign Worker</label>
+                                <label class="block text-xs font-semibold text-slate-500 mb-1">{{ __('Assign Worker') }}</label>
                                 <select :name="'suits['+idx+'][worker_id]'" x-model="suit.worker_id"
                                     class="w-full border border-slate-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                                     <option value="">— Unassigned —</option>
@@ -425,13 +425,13 @@ function posApp() {
                         {{-- Row 3: fabric desc + notes --}}
                         <div class="grid grid-cols-2 gap-2 pl-7">
                             <div>
-                                <label class="block text-xs font-semibold text-slate-500 mb-1">Fabric Description</label>
+                                <label class="block text-xs font-semibold text-slate-500 mb-1">{{ __('Fabric Description') }}</label>
                                 <input type="text" :name="'suits['+idx+'][fabric_description]'" x-model="suit.fabric_description"
                                     placeholder="Colour, material…"
                                     class="w-full border border-slate-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-slate-500 mb-1">Notes</label>
+                                <label class="block text-xs font-semibold text-slate-500 mb-1">{{ __('Notes') }}</label>
                                 <input type="text" :name="'suits['+idx+'][notes]'" x-model="suit.notes"
                                     placeholder="Special instructions…"
                                     class="w-full border border-slate-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -442,7 +442,7 @@ function posApp() {
 
                 <div x-show="suits.length === 0"
                      class="py-8 text-center text-sm text-slate-400">
-                    No suits added. Click "+ Add Suit" above.
+                    {{ __('No suits added.') }}
                 </div>
             </div>
         </div>
@@ -453,24 +453,24 @@ function posApp() {
                 <div class="text-sm text-slate-600">
                     <span x-text="suitsCount + ' suit' + (suitsCount !== 1 ? 's' : '')"></span>
                     <span class="mx-1.5 text-slate-300">·</span>
-                    Total: <span class="font-bold text-slate-800">Rs <span x-text="(parseFloat(totalAmount)||0).toLocaleString()"></span></span>
+                    {{ __('Total') }}: <span class="font-bold text-slate-800">Rs <span x-text="(parseFloat(totalAmount)||0).toLocaleString()"></span></span>
                     <span class="mx-1.5 text-slate-300">·</span>
-                    Balance: <span class="font-bold" :class="balance > 0 ? 'text-red-600' : 'text-green-600'">Rs <span x-text="balance.toLocaleString()"></span></span>
+                    {{ __('Balance') }}: <span class="font-bold" :class="balance > 0 ? 'text-red-600' : 'text-green-600'">Rs <span x-text="balance.toLocaleString()"></span></span>
                 </div>
                 <div class="flex gap-2">
                     <a href="{{ route('orders.index') }}"
                        class="px-4 py-2 text-sm text-slate-600 border border-slate-300 rounded-lg hover:bg-slate-50">
-                       Cancel
+                       {{ __('Cancel') }}
                     </a>
                     <button type="submit" :disabled="!canSubmit"
                         :class="canSubmit ? 'bg-blue-600 hover:bg-blue-700 cursor-pointer' : 'bg-slate-300 cursor-not-allowed'"
                         class="px-6 py-2 text-sm font-semibold text-white rounded-lg transition">
-                        ✓ Create Order
+                        ✓ {{ __('Create Order') }}
                     </button>
                 </div>
             </div>
             <p x-show="!canSubmit" class="text-xs text-amber-600 mt-2">
-                Fill in customer, at least one suit (type + fabric), order date, and delivery date to continue.
+                {{ __('Fill in all required fields to continue.') }}, at least one suit (type + fabric), order date, and delivery date to continue.
             </p>
         </div>
 

@@ -164,7 +164,7 @@ class OrderController extends Controller
 
     public function invoice(Order $order): Response
     {
-        $order->load(['customer', 'suits.worker', 'suits.measurement']);
+        $order->load(['customer.measurements', 'suits.worker', 'suits.measurement']);
         $settings        = Setting::allKeyed();
         $previousBalance = $order->customer->outstandingBalance($order->id);
 

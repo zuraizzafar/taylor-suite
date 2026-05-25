@@ -1,6 +1,6 @@
 @extends('layouts.app')
-@section('title', 'Pending Balances')
-@section('page-title', 'Pending Customer Balances')
+@section('title', __('Pending Balances'))
+@section('page-title', __('Pending Balances'))
 
 @section('content')
 <div class="space-y-5">
@@ -8,7 +8,7 @@
     {{-- Grand Total Banner --}}
     <div class="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center justify-between">
         <div>
-            <p class="text-xs text-red-600 font-semibold uppercase tracking-wide">Total Outstanding Dues</p>
+            <p class="text-xs text-red-600 font-semibold uppercase tracking-wide">{{ __('Total Outstanding Dues') }}</p>
             <p class="text-2xl font-bold text-red-800">Rs {{ number_format($grandTotal) }}</p>
         </div>
         <div class="text-sm text-red-500">{{ $customers->count() }} customers with pending dues</div>
@@ -19,12 +19,12 @@
         <table class="w-full text-sm">
             <thead>
                 <tr class="bg-slate-50 text-xs text-slate-500 border-b border-slate-200">
-                    <th class="px-4 py-3 text-left font-medium">File No</th>
-                    <th class="px-4 py-3 text-left font-medium">Customer</th>
-                    <th class="px-4 py-3 text-left font-medium">Mobile</th>
-                    <th class="px-4 py-3 text-right font-medium">Pending Orders</th>
-                    <th class="px-4 py-3 text-right font-medium">Total Due</th>
-                    <th class="px-4 py-3 text-center font-medium">Action</th>
+                    <th class="px-4 py-3 text-left font-medium">{{ __('File No') }}</th>
+                    <th class="px-4 py-3 text-left font-medium">{{ __('Customer') }}</th>
+                    <th class="px-4 py-3 text-left font-medium">{{ __('Mobile') }}</th>
+                    <th class="px-4 py-3 text-right font-medium">{{ __('Pending Orders') }}</th>
+                    <th class="px-4 py-3 text-right font-medium">{{ __('Total Due') }}</th>
+                    <th class="px-4 py-3 text-center font-medium">{{ __('Actions') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -44,25 +44,25 @@
                     <td class="px-4 py-3 text-center">
                         <div class="flex items-center justify-center gap-1">
                         <a href="{{ route('customers.show', $customer) }}"
-                            class="text-xs text-blue-600 hover:underline">View</a>
+                            class="text-xs text-blue-600 hover:underline">{{ __('View') }}</a>
                         @foreach($customer->orders as $pendingOrder)
                         <button onclick="openPayModal({{ $pendingOrder->id }}, '{{ $pendingOrder->order_number }}', {{ $pendingOrder->balance_amount }})"
                             class="text-xs bg-green-600 hover:bg-green-700 text-white px-2 py-0.5 rounded">
-                            Pay {{ $pendingOrder->order_number }}
+                            {{ __('Pay') }} {{ $pendingOrder->order_number }}
                         </button>
                         @endforeach
                         </div>
                     </td>
                 </tr>
                 @empty
-                <tr><td colspan="6" class="text-center py-10 text-slate-400">No pending balances found.</td></tr>
+                <tr><td colspan="6" class="text-center py-10 text-slate-400">{{ __('No data found.') }}</td></tr>
                 @endforelse
             </tbody>
 
             @if($customers->isNotEmpty())
             <tfoot>
                 <tr class="bg-red-50">
-                    <td colspan="4" class="px-4 py-3 text-right font-semibold text-red-800 text-xs uppercase">Grand Total Outstanding</td>
+                    <td colspan="4" class="px-4 py-3 text-right font-semibold text-red-800 text-xs uppercase">{{ __('Grand Total Outstanding') }}</td>
                     <td class="px-4 py-3 text-right font-bold text-red-800">Rs {{ number_format($grandTotal) }}</td>
                     <td></td>
                 </tr>

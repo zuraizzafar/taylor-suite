@@ -1,6 +1,6 @@
 <div class="space-y-4">
     <div>
-        <label class="block text-sm font-medium text-slate-700 mb-1">Worker Name *</label>
+        <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Worker Name') }} *</label>
         <input type="text" name="name" value="{{ old('name', $worker->name ?? '') }}"
             class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             required>
@@ -8,13 +8,13 @@
     </div>
 
     <div>
-        <label class="block text-sm font-medium text-slate-700 mb-1">Mobile</label>
+        <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Mobile') }}</label>
         <input type="text" name="mobile" value="{{ old('mobile', $worker->mobile ?? '') }}"
             class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
     </div>
 
     <div>
-        <label class="block text-sm font-medium text-slate-700 mb-1">Rate Per Suit (Rs)</label>
+        <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Rate per Suit') }}</label>
         <input type="number" name="rate_per_suit" value="{{ old('rate_per_suit', $worker->rate_per_suit ?? 0) }}"
             step="0.01" min="0" placeholder="0.00"
             class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -23,7 +23,7 @@
 
     @if(auth()->user()->isAdmin() && isset($branches) && $branches->isNotEmpty())
     <div>
-        <label class="block text-sm font-medium text-slate-700 mb-1">Branch</label>
+        <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Branch') }}</label>
         <select name="branch_id"
             class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
             <option value="">— No branch —</option>
@@ -38,7 +38,7 @@
     @endif
 
     <div>
-        <label class="block text-sm font-medium text-slate-700 mb-1">Link to Login User (optional)</label>
+        <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Link to Login User') }}</label>
         <select name="user_id"
             class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
             <option value="">— none —</option>
@@ -54,6 +54,6 @@
     <div class="flex items-center gap-2">
         <input type="checkbox" name="is_active" id="is_active" value="1"
             {{ old('is_active', $worker->is_active ?? true) ? 'checked' : '' }}>
-        <label for="is_active" class="text-sm text-slate-700">Active</label>
+        <label for="is_active" class="text-sm text-slate-700">{{ __('Active') }}</label>
     </div>
 </div>

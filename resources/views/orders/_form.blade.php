@@ -1,7 +1,7 @@
 <div class="space-y-4">
     @if(isset($customers))
     <div>
-        <label class="block text-sm font-medium text-slate-700 mb-1">Customer *</label>
+        <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Customer') }} *</label>
         <select name="customer_id" id="customer_id"
             class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             {{ isset($order) ? 'disabled' : 'required' }}>
@@ -19,7 +19,7 @@
 
     @if(auth()->user()->isAdmin() && isset($branches) && $branches->isNotEmpty())
     <div>
-        <label class="block text-sm font-medium text-slate-700 mb-1">Branch</label>
+        <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Branch') }}</label>
         <select name="branch_id"
             class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
             <option value="">— No branch —</option>
@@ -35,14 +35,14 @@
 
     <div class="grid grid-cols-2 gap-4">
         <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1">Order Date *</label>
+            <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Order Date') }} *</label>
             <input type="date" name="order_date" value="{{ old('order_date', isset($order) ? $order->order_date->format('Y-m-d') : date('Y-m-d')) }}"
                 class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required>
             @error('order_date')<p class="text-xs text-red-600 mt-1">{{ $message }}</p>@enderror
         </div>
         <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1">Delivery Date *</label>
+            <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Delivery Date') }} *</label>
             <input type="date" name="delivery_date" value="{{ old('delivery_date', isset($order) ? $order->delivery_date->format('Y-m-d') : '') }}"
                 class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required>
@@ -52,7 +52,7 @@
 
     <div class="grid grid-cols-3 gap-4">
         <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1">Total Amount *</label>
+            <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Total Amount') }} *</label>
             <input type="number" name="total_amount" value="{{ old('total_amount', $order->total_amount ?? '') }}"
                 step="0.01" min="0"
                 class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -60,7 +60,7 @@
             @error('total_amount')<p class="text-xs text-red-600 mt-1">{{ $message }}</p>@enderror
         </div>
         <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1">Advance Paid *</label>
+            <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Advance') }} *</label>
             <input type="number" name="advance_amount" value="{{ old('advance_amount', $initialAdvance ?? ($order->advance_amount ?? 0)) }}"
                 step="0.01" min="0"
                 class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -68,14 +68,14 @@
             @error('advance_amount')<p class="text-xs text-red-600 mt-1">{{ $message }}</p>@enderror
         </div>
         <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1">Balance (auto)</label>
+            <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Balance') }} (auto)</label>
             <input type="text" readonly placeholder="Auto calculated"
                 class="w-full border border-slate-200 bg-slate-50 rounded-lg px-3 py-2 text-sm text-slate-500">
         </div>
     </div>
 
     <div>
-        <label class="block text-sm font-medium text-slate-700 mb-1">Notes</label>
+        <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Notes') }}</label>
         <textarea name="notes" rows="2"
             class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">{{ old('notes', $order->notes ?? '') }}</textarea>
     </div>

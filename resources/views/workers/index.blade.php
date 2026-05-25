@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Workers')
-@section('page-title', 'Workers')
+@section('title', __('Workers'))
+@section('page-title', __('Workers'))
 
 @section('content')
 <div class="pt-2">
@@ -16,11 +16,11 @@
         <table class="w-full text-sm">
             <thead class="bg-slate-50 text-slate-600">
                 <tr>
-                    <th class="px-4 py-3 text-left font-medium">Name</th>
-                    <th class="px-4 py-3 text-left font-medium">Mobile</th>
-                    <th class="px-4 py-3 text-left font-medium">Login User</th>
-                    <th class="px-4 py-3 text-left font-medium">Status</th>
-                    <th class="px-4 py-3 text-left font-medium">Actions</th>
+                    <th class="px-4 py-3 text-left font-medium">{{ __('Name') }}</th>
+                    <th class="px-4 py-3 text-left font-medium">{{ __('Mobile') }}</th>
+                    <th class="px-4 py-3 text-left font-medium">{{ __('Login User') }}</th>
+                    <th class="px-4 py-3 text-left font-medium">{{ __('Status') }}</th>
+                    <th class="px-4 py-3 text-left font-medium">{{ __('Actions') }}</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-50">
@@ -31,25 +31,25 @@
                     <td class="px-4 py-3 text-slate-600">{{ $worker->user?->email ?? '—' }}</td>
                     <td class="px-4 py-3">
                         @if($worker->is_active)
-                        <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">Active</span>
+                        <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">{{ __('Active') }}</span>
                         @else
-                        <span class="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full">Inactive</span>
+                        <span class="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full">{{ __('Inactive') }}</span>
                         @endif
                     </td>
                     <td class="px-4 py-3">
                         <div class="flex gap-2">
                             <a href="{{ route('workers.edit', $worker) }}"
-                               class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 px-2 py-1 rounded">Edit</a>
+                               class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 px-2 py-1 rounded">{{ __('Edit') }}</a>
                             <form method="POST" action="{{ route('workers.destroy', $worker) }}"
-                                  onsubmit="return confirm('Delete this worker?')">
+                                  onsubmit="return confirm('{{ __('Are you sure?') }}')">
                                 @csrf @method('DELETE')
-                                <button class="text-xs bg-red-50 hover:bg-red-100 text-red-600 px-2 py-1 rounded">Delete</button>
+                                <button class="text-xs bg-red-50 hover:bg-red-100 text-red-600 px-2 py-1 rounded">{{ __('Delete') }}</button>
                             </form>
                         </div>
                     </td>
                 </tr>
                 @empty
-                <tr><td colspan="5" class="px-4 py-8 text-center text-slate-400">No workers yet.</td></tr>
+                <tr><td colspan="5" class="px-4 py-8 text-center text-slate-400">{{ __('No workers found.') }}</td></tr>
                 @endforelse
             </tbody>
         </table>

@@ -16,6 +16,8 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         // Kill switch runs before everything — including auth
         $middleware->prepend(\App\Http\Middleware\KillSwitchMiddleware::class);
+        // Locale from session
+        $middleware->web(\App\Http\Middleware\SetLocaleMiddleware::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

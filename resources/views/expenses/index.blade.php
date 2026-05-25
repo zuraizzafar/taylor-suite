@@ -1,13 +1,13 @@
 @extends('layouts.app')
-@section('title', 'Expenses')
-@section('page-title', 'Expenses')
+@section('title', __('Expenses'))
+@section('page-title', __('Expenses'))
 @section('content')
 <div class="pt-2">
     <div class="flex items-center justify-between mb-5 flex-wrap gap-2">
         <form method="GET" action="{{ route('expenses.index') }}" class="flex gap-2 flex-wrap">
             <select name="category"
                 class="text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <option value="">All Categories</option>
+                <option value="">{{ __('All Categories') }}</option>
                 @foreach(\App\Models\Expense::CATEGORIES as $key => $label)
                 <option value="{{ $key }}" {{ request('category') === $key ? 'selected' : '' }}>{{ $label }}</option>
                 @endforeach
@@ -16,7 +16,7 @@
                 class="text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
             <input type="date" name="to" value="{{ request('to') }}"
                 class="text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <button class="bg-slate-700 text-white text-sm px-4 py-2 rounded-lg hover:bg-slate-800">Filter</button>
+            <button class="bg-slate-700 text-white text-sm px-4 py-2 rounded-lg hover:bg-slate-800">{{ __('Filter') }}</button>
         </form>
         <a href="{{ route('expenses.create') }}"
            class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg">
@@ -26,7 +26,7 @@
 
     {{-- Total banner --}}
     <div class="bg-red-50 border border-red-200 rounded-xl px-5 py-3 mb-4 flex items-center justify-between">
-        <span class="text-sm text-red-700 font-medium">Total Expenses (filtered)</span>
+        <span class="text-sm text-red-700 font-medium">{{ __('Total Expenses') }}</span>
         <span class="text-lg font-bold text-red-700">Rs {{ number_format($expenses->sum('amount')) }}</span>
     </div>
 
@@ -34,12 +34,12 @@
         <table class="w-full text-sm">
             <thead class="bg-slate-50 text-slate-600">
                 <tr>
-                    <th class="px-4 py-3 text-left font-medium">Date</th>
-                    <th class="px-4 py-3 text-left font-medium">Category</th>
-                    <th class="px-4 py-3 text-left font-medium">Description</th>
-                    <th class="px-4 py-3 text-left font-medium">Branch</th>
-                    <th class="px-4 py-3 text-left font-medium">Amount</th>
-                    <th class="px-4 py-3 text-left font-medium">Actions</th>
+                    <th class="px-4 py-3 text-left font-medium">{{ __('Date') }}</th>
+                    <th class="px-4 py-3 text-left font-medium">{{ __('Category') }}</th>
+                    <th class="px-4 py-3 text-left font-medium">{{ __('Description') }}</th>
+                    <th class="px-4 py-3 text-left font-medium">{{ __('Branch') }}</th>
+                    <th class="px-4 py-3 text-left font-medium">{{ __('Amount') }}</th>
+                    <th class="px-4 py-3 text-left font-medium">{{ __('Actions') }}</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-50">
@@ -55,11 +55,11 @@
                     <td class="px-4 py-3">
                         <div class="flex gap-2">
                             <a href="{{ route('expenses.edit', $expense) }}"
-                               class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 px-2 py-1 rounded">Edit</a>
+                               class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 px-2 py-1 rounded">{{ __('Edit') }}</a>
                             <form method="POST" action="{{ route('expenses.destroy', $expense) }}"
-                                  onsubmit="return confirm('Delete?')">
+                                  onsubmit="return confirm('{{ __('Are you sure?') }}')">
                                 @csrf @method('DELETE')
-                                <button class="text-xs bg-red-50 hover:bg-red-100 text-red-600 px-2 py-1 rounded">Del</button>
+                                <button class="text-xs bg-red-50 hover:bg-red-100 text-red-600 px-2 py-1 rounded">{{ __('Delete') }}</button>
                             </form>
                         </div>
                     </td>

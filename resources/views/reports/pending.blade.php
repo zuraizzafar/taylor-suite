@@ -1,35 +1,35 @@
 @extends('layouts.app')
-@section('title', 'Pending Orders')
-@section('page-title', 'Pending Orders')
+@section('title', __('Pending Orders'))
+@section('page-title', __('Pending Orders'))
 
 @section('content')
 <div class="pt-2">
     <form method="GET" action="{{ route('reports.pending') }}" class="flex gap-2 mb-5">
         <select name="status"
             class="text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <option value="">All Active Statuses</option>
+            <option value="">{{ __('All Statuses') }}</option>
             @foreach(['pending','cutting','stitching','ready'] as $s)
             <option value="{{ $s }}" {{ $status === $s ? 'selected' : '' }}>{{ ucfirst($s) }}</option>
             @endforeach
         </select>
-        <button class="bg-slate-700 text-white text-sm px-4 py-2 rounded-lg">Filter</button>
+        <button class="bg-slate-700 text-white text-sm px-4 py-2 rounded-lg">{{ __('Filter') }}</button>
     </form>
 
     <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
         <div class="px-5 py-3 border-b border-slate-100 flex items-center justify-between">
-            <h3 class="font-semibold text-slate-700">Active Suits</h3>
+            <h3 class="font-semibold text-slate-700">{{ __('Active Suits') }}</h3>
             <span class="text-xs text-slate-500">{{ $suits->count() }} suit(s)</span>
         </div>
         <table class="w-full text-sm">
             <thead class="bg-slate-50 text-slate-600">
                 <tr>
-                    <th class="px-4 py-2 text-left font-medium">Code</th>
-                    <th class="px-4 py-2 text-left font-medium">Customer</th>
-                    <th class="px-4 py-2 text-left font-medium">Type</th>
-                    <th class="px-4 py-2 text-left font-medium">Worker</th>
-                    <th class="px-4 py-2 text-left font-medium">Status</th>
-                    <th class="px-4 py-2 text-left font-medium">Order</th>
-                    <th class="px-4 py-2 text-left font-medium">Action</th>
+                    <th class="px-4 py-2 text-left font-medium">{{ __('Suit Code') }}</th>
+                    <th class="px-4 py-2 text-left font-medium">{{ __('Customer') }}</th>
+                    <th class="px-4 py-2 text-left font-medium">{{ __('Suit Type') }}</th>
+                    <th class="px-4 py-2 text-left font-medium">{{ __('Worker') }}</th>
+                    <th class="px-4 py-2 text-left font-medium">{{ __('Status') }}</th>
+                    <th class="px-4 py-2 text-left font-medium">{{ __('Order') }}</th>
+                    <th class="px-4 py-2 text-left font-medium">{{ __('Actions') }}</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-50">
@@ -54,16 +54,16 @@
                     <td class="px-4 py-2">
                         <div class="flex gap-1">
                         <a href="{{ route('suits.show', $suit) }}"
-                           class="text-xs bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded">View</a>
+                           class="text-xs bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded">{{ __('View') }}</a>
                         @if($suit->order && $suit->order->balance_amount > 0)
                         <button onclick="openPayModal({{ $suit->order->id }}, '{{ $suit->order->order_number }}', {{ $suit->order->balance_amount }})"
-                            class="text-xs bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded">+ Pay</button>
+                            class="text-xs bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded">+ {{ __('Pay') }}</button>
                         @endif
                         </div>
                     </td>
                 </tr>
                 @empty
-                <tr><td colspan="7" class="px-4 py-8 text-center text-slate-400">No pending suits.</td></tr>
+                <tr><td colspan="7" class="px-4 py-8 text-center text-slate-400">{{ __('No data found.') }}</td></tr>
                 @endforelse
             </tbody>
         </table>

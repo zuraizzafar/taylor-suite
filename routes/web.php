@@ -17,11 +17,20 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\StitchTypeController;
 use App\Http\Controllers\SuitController;
+use App\Http\Controllers\TranslationController;
 use App\Http\Controllers\WorkerController;
 use App\Http\Controllers\WorkerSalaryController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WorkerPortalController;
 use Illuminate\Support\Facades\Route;
+
+// ─── Language switcher (public, no auth) ─────────────────────────────────────
+Route::get('/lang/{locale}', function (string $locale) {
+    if (in_array($locale, ['en', 'ur'])) {
+        session(['locale' => $locale]);
+    }
+    return redirect()->back();
+})->name('lang.switch');
 
 // ─── Public: QR scan (no auth required) ───────────────────────────────────────
 Route::get('/scan/{code}', [ScanController::class, 'show'])->name('scan.show');
@@ -127,6 +136,11 @@ Route::middleware('auth')->group(function () {
         Route::post('/users', [UserController::class, 'store'])->name('users.store');
         Route::get('/users/{user}/password', [UserController::class, 'editPassword'])->name('users.password');
         Route::put('/users/{user}/password', [UserController::class, 'updatePassword'])->name('users.password.update');
+
+        // Translation management
+        Route::get('/translations', [TranslationController::class, 'index'])->name('translations.index');
+        Route::post('/translations', [TranslationController::class, 'update'])->name('translations.update');
+        Route::delete('/translations', [TranslationController::class, 'destroy'])->name('translations.destroy');
     });
 });
 

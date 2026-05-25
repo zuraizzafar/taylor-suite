@@ -1,11 +1,11 @@
 @extends('layouts.app')
-@section('title', 'Search Results')
+@section('title', __('Search Results'))
 @section('page-title', 'Search: "' . $q . '"')
 
 @section('content')
 <div class="pt-2 space-y-6">
     @if(strlen($q) < 2)
-    <p class="text-slate-500 text-sm">Enter at least 2 characters to search.</p>
+    <p class="text-slate-500 text-sm">{{ __('Enter at least 2 characters to search.') }}</p>
     @else
 
     {{-- Customers --}}
@@ -23,7 +23,7 @@
                         <th class="px-4 py-2 text-left font-medium">File No</th>
                         <th class="px-4 py-2 text-left font-medium">Name</th>
                         <th class="px-4 py-2 text-left font-medium">Mobile</th>
-                        <th class="px-4 py-2 text-left font-medium">Suits</th>
+                        <th class="px-4 py-2 text-left font-medium">{{ __('Suits') }}</th>
                         <th class="px-4 py-2 text-left font-medium">Action</th>
                     </tr>
                 </thead>
@@ -38,7 +38,7 @@
                         </td>
                         <td class="px-4 py-2">
                             <a href="{{ route('customers.show', $c) }}"
-                               class="text-xs bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded">View</a>
+                               class="text-xs bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded">{{ __('View') }}</a>
                         </td>
                     </tr>
                     @endforeach
@@ -80,7 +80,7 @@
                         </td>
                         <td class="px-4 py-2">
                             <a href="{{ route('suits.show', $suit) }}"
-                               class="text-xs bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded">View</a>
+                               class="text-xs bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded">{{ __('View') }}</a>
                         </td>
                     </tr>
                     @endforeach
@@ -123,7 +123,7 @@
                         <td class="px-4 py-2">
                             <div class="flex gap-1">
                                 <a href="{{ route('orders.show', $order) }}"
-                                   class="text-xs bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded">View</a>
+                                   class="text-xs bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded">{{ __('View') }}</a>
                                 @if($order->balance_amount > 0)
                                 <button onclick="openPayModal({{ $order->id }}, '{{ $order->order_number }}', {{ $order->balance_amount }})"
                                     class="text-xs bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded">+ Pay</button>

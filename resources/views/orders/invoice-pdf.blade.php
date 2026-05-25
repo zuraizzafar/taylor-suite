@@ -83,6 +83,17 @@
     .row-prev       { }
     .row-grand      { background: #1e293b; }
 
+    /* Measurements */
+    .meas-wrap        { border: 1px solid #e2e8f0; border-radius: 6px; margin-bottom: 16px; overflow: hidden; font-family: DejaVu Sans, sans-serif; }
+    .meas-title-row   { background: #f1f5f9; padding: 5px 10px; font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #475569; font-family: DejaVu Sans, sans-serif; }
+    .meas-section-hdr { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #94a3b8; padding: 5px 10px 3px; background: #fff; font-family: DejaVu Sans, sans-serif; border-top: 1px solid #f1f5f9; }
+    table.meas-grid   { width: 100%; border-collapse: collapse; font-family: DejaVu Sans, sans-serif; }
+    table.meas-grid td { padding: 3px 8px 4px; font-size: 9.5px; border-right: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; font-family: DejaVu Sans, sans-serif; color: #1e293b; }
+    table.meas-grid td:last-child { border-right: none; }
+    .meas-lbl  { color: #94a3b8; font-size: 7.5px; display: block; font-family: DejaVu Sans, sans-serif; margin-bottom: 1px; }
+    .meas-val  { font-weight: 700; color: #0f172a; font-size: 10px; font-family: DejaVu Sans, sans-serif; }
+    .meas-empty { color: #cbd5e1; }
+
     /* Order notes */
     .note-box   { margin-bottom: 14px; font-size: 10px; color: #64748b; padding: 7px 10px; background: #f8fafc; border-left: 3px solid #cbd5e1; border-radius: 3px; font-family: DejaVu Sans, sans-serif; }
     .note-box strong { font-family: DejaVu Sans, sans-serif; color: #1e293b; }
@@ -101,6 +112,36 @@
 <body>
 
 @php
+    // Resolve measurement: prefer customer's own, fall back to first suit's measurement
+    $measurement = $order->customer->measurements->first()
+                   ?? $order->suits->pluck('measurement')->filter()->first();
+
+    // Fields to display
+    $qFields = [
+        'q_length'      => 'Length',
+        'q_shoulder'    => 'Shoulder',
+        'q_chest'       => 'Chest',
+        'q_waist'       => 'Waist',
+        'q_seat'        => 'Seat',
+        'q_sleeve'      => 'Sleeve',
+        'q_sleeve_width'=> 'Slv. W',
+        'q_collar'      => 'Collar',
+        'q_front'       => 'Front',
+        'q_back'        => 'Back',
+        'q_armhole'     => 'Armhole',
+        'q_cuff'        => 'Cuff',
+    ];
+    $sFields = [
+        's_length'  => 'Length',
+        's_waist'   => 'Waist',
+        's_seat'    => 'Seat',
+        's_thigh'   => 'Thigh',
+        's_knee'    => 'Knee',
+        's_bottom'  => 'Bottom',
+        's_crotch'  => 'Crotch',
+        's_ankle'   => 'Ankle',
+    ];
+
     $companyName    = $settings['company_name']        ?? 'The Suit Tailor';
     $companyTagline = $settings['company_tagline']     ?? 'Professional Tailoring Services';
     $companyAddress = $settings['company_address']     ?? '';
@@ -242,6 +283,53 @@
             </tr>
         </tfoot>
     </table>
+
+    {{-- MEASUREMENTS --}}
+    @if($measurement)
+    @php
+        $hasMeas = collect($qFields)->keys()->merge(collect($sFields)->keys())
+                       ->some(fn($k) => !empty($measurement->$k));
+    @endphp
+    @if($hasMeas)
+    <div class="meas-wrap">
+        <div class="meas-title-row">Customer Measurements@if($measurement->notes) &nbsp;&middot;&nbsp; <span style="font-weight:400;color:#64748b;text-transform:none;letter-spacing:0">{{ $measurement->notes }}</span>@endif</div>
+
+        {{-- Qameez / Kameez --}}
+        <div class="meas-section-hdr">Qameez / Kameez</div>
+        <table class="meas-grid">
+            <tr>
+                @foreach($qFields as $field => $label)
+                <td style="width:8.33%">
+                    <span class="meas-lbl">{{ $label }}</span>
+                    @if(!empty($measurement->$field))
+                    <span class="meas-val">{{ $measurement->$field }}</span>
+                    @else
+                    <span class="meas-val meas-empty">&mdash;</span>
+                    @endif
+                </td>
+                @endforeach
+            </tr>
+        </table>
+
+        {{-- Shalwar / Trouser --}}
+        <div class="meas-section-hdr">Shalwar / Trouser</div>
+        <table class="meas-grid">
+            <tr>
+                @foreach($sFields as $field => $label)
+                <td style="width:12.5%">
+                    <span class="meas-lbl">{{ $label }}</span>
+                    @if(!empty($measurement->$field))
+                    <span class="meas-val">{{ $measurement->$field }}</span>
+                    @else
+                    <span class="meas-val meas-empty">&mdash;</span>
+                    @endif
+                </td>
+                @endforeach
+            </tr>
+        </table>
+    </div>
+    @endif
+    @endif
 
     {{-- PAYMENT SUMMARY --}}
     <div class="payment-wrap">

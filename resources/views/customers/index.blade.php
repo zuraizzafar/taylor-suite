@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Customers')
-@section('page-title', 'Customers')
+@section('title', __('Customers'))
+@section('page-title', __('Customers'))
 
 @section('content')
 <div class="pt-2">
@@ -10,7 +10,7 @@
             <input type="text" name="search" value="{{ $search }}"
                 placeholder="Search name, mobile, file no…"
                 class="text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-72">
-            <button class="bg-slate-700 text-white text-sm px-4 py-2 rounded-lg hover:bg-slate-800">Search</button>
+            <button class="bg-slate-700 text-white text-sm px-4 py-2 rounded-lg hover:bg-slate-800">{{ __('Search') }}</button>
         </form>
         <a href="{{ route('customers.create') }}"
            class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg">
@@ -22,12 +22,12 @@
         <table class="w-full text-sm">
             <thead class="bg-slate-50 text-slate-600">
                 <tr>
-                    <th class="px-4 py-3 text-left font-medium">File No</th>
-                    <th class="px-4 py-3 text-left font-medium">Name</th>
-                    <th class="px-4 py-3 text-left font-medium">Mobile</th>
-                    <th class="px-4 py-3 text-left font-medium">Suits</th>
-                    <th class="px-4 py-3 text-left font-medium">Address</th>
-                    <th class="px-4 py-3 text-left font-medium">Actions</th>
+                    <th class="px-4 py-3 text-left font-medium">{{ __('File No') }}</th>
+                    <th class="px-4 py-3 text-left font-medium">{{ __('Name') }}</th>
+                    <th class="px-4 py-3 text-left font-medium">{{ __('Mobile') }}</th>
+                    <th class="px-4 py-3 text-left font-medium">{{ __('Suits') }}</th>
+                    <th class="px-4 py-3 text-left font-medium">{{ __('Address') }}</th>
+                    <th class="px-4 py-3 text-left font-medium">{{ __('Actions') }}</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-50">
@@ -45,14 +45,14 @@
                     <td class="px-4 py-3">
                         <div class="flex gap-2">
                             <a href="{{ route('customers.show', $customer) }}"
-                               class="text-xs bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded">View</a>
+                               class="text-xs bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded">{{ __('View') }}</a>
                             <a href="{{ route('customers.edit', $customer) }}"
-                               class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 px-2 py-1 rounded">Edit</a>
+                               class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 px-2 py-1 rounded">{{ __('Edit') }}</a>
                         </div>
                     </td>
                 </tr>
                 @empty
-                <tr><td colspan="6" class="px-4 py-8 text-center text-slate-400">No customers found.</td></tr>
+                <tr><td colspan="6" class="px-4 py-8 text-center text-slate-400">{{ __('No customers found.') }}.</td></tr>
                 @endforelse
             </tbody>
         </table>

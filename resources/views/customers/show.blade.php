@@ -25,11 +25,11 @@
                 <span class="font-mono text-blue-700 font-bold text-lg">{{ $customer->file_number }}</span>
                 <div class="flex gap-2 mt-2">
                     <a href="{{ route('customers.edit', $customer) }}"
-                       class="text-xs bg-slate-100 hover:bg-slate-200 px-3 py-1 rounded-lg">Edit</a>
+                       class="text-xs bg-slate-100 hover:bg-slate-200 px-3 py-1 rounded-lg">{{ __('Edit') }}</a>
                     <a href="{{ route('orders.create', ['customer_id' => $customer->id]) }}"
-                       class="text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg">+ New Order</a>
+                       class="text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg">+ {{ __('Add Order') }}</a>
                     <a href="{{ route('measurements.create', $customer) }}"
-                       class="text-xs bg-slate-700 hover:bg-slate-800 text-white px-3 py-1 rounded-lg">+ Measurement</a>
+                       class="text-xs bg-slate-700 hover:bg-slate-800 text-white px-3 py-1 rounded-lg">+ {{ __('Measurements') }}</a>
                 </div>
             </div>
         </div>
@@ -52,7 +52,7 @@
                     </p>
                 </div>
                 <a href="{{ route('measurements.edit', [$customer, $m]) }}"
-                   class="text-xs bg-slate-100 hover:bg-slate-200 px-3 py-1 rounded-lg">Edit</a>
+                   class="text-xs bg-slate-100 hover:bg-slate-200 px-3 py-1 rounded-lg">{{ __('Edit') }}</a>
             </div>
             @endforeach
         </div>
@@ -64,18 +64,18 @@
         <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
             <h3 class="font-semibold text-slate-700">👔 Suits ({{ $customer->suits->count() }})</h3>
             <a href="{{ route('suits.create', ['customer_id' => $customer->id]) }}"
-               class="text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg">+ Add Suit</a>
+               class="text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg">+ {{ __('Add Suit') }}</a>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
                 <thead class="bg-slate-50 text-slate-600">
                     <tr>
-                        <th class="px-4 py-2 text-left font-medium">Code</th>
-                        <th class="px-4 py-2 text-left font-medium">Type</th>
-                        <th class="px-4 py-2 text-left font-medium">Fabric</th>
-                        <th class="px-4 py-2 text-left font-medium">Worker</th>
-                        <th class="px-4 py-2 text-left font-medium">Status</th>
-                        <th class="px-4 py-2 text-left font-medium">Actions</th>
+                        <th class="px-4 py-2 text-left font-medium">{{ __('Suit Code') }}</th>
+                        <th class="px-4 py-2 text-left font-medium">{{ __('Suit Type') }}</th>
+                        <th class="px-4 py-2 text-left font-medium">{{ __('Fabric') }}</th>
+                        <th class="px-4 py-2 text-left font-medium">{{ __('Worker') }}</th>
+                        <th class="px-4 py-2 text-left font-medium">{{ __('Status') }}</th>
+                        <th class="px-4 py-2 text-left font-medium">{{ __('Actions') }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-50">
@@ -92,11 +92,11 @@
                         </td>
                         <td class="px-4 py-2">
                             <a href="{{ route('suits.show', $suit) }}"
-                               class="text-xs bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded">View</a>
+                               class="text-xs bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded">{{ __('View') }}</a>
                         </td>
                     </tr>
                     @empty
-                    <tr><td colspan="6" class="px-4 py-6 text-center text-slate-400">No suits yet.</td></tr>
+                    <tr><td colspan="6" class="px-4 py-6 text-center text-slate-400">{{ __('No suits found.') }}</td></tr>
                     @endforelse
                 </tbody>
             </table>
@@ -114,7 +114,7 @@
                 <div>
                     <p class="text-sm font-medium text-slate-800">{{ $order->order_number }}</p>
                     <p class="text-xs text-slate-500">
-                        {{ $order->order_date->format('d M Y') }} · Delivery: {{ $order->delivery_date->format('d M Y') }}
+                        {{ $order->order_date->format('d M Y') }} · {{ __('Delivery') }}: {{ $order->delivery_date->format('d M Y') }}
                         · {{ $order->suits->count() }} suit(s)
                     </p>
                 </div>
@@ -124,7 +124,7 @@
                         <p class="text-xs text-red-500">Bal: Rs {{ number_format($order->balance_amount) }}</p>
                     </div>
                     <a href="{{ route('orders.show', $order) }}"
-                       class="text-xs bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded">View</a>
+                       class="text-xs bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded">{{ __('View') }}</a>
                     @if($order->balance_amount > 0)
                     <button onclick="openPayModal({{ $order->id }}, '{{ $order->order_number }}', {{ $order->balance_amount }})"
                         class="text-xs bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded">+ Pay</button>

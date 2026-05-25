@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Dashboard – Suit Tailor')
-@section('page-title', 'Dashboard')
+@section('title', __('Dashboard') . ' – Suit Tailor')
+@section('page-title', __('Dashboard'))
 
 @section('content')
 <div class="pt-2">
@@ -10,10 +10,10 @@
     @if(auth()->user()->isAdmin() && $branches->isNotEmpty())
     <div class="mb-5 flex items-center gap-3">
         <form method="GET" action="{{ route('dashboard') }}" class="flex items-center gap-2">
-            <label class="text-sm font-medium text-slate-600">Branch:</label>
+            <label class="text-sm font-medium text-slate-600">{{ __('Branch:') }}</label>
             <select name="branch_id" onchange="this.form.submit()"
                 class="border border-slate-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <option value="">All Branches</option>
+                <option value="">{{ __('All Branches') }}</option>
                 @foreach($branches as $b)
                 <option value="{{ $b->id }}" {{ request('branch_id') == $b->id ? 'selected' : '' }}>
                     {{ $b->name }}
@@ -21,7 +21,7 @@
                 @endforeach
             </select>
             @if(request('branch_id'))
-            <a href="{{ route('dashboard') }}" class="text-xs text-slate-500 hover:text-slate-700 underline">Clear</a>
+            <a href="{{ route('dashboard') }}" class="text-xs text-slate-500 hover:text-slate-700 underline">{{ __('Clear') }}</a>
             @endif
         </form>
         @if($selectedBranch)
@@ -35,27 +35,27 @@
     {{-- Stats cards --}}
     <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
         <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-100">
-            <p class="text-xs text-slate-500 mb-1">Total Customers</p>
+            <p class="text-xs text-slate-500 mb-1">{{ __('Total Customers') }}</p>
             <p class="text-2xl font-bold text-slate-800">{{ $stats['total_customers'] }}</p>
         </div>
         <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-100">
-            <p class="text-xs text-slate-500 mb-1">Orders Today</p>
+            <p class="text-xs text-slate-500 mb-1">{{ __('Orders Today') }}</p>
             <p class="text-2xl font-bold text-blue-600">{{ $stats['orders_today'] }}</p>
         </div>
         <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-100">
-            <p class="text-xs text-slate-500 mb-1">Pending Suits</p>
+            <p class="text-xs text-slate-500 mb-1">{{ __('Pending Suits') }}</p>
             <p class="text-2xl font-bold text-yellow-600">{{ $stats['pending_suits'] }}</p>
         </div>
         <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-100">
-            <p class="text-xs text-slate-500 mb-1">Ready to Deliver</p>
+            <p class="text-xs text-slate-500 mb-1">{{ __('Ready to Deliver') }}</p>
             <p class="text-2xl font-bold text-green-600">{{ $stats['ready_suits'] }}</p>
         </div>
         <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-100">
-            <p class="text-xs text-slate-500 mb-1">Delivered Today</p>
+            <p class="text-xs text-slate-500 mb-1">{{ __('Delivered Today') }}</p>
             <p class="text-2xl font-bold text-purple-600">{{ $stats['delivered_today'] }}</p>
         </div>
         <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-100">
-            <p class="text-xs text-slate-500 mb-1">Total Suits</p>
+            <p class="text-xs text-slate-500 mb-1">{{ __('Total Suits') }}</p>
             <p class="text-2xl font-bold text-slate-800">{{ $stats['total_suits'] }}</p>
         </div>
     </div>
@@ -63,40 +63,40 @@
     {{-- Finance Overview --}}
     @if(auth()->user()->isAdmin() || auth()->user()->isBranchManager())
     <div class="mb-6">
-        <h3 class="text-sm font-semibold text-slate-600 mb-3 uppercase tracking-wide">💰 Financial Overview</h3>
+        <h3 class="text-sm font-semibold text-slate-600 mb-3 uppercase tracking-wide">💰 {{ __('Financial Overview') }}</h3>
         <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
             <div class="bg-blue-50 border border-blue-100 rounded-xl p-4">
-                <p class="text-xs text-blue-600 font-medium mb-1">Total Revenue</p>
+                <p class="text-xs text-blue-600 font-medium mb-1">{{ __('Total Revenue') }}</p>
                 <p class="text-xl font-bold text-blue-800">Rs {{ number_format($finance['totalRevenue']) }}</p>
-                <p class="text-xs text-blue-400 mt-1">All-time billed</p>
+                <p class="text-xs text-blue-400 mt-1">{{ __('All-time billed') }}</p>
             </div>
             <div class="bg-green-50 border border-green-100 rounded-xl p-4">
-                <p class="text-xs text-green-600 font-medium mb-1">Total Collected</p>
+                <p class="text-xs text-green-600 font-medium mb-1">{{ __('Total Collected') }}</p>
                 <p class="text-xl font-bold text-green-800">Rs {{ number_format($finance['totalCollected']) }}</p>
-                <p class="text-xs text-green-400 mt-1">Advance payments</p>
+                <p class="text-xs text-green-400 mt-1">{{ __('Advance payments') }}</p>
             </div>
             <div class="bg-red-50 border border-red-100 rounded-xl p-4">
-                <p class="text-xs text-red-600 font-medium mb-1">Outstanding Dues</p>
+                <p class="text-xs text-red-600 font-medium mb-1">{{ __('Outstanding Dues') }}</p>
                 <p class="text-xl font-bold text-red-800">Rs {{ number_format($finance['totalOutstanding']) }}</p>
-                <a href="{{ route('reports.pending-balances') }}" class="text-xs text-red-400 mt-1 hover:underline block">View details →</a>
+                <a href="{{ route('reports.pending-balances') }}" class="text-xs text-red-400 mt-1 hover:underline block">{{ __('View details →') }}</a>
             </div>
             <div class="bg-orange-50 border border-orange-100 rounded-xl p-4">
-                <p class="text-xs text-orange-600 font-medium mb-1">Worker Salaries</p>
+                <p class="text-xs text-orange-600 font-medium mb-1">{{ __('Worker Salaries') }}</p>
                 <p class="text-xl font-bold text-orange-800">Rs {{ number_format($finance['workerSalaries']) }}</p>
-                <a href="{{ route('reports.salary') }}" class="text-xs text-orange-400 mt-1 hover:underline block">Salary report →</a>
+                <a href="{{ route('reports.salary') }}" class="text-xs text-orange-400 mt-1 hover:underline block">{{ __('Salary report →') }}</a>
             </div>
             <div class="bg-purple-50 border border-purple-100 rounded-xl p-4">
-                <p class="text-xs text-purple-600 font-medium mb-1">Total Expenses</p>
+                <p class="text-xs text-purple-600 font-medium mb-1">{{ __('Total Expenses') }}</p>
                 <p class="text-xl font-bold text-purple-800">Rs {{ number_format($finance['totalExpenses']) }}</p>
-                <a href="{{ route('expenses.index') }}" class="text-xs text-purple-400 mt-1 hover:underline block">View expenses →</a>
+                <a href="{{ route('expenses.index') }}" class="text-xs text-purple-400 mt-1 hover:underline block">{{ __('View expenses →') }}</a>
             </div>
             <div class="{{ $finance['netProfit'] >= 0 ? 'bg-emerald-50 border-emerald-100' : 'bg-rose-50 border-rose-100' }} border rounded-xl p-4">
-                <p class="text-xs {{ $finance['netProfit'] >= 0 ? 'text-emerald-600' : 'text-rose-600' }} font-medium mb-1">Net Profit</p>
+                <p class="text-xs {{ $finance['netProfit'] >= 0 ? 'text-emerald-600' : 'text-rose-600' }} font-medium mb-1">{{ __('Net Profit') }}</p>
                 <p class="text-xl font-bold {{ $finance['netProfit'] >= 0 ? 'text-emerald-800' : 'text-rose-800' }}">
                     Rs {{ number_format(abs($finance['netProfit'])) }}
                     <span class="text-sm font-normal">{{ $finance['netProfit'] >= 0 ? '▲' : '▼' }}</span>
                 </p>
-                <p class="text-xs {{ $finance['netProfit'] >= 0 ? 'text-emerald-400' : 'text-rose-400' }} mt-1">Collected − Salaries − Expenses</p>
+                <p class="text-xs {{ $finance['netProfit'] >= 0 ? 'text-emerald-400' : 'text-rose-400' }} mt-1">{{ __('Collected − Salaries − Expenses') }}</p>
             </div>
         </div>
     </div>
@@ -107,8 +107,8 @@
         {{-- Recent Orders --}}
         <div class="bg-white rounded-xl shadow-sm border border-slate-100">
             <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100">
-                <h3 class="font-semibold text-slate-700">Recent Orders</h3>
-                <a href="{{ route('orders.index') }}" class="text-xs text-blue-600 hover:underline">View all →</a>
+                <h3 class="font-semibold text-slate-700">{{ __('Recent Orders') }}</h3>
+                <a href="{{ route('orders.index') }}" class="text-xs text-blue-600 hover:underline">{{ __('View all →') }}</a>
             </div>
             <div class="divide-y divide-slate-50">
                 @forelse($recent_orders as $order)
@@ -123,7 +123,7 @@
                     </div>
                 </div>
                 @empty
-                <p class="px-5 py-4 text-sm text-slate-400">No orders yet.</p>
+                <p class="px-5 py-4 text-sm text-slate-400">{{ __('No orders yet.') }}</p>
                 @endforelse
             </div>
         </div>
@@ -131,8 +131,8 @@
         {{-- Active Suits --}}
         <div class="bg-white rounded-xl shadow-sm border border-slate-100">
             <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100">
-                <h3 class="font-semibold text-slate-700">Active Suits</h3>
-                <a href="{{ route('suits.index') }}" class="text-xs text-blue-600 hover:underline">View all →</a>
+                <h3 class="font-semibold text-slate-700">{{ __('Suits') }}</h3>
+                <a href="{{ route('suits.index') }}" class="text-xs text-blue-600 hover:underline">{{ __('View all →') }}</a>
             </div>
             <div class="divide-y divide-slate-50">
                 @forelse($pending_suits as $suit)
@@ -146,7 +146,7 @@
                     </span>
                 </div>
                 @empty
-                <p class="px-5 py-4 text-sm text-slate-400">No active suits.</p>
+                <p class="px-5 py-4 text-sm text-slate-400">{{ __('No suits found.') }}</p>
                 @endforelse
             </div>
         </div>

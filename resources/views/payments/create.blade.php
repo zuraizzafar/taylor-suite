@@ -20,11 +20,11 @@
             <input
                 id="paySearchInput"
                 type="text"
-                placeholder="Search by customer name, mobile, file number, suit code, or order number…"
+                placeholder="{{ __('Search') }}…"
                 autocomplete="off"
                 class="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-sm pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-            <span id="paySearchSpinner" class="hidden absolute right-3 top-2.5 text-slate-400 text-xs animate-pulse">searching…</span>
+            <span id="paySearchSpinner" class="hidden absolute right-3 top-2.5 text-slate-400 text-xs animate-pulse">{{ __('Searching') }}…</span>
         </div>
 
         <!-- Results -->
@@ -41,19 +41,19 @@
                     @php $so = $selectedOrder; @endphp
                     <div class="flex items-start justify-between">
                         <div>
-                            <p class="text-xs text-slate-500 mb-0.5">Selected Order</p>
+                            <p class="text-xs text-slate-500 mb-0.5">{{ __('Selected Order') }}</p>
                             <p class="font-semibold text-slate-800" id="summaryOrderNum">{{ $so->order_number }}</p>
                             <p class="text-sm text-slate-600" id="summaryCustomer">{{ $so->customer->name }}
                                 @if($so->customer->mobile)<span class="text-slate-400">· {{ $so->customer->mobile }}</span>@endif
                             </p>
                         </div>
                         <div class="text-right">
-                            <p class="text-xs text-slate-500">Outstanding Balance</p>
+                            <p class="text-xs text-slate-500">{{ __('Outstanding Balance') }}</p>
                             <p class="text-xl font-bold text-red-600" id="summaryBalance">Rs {{ number_format($so->balance_amount) }}</p>
-                            <p class="text-xs text-slate-400">of Rs <span id="summaryTotal">{{ number_format($so->total_amount) }}</span> total</p>
+                            <p class="text-xs text-slate-400">{{ __('of Rs') }} <span id="summaryTotal">{{ number_format($so->total_amount) }}</span> {{ __('total') }}</p>
                         </div>
                     </div>
-                    <button onclick="clearOrderSelection()" class="mt-3 text-xs text-blue-600 hover:underline">← Change order</button>
+                    <button onclick="clearOrderSelection()" class="mt-3 text-xs text-blue-600 hover:underline">← {{ __('Change Order') }}</button>
                 @endif
             </div>
 
@@ -66,7 +66,7 @@
                 <div class="space-y-4">
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-1">Amount (Rs) *</label>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">{{ __('Amount') }} (Rs) *</label>
                             <input type="number" name="amount" id="payAmountInput" min="1" step="0.01" required
                                 max="{{ $selectedOrder?->balance_amount }}"
                                 value="{{ old('amount') }}"
@@ -75,7 +75,7 @@
                             @error('amount')<p class="text-xs text-red-600 mt-1">{{ $message }}</p>@enderror
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-1">Method *</label>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">{{ __('Payment Method') }} *</label>
                             <select name="method"
                                 class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 @foreach(\App\Models\Payment::METHODS as $key => $label)
@@ -84,21 +84,21 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-1">Payment Date *</label>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">{{ __('Payment Date') }} *</label>
                             <input type="date" name="payment_date" required
                                 value="{{ old('payment_date', date('Y-m-d')) }}"
                                 class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-1">Reference</label>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">{{ __('Reference') }}</label>
                             <input type="text" name="reference" placeholder="Txn ID, cheque no…"
                                 value="{{ old('reference') }}"
                                 class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                         </div>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Note</label>
-                        <input type="text" name="note" placeholder="Optional note"
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">{{ __('Notes') }}</label>
+                        <input type="text" name="note" placeholder="{{ __('optional') }}"
                             value="{{ old('note') }}"
                             class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
@@ -107,11 +107,11 @@
                 <div class="mt-6 flex gap-3">
                     <button type="submit"
                         class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-6 py-2 rounded-lg">
-                        Record Payment
+                        {{ __('Record Payment') }}
                     </button>
                     <button type="button" onclick="clearOrderSelection()"
                         class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium px-5 py-2 rounded-lg">
-                        Cancel
+                        {{ __('Cancel') }}
                     </button>
                 </div>
             </form>

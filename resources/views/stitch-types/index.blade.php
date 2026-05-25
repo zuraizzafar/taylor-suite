@@ -1,6 +1,6 @@
 @extends('layouts.app')
-@section('title', 'Stitch Types')
-@section('page-title', 'Stitch Types & Pricing')
+@section('title', __('Stitch Types'))
+@section('page-title', __('Stitch Types'))
 
 @section('content')
 <div class="pt-2 max-w-4xl">
@@ -16,7 +16,7 @@
 
         {{-- ── Add New Stitch Type ────────────────────────────────── --}}
         <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-5">
-            <h2 class="text-sm font-semibold text-slate-700 mb-4">Add Stitch Type</h2>
+            <h2 class="text-sm font-semibold text-slate-700 mb-4">{{ __('Add Stitch Type') }}</h2>
             <form method="POST" action="{{ route('stitch-types.store') }}">
                 @csrf
                 <div class="space-y-3">
@@ -35,7 +35,7 @@
                     </div>
                     @if(auth()->user()->isAdmin() && $branches->isNotEmpty())
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Branch (optional)</label>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">{{ __('Branch') }}</label>
                         <select name="branch_id"
                             class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                             <option value="">— All branches —</option>
@@ -47,11 +47,11 @@
                     @endif
                     <div class="flex items-center gap-2">
                         <input type="checkbox" name="is_active" id="is_active_new" value="1" checked>
-                        <label for="is_active_new" class="text-sm text-slate-700">Active</label>
+                        <label for="is_active_new" class="text-sm text-slate-700">{{ __('Active') }}</label>
                     </div>
                     <button type="submit"
                         class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 rounded-lg">
-                        Add Stitch Type
+                        {{ __('Add Stitch Type') }}
                     </button>
                 </div>
             </form>
@@ -60,12 +60,12 @@
         {{-- ── Stitch Types Table ─────────────────────────────────── --}}
         <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
             <div class="px-5 py-4 border-b border-slate-100">
-                <h2 class="text-sm font-semibold text-slate-700">All Stitch Types</h2>
+                <h2 class="text-sm font-semibold text-slate-700">{{ __('All Stitch Types') }}</h2>
                 <p class="text-xs text-slate-400 mt-0.5">{{ $stitchTypes->count() }} types defined</p>
             </div>
 
             @if($stitchTypes->isEmpty())
-                <p class="text-sm text-slate-400 px-5 py-8 text-center">No stitch types yet. Add one on the left.</p>
+                <p class="text-sm text-slate-400 px-5 py-8 text-center">{{ __('No stitch types found.') }} Add one on the left.</p>
             @else
             <div class="divide-y divide-slate-50">
                 @foreach($stitchTypes as $st)
@@ -86,11 +86,11 @@
                         <div class="flex items-center gap-4">
                             <span class="text-sm font-semibold text-slate-700">Rs {{ number_format($st->base_price) }}</span>
                             <button @click="editing = true"
-                                class="text-xs text-blue-600 hover:underline">Edit</button>
+                                class="text-xs text-blue-600 hover:underline">{{ __('Edit') }}</button>
                             <form method="POST" action="{{ route('stitch-types.destroy', $st) }}"
-                                onsubmit="return confirm('Delete {{ $st->name }}?')">
+                                onsubmit="return confirm('{{ __('Are you sure?') }}')">
                                 @csrf @method('DELETE')
-                                <button type="submit" class="text-xs text-red-500 hover:underline">Delete</button>
+                                <button type="submit" class="text-xs text-red-500 hover:underline">{{ __('Delete') }}</button>
                             </form>
                         </div>
                     </div>
@@ -125,13 +125,13 @@
                             @endif
                             <div class="flex items-center gap-2">
                                 <input type="checkbox" name="is_active" id="ia_{{ $st->id }}" value="1" {{ $st->is_active ? 'checked' : '' }}>
-                                <label for="ia_{{ $st->id }}" class="text-sm text-slate-700">Active</label>
+                                <label for="ia_{{ $st->id }}" class="text-sm text-slate-700">{{ __('Active') }}</label>
                             </div>
                             <div class="flex gap-2">
                                 <button type="submit"
-                                    class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium px-4 py-1.5 rounded-lg">Save</button>
+                                    class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium px-4 py-1.5 rounded-lg">{{ __('Save') }}</button>
                                 <button type="button" @click="editing = false"
-                                    class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium px-4 py-1.5 rounded-lg">Cancel</button>
+                                    class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium px-4 py-1.5 rounded-lg">{{ __('Cancel') }}</button>
                             </div>
                         </form>
                     </div>

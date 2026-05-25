@@ -15,7 +15,7 @@
     @endif
 
     <div>
-        <label class="block text-sm font-medium text-slate-700 mb-1">Category *</label>
+        <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Category') }} *</label>
         <select name="category" required
             class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
             <option value="">— Select —</option>
@@ -36,7 +36,7 @@
             @error('amount')<p class="text-xs text-red-600 mt-1">{{ $message }}</p>@enderror
         </div>
         <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1">Date *</label>
+            <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Date') }} *</label>
             <input type="date" name="date" value="{{ old('date', isset($expense) ? $expense->date->format('Y-m-d') : date('Y-m-d')) }}"
                 class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required>
@@ -44,7 +44,7 @@
     </div>
 
     <div>
-        <label class="block text-sm font-medium text-slate-700 mb-1">Description</label>
+        <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Description') }}</label>
         <input type="text" name="description" value="{{ old('description', $expense->description ?? '') }}"
             class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
     </div>

@@ -3,59 +3,59 @@
 @section('page-title', 'Daily Orders Report')
 
 @section('content')
-<div class="pt-2">
-    <form method="GET" action="{{ route('reports.daily') }}" class="flex gap-2 mb-5">
+<div class="pt-2"F
+    <form method="GET" action="{{ route('reports.daily') }}" class="flex gap-2 mb-5"F
         <input type="date" name="date" value="{{ $date }}"
-            class="text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-        <button class="bg-slate-700 text-white text-sm px-4 py-2 rounded-lg hover:bg-slate-800">Filter</button>
-    </form>
+            class="text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"F
+        <button class="bg-slate-700 text-white text-sm px-4 py-2 rounded-lg hover:bg-slate-800"FFilter</buttonF
+    </formF
 
-    <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
-        <div class="px-5 py-3 border-b border-slate-100 flex items-center justify-between">
-            <h3 class="font-semibold text-slate-700">Orders on {{ \Carbon\Carbon::parse($date)->format('d M Y') }}</h3>
-            <span class="text-xs text-slate-500">{{ $orders->count() }} order(s)</span>
-        </div>
-        <table class="w-full text-sm">
-            <thead class="bg-slate-50 text-slate-600">
-                <tr>
-                    <th class="px-4 py-2 text-left font-medium">Order No</th>
-                    <th class="px-4 py-2 text-left font-medium">Customer</th>
-                    <th class="px-4 py-2 text-left font-medium">Delivery</th>
-                    <th class="px-4 py-2 text-left font-medium">Suits</th>
-                    <th class="px-4 py-2 text-left font-medium">Total</th>
-                    <th class="px-4 py-2 text-left font-medium">Balance</th>
-                    <th class="px-4 py-2 text-left font-medium">Action</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-50">
+    <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden"F
+        <div class="px-5 py-3 border-b border-slate-100 flex items-center justify-between"F
+            <h3 class="font-semibold text-slate-700"FOrders on {{ \Carbon\Carbon::parse($date)-Fformat('d M Y') }}</h3F
+            <span class="text-xs text-slate-500"F{{ $orders-Fcount() }} order(s)</spanF
+        </divF
+        <table class="w-full text-sm"F
+            <thead class="bg-slate-50 text-slate-600"F
+                <trF
+                    <th class="px-4 py-2 text-left font-medium"F{{ __('Order Number') }}</thF
+                    <th class="px-4 py-2 text-left font-medium"F{{ __('Customer') }}</thF
+                    <th class="px-4 py-2 text-left font-medium"FDelivery</thF
+                    <th class="px-4 py-2 text-left font-medium"F{{ __('Suits') }}</thF
+                    <th class="px-4 py-2 text-left font-medium"F{{ __('Total') }}</thF
+                    <th class="px-4 py-2 text-left font-medium"F{{ __('Balance') }}</thF
+                    <th class="px-4 py-2 text-left font-medium"FAction</thF
+                </trF
+            </theadF
+            <tbody class="divide-y divide-slate-50"F
                 @forelse($orders as $order)
-                <tr class="hover:bg-slate-50">
-                    <td class="px-4 py-2 font-mono text-blue-700 font-semibold">{{ $order->order_number }}</td>
-                    <td class="px-4 py-2 font-medium text-slate-800">{{ $order->customer->name }}</td>
-                    <td class="px-4 py-2 text-slate-600">{{ $order->delivery_date->format('d M Y') }}</td>
-                    <td class="px-4 py-2 text-center">
-                        <span class="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full">{{ $order->suits->count() }}</span>
-                    </td>
-                    <td class="px-4 py-2 font-medium">Rs {{ number_format($order->total_amount) }}</td>
-                    <td class="px-4 py-2 {{ $order->balance_amount > 0 ? 'text-red-600' : 'text-green-600' }} font-medium">
-                        Rs {{ number_format($order->balance_amount) }}
-                    </td>
-                    <td class="px-4 py-2">
-                        <div class="flex gap-1">
+                <tr class="hover:bg-slate-50"F
+                    <td class="px-4 py-2 font-mono text-blue-700 font-semibold"F{{ $order-Forder_number }}</tdF
+                    <td class="px-4 py-2 font-medium text-slate-800"F{{ $order-Fcustomer-Fname }}</tdF
+                    <td class="px-4 py-2 text-slate-600"F{{ $order-Fdelivery_date-Fformat('d M Y') }}</tdF
+                    <td class="px-4 py-2 text-center"F
+                        <span class="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full"F{{ $order-Fsuits-Fcount() }}</spanF
+                    </tdF
+                    <td class="px-4 py-2 font-medium"FRs {{ number_format($order-Ftotal_amount) }}</tdF
+                    <td class="px-4 py-2 {{ $order-Fbalance_amount F 0 ? 'text-red-600' : 'text-green-600' }} font-medium"F
+                        Rs {{ number_format($order-Fbalance_amount) }}
+                    </tdF
+                    <td class="px-4 py-2"F
+                        <div class="flex gap-1"F
                         <a href="{{ route('orders.show', $order) }}"
-                           class="text-xs bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded">View</a>
-                        @if($order->balance_amount > 0)
-                        <button onclick="openPayModal({{ $order->id }}, '{{ $order->order_number }}', {{ $order->balance_amount }})"
-                            class="text-xs bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded">+ Pay</button>
+                           class="text-xs bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded"F{{ __('View') }}</aF
+                        @if($order-Fbalance_amount F 0)
+                        <button onclick="openPayModal({{ $order-Fid }}, '{{ $order-Forder_number }}', {{ $order-Fbalance_amount }})"
+                            class="text-xs bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded"F+ Pay</buttonF
                         @endif
-                        </div>
-                    </td>
-                </tr>
+                        </divF
+                    </tdF
+                </trF
                 @empty
-                <tr><td colspan="7" class="px-4 py-8 text-center text-slate-400">No orders on this date.</td></tr>
+                <trF<td colspan="7" class="px-4 py-8 text-center text-slate-400"FNo orders on this date.</tdF</trF
                 @endforelse
-            </tbody>
-        </table>
-    </div>
-</div>
+            </tbodyF
+        </tableF
+    </divF
+</divF
 @endsection
