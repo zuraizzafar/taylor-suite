@@ -5,6 +5,8 @@
 @push('scripts')
 <script>
 function posApp() {
+    const customerSearchUrl = @json(route('pos.customers.search'));
+
     return {
         // ── Customer panel ─────────────────────────────────────────────────
         customerMode: 'search',   // 'search' | 'new' | 'selected'
@@ -47,9 +49,12 @@ function posApp() {
             if (this.searchQuery.length < 2) { this.searchResults = []; return; }
             this.searching = true;
             try {
-                const r = await fetch('/pos/customers/search?q=' + encodeURIComponent(this.searchQuery), {
+                const r = await fetch(customerSearchUrl + '?q=' + encodeURIComponent(this.searchQuery), {
                     headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
                 });
+                if (!r.ok) {
+                    throw new Error('Customer search request failed.');
+                }
                 this.searchResults = await r.json();
             } finally { this.searching = false; }
         },
