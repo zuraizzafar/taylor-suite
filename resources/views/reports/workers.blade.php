@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', __(__('Workers Report')))
+@section('title', __('Workers Report'))
 @section('page-title', __('Workers Report'))
 
 @section('content')
@@ -36,7 +36,7 @@
     {{-- ── Summary Bar ───────────────────────────────────────────── --}}
     <div class="grid grid-cols-3 gap-4">
         <div class="bg-white rounded-xl border border-slate-100 shadow-sm p-4 text-center">
-            <p class="text-xs text-slate-500 mb-1">{{ __('{{ __('Total Suits Stitched') }}') }}</p>
+            <p class="text-xs text-slate-500 mb-1">{{ __('Total Suits Stitched') }}</p>
             <p class="text-3xl font-bold text-slate-800">{{ $totalSuits }}</p>
         </div>
         <div class="bg-white rounded-xl border border-slate-100 shadow-sm p-4 text-center">
@@ -44,7 +44,7 @@
             <p class="text-2xl font-bold text-blue-600">Rs {{ number_format($totalEarned) }}</p>
         </div>
         <div class="bg-white rounded-xl border border-slate-100 shadow-sm p-4 text-center">
-            <p class="text-xs text-slate-500 mb-1">{{ __('{{ __('Total Paid Out') }}') }}</p>
+            <p class="text-xs text-slate-500 mb-1">{{ __('Total Paid Out') }}</p>
             <p class="text-2xl font-bold text-green-600">Rs {{ number_format($totalPaid) }}</p>
         </div>
     </div>
@@ -52,7 +52,7 @@
     {{-- ── Leaderboard Table ─────────────────────────────────────── --}}
     <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
         <div class="px-5 py-4 border-b border-slate-100">
-            <h2 class="text-sm font-semibold text-slate-700">{{ __('{{ __('Worker Leaderboard') }}') }}</h2>
+            <h2 class="text-sm font-semibold text-slate-700">{{ __('Worker Leaderboard') }}</h2>
             <p class="text-xs text-slate-400 mt-0.5">{{ $from }} to {{ $to }} · sorted by suits stitched</p>
         </div>
 
