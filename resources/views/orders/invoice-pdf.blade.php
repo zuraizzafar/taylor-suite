@@ -285,14 +285,20 @@
     </table>
 
     {{-- MEASUREMENTS --}}
-    @if($measurement)
     @php
-        $hasMeas = collect($qFields)->keys()->merge(collect($sFields)->keys())
-                       ->some(fn($k) => !empty($measurement->$k));
+        $hasMeas = $measurement
+            && collect($qFields)->keys()->merge(collect($sFields)->keys())
+                ->some(fn($k) => !empty($measurement->$k));
+        $measurementNotes = $measurement?->notes;
     @endphp
     @if($hasMeas)
     <div class="meas-wrap">
-        <div class="meas-title-row">Customer Measurements@if($measurement->notes) &nbsp;&middot;&nbsp; <span style="font-weight:400;color:#64748b;text-transform:none;letter-spacing:0">{{ $measurement->notes }}</span>@endif</div>
+        <div class="meas-title-row">
+            Customer Measurements
+            @if($measurementNotes)
+            &nbsp;&middot;&nbsp; <span style="font-weight:400;color:#64748b;text-transform:none;letter-spacing:0">{{ $measurementNotes }}</span>
+            @endif
+        </div>
 
         {{-- Qameez / Kameez --}}
         <div class="meas-section-hdr">Qameez / Kameez</div>
@@ -328,7 +334,6 @@
             </tr>
         </table>
     </div>
-    @endif
     @endif
 
     {{-- PAYMENT SUMMARY --}}
