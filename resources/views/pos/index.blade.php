@@ -254,26 +254,31 @@ function posApp() {
                 <div x-show="customerMode === 'new'" class="space-y-2.5">
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">{{ __('Full Name') }} *</label>
-                        <input type="text" name="customer_name" x-model="newCustomer.name" required
+                        <input type="text" name="customer_name" x-model="newCustomer.name"
+                            :required="customerMode === 'new'"
+                            :disabled="customerMode !== 'new'"
                             class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder="Customer name">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">{{ __('Mobile') }} *</label>
-                        <input type="text" name="customer_mobile" x-model="newCustomer.mobile" required
+                        <input type="text" name="customer_mobile" x-model="newCustomer.mobile"
+                            :required="customerMode === 'new'"
+                            :disabled="customerMode !== 'new'"
                             class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder="03XX-XXXXXXX">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">{{ __('Address') }}</label>
                         <input type="text" name="customer_address" x-model="newCustomer.address"
+                            :disabled="customerMode !== 'new'"
                             class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder="Optional">
                     </div>
                     @if(auth()->user()->isAdmin())
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">{{ __('Branch') }}</label>
-                        <select name="branch_id" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <select name="branch_id" :disabled="customerMode !== 'new'" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                             <option value="">— Select branch —</option>
                             @foreach($branches as $b)
                             <option value="{{ $b->id }}">{{ $b->name }}</option>
