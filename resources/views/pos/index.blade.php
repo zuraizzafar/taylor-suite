@@ -110,7 +110,7 @@ function posApp() {
             const hasSuit = this.suits.length > 0 && this.suits.every(s => s.suit_type && s.fabric_meter);
             const total = parseFloat(this.totalAmount) || 0;
             const advance = parseFloat(this.advanceAmount) || 0;
-            const hasOrder = this.orderDate && this.deliveryDate && total > 0 && advance < total;
+            const hasOrder = this.orderDate && this.deliveryDate && total > 0 && advance <= total;
             return hasCustomer && hasSuit && hasOrder;
         },
 
@@ -130,8 +130,8 @@ function posApp() {
                 return 'Total amount must be greater than zero.';
             }
 
-            if (advance >= total) {
-                return 'Advance must be less than the total amount.';
+            if (advance > total) {
+                return 'Advance cannot be greater than the total amount.';
             }
 
             if (!(this.suits.length > 0 && this.suits.every(s => s.suit_type && s.fabric_meter))) {

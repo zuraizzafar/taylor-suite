@@ -101,16 +101,14 @@ class PosController extends Controller
             'suits.*.stitch_type_id' => ['nullable', 'exists:stitch_types,id'],
             'suits.*.worker_id'  => ['nullable', 'exists:workers,id'],
             'suits.*.notes'      => ['nullable', 'string'],
-        ], [
-            'advance_amount.lt' => 'Advance must be less than the total amount.',
         ]);
 
         $total   = (float) $request->input('total_amount');
         $advance = (float) $request->input('advance_amount');
 
-        if ($advance >= $total) {
+        if ($advance > $total) {
             return back()
-                ->withErrors(['advance_amount' => 'Advance must be less than the total amount.'])
+            ->withErrors(['advance_amount' => 'Advance cannot be greater than the total amount.'])
                 ->withInput();
         }
 
