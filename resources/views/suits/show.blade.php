@@ -3,6 +3,15 @@
 @section('page-title', 'Suit: ' . $suit->suit_code)
 
 @section('content')
+@php
+    $measurementActionUrl = $suit->measurement
+        ? route('measurements.edit', [$suit->customer, $suit->measurement])
+        : route('measurements.create', $suit->customer);
+    $measurementActionUrl .= '?' . http_build_query([
+        'redirect_to' => route('suits.show', $suit),
+        'suit_id' => $suit->id,
+    ]);
+@endphp
 <div class="pt-2 space-y-6">
 
     {{-- Suit header --}}
@@ -140,8 +149,17 @@
     @endif
 
     {{-- Measurements --}}
-    @if($suit->measurement)    <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-5">
-        <h3 class="font-semibold text-slate-700 mb-3">📏 Measurements – {{ $suit->measurement->label }}</h3>
+    <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-5">
+        <div class="flex items-center justify-between gap-3 mb-3">
+            <h3 class="font-semibold text-slate-700">
+                📏 {{ $suit->measurement ? 'Measurements – ' . $suit->measurement->label : __('Measurements') }}
+            </h3>
+            <a href="{{ $measurementActionUrl }}"
+               class="text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg">
+                {{ $suit->measurement ? __('Edit Measurements') : __('Add Measurements') }}
+            </a>
+        </div>
+        @if($suit->measurement)
         <div class="grid grid-cols-2 gap-4">
             <div>
                 <h4 class="text-xs font-semibold text-slate-500 uppercase mb-2">{{ __('Qameez') }}</h4>
@@ -170,8 +188,12 @@
                 </div>
             </div>
         </div>
+        @else
+        <div class="rounded-lg border border-dashed border-slate-200 bg-slate-50 px-4 py-5 text-sm text-slate-500">
+            {{ __('No measurement set is attached to this suit yet. You can add one directly from here.') }}
+        </div>
+        @endif
     </div>
-    @endif
 
 </div>
 @endsection

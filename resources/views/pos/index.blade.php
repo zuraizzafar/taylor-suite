@@ -39,7 +39,7 @@ function posApp() {
         suits: [],
 
         get balance() {
-            return Math.max(0, parseFloat(this.totalAmount)||0 - parseFloat(this.advanceAmount)||0);
+            return Math.max(0, (parseFloat(this.totalAmount) || 0) - (parseFloat(this.advanceAmount) || 0));
         },
 
         get suitsCount() { return this.suits.length; },
@@ -108,8 +108,48 @@ function posApp() {
             const hasCustomer = this.customerMode === 'selected'
                 || (this.customerMode === 'new' && this.newCustomer.name && this.newCustomer.mobile);
             const hasSuit = this.suits.length > 0 && this.suits.every(s => s.suit_type && s.fabric_meter);
-            const hasOrder = this.orderDate && this.deliveryDate && this.totalAmount >= 0;
+            const total = parseFloat(this.totalAmount) || 0;
+            const advance = parseFloat(this.advanceAmount) || 0;
+            const hasOrder = this.orderDate && this.deliveryDate && total > 0 && advance < total;
             return hasCustomer && hasSuit && hasOrder;
+        },
+
+        validationError() {
+            const total = parseFloat(this.totalAmount) || 0;
+            const advance = parseFloat(this.advanceAmount) || 0;
+
+            if (!(this.customerMode === 'selected' || (this.customerMode === 'new' && this.newCustomer.name && this.newCustomer.mobile))) {
+                return 'Please select an existing customer or enter a new customer name and mobile number.';
+            }
+
+            if (!this.orderDate || !this.deliveryDate) {
+                return 'Please fill in the order date and delivery date.';
+            }
+
+            if (total <= 0) {
+                return 'Total amount must be greater than zero.';
+            }
+
+            if (advance >= total) {
+                return 'Advance must be less than the total amount.';
+            }
+
+            if (!(this.suits.length > 0 && this.suits.every(s => s.suit_type && s.fabric_meter))) {
+                return 'Please add at least one suit with suit type and fabric size.';
+            }
+
+            return null;
+        },
+
+        submitForm(event) {
+            const message = this.validationError();
+
+            if (message) {
+                window.alert(message);
+                return;
+            }
+
+            event.target.submit();
         },
 
         // ── Init ──────────────────────────────────────────────────────────
@@ -138,7 +178,7 @@ function posApp() {
 
 @section('content')
 <div x-data="posApp()" x-init="init()" class="pt-1">
-<form method="POST" action="{{ route('pos.store') }}" @submit.prevent="$el.submit()">
+<form method="POST" action="{{ route('pos.store') }}" @submit.prevent="submitForm($event)">
 @csrf
 
 <div class="grid grid-cols-1 lg:grid-cols-5 gap-5 items-start">
@@ -392,7 +432,7 @@ function posApp() {
                                         class="w-full border border-slate-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-semibold text-slate-500 mb-1">{{ __('Fabric') }} (m) *</label>
+                                    <label class="block text-xs font-semibold text-slate-500 mb-1">{{ __('Fabric Size') }} (meter) *</label>
                                     <input type="number" :name="'suits['+idx+'][fabric_meter]'" x-model="suit.fabric_meter"
                                         required min="0.5" step="0.5"
                                         class="w-full border border-slate-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -496,4 +536,11 @@ function posApp() {
 
 </form>
 </div>
+@if($errors->any())
+<script>
+window.addEventListener('DOMContentLoaded', function () {
+    window.alert(@json($errors->first()));
+});
+</script>
+@endif
 @endsection

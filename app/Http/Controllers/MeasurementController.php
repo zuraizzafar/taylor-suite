@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Customer;
 use App\Models\Measurement;
+use App\Models\Suit;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -46,10 +47,11 @@ class MeasurementController extends Controller
         $data['customer_id'] = $customer->id;
         $data['meta']        = $this->extractMeta($request);
 
-        Measurement::create($data);
+        $measurement = Measurement::create($data);
 
-        return redirect()->route('customers.show', $customer)
-            ->with('success', 'Measurement saved.');
+        $this->attachMeasurementToSuit($request, $customer, $measurement);
+
+        return $this->redirectAfterSave($request, $customer, 'Measurement saved.');
     }
 
     public function edit(Customer $customer, Measurement $measurement): View
@@ -87,8 +89,42 @@ class MeasurementController extends Controller
         $data['meta'] = $this->extractMeta($request);
         $measurement->update($data);
 
+        $this->attachMeasurementToSuit($request, $customer, $measurement);
+
+        return $this->redirectAfterSave($request, $customer, 'Measurement updated.');
+    }
+
+    private function attachMeasurementToSuit(Request $request, Customer $customer, Measurement $measurement): void
+    {
+        $suitId = $request->integer('suit_id');
+        if (! $suitId) {
+            return;
+        }
+
+        $suit = Suit::whereKey($suitId)
+            ->where('customer_id', $customer->id)
+            ->first();
+
+        if ($suit) {
+            $suit->update(['measurement_id' => $measurement->id]);
+        }
+    }
+
+    private function redirectAfterSave(Request $request, Customer $customer, string $message): RedirectResponse
+    {
+        $redirectTo = $request->input('redirect_to');
+
+        if (is_string($redirectTo) && $redirectTo !== '' && $this->isLocalRedirect($redirectTo)) {
+            return redirect()->to($redirectTo)->with('success', $message);
+        }
+
         return redirect()->route('customers.show', $customer)
-            ->with('success', 'Measurement updated.');
+            ->with('success', $message);
+    }
+
+    private function isLocalRedirect(string $redirectTo): bool
+    {
+        return str_starts_with($redirectTo, '/') || str_starts_with($redirectTo, url('/'));
     }
 
     private function extractMeta(Request $request): array

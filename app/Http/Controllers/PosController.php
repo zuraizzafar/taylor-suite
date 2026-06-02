@@ -27,12 +27,12 @@ class PosController extends Controller
      */
     public function index(Request $request): View
     {
-        $workers = Worker::where('is_active', true)
+        $workers = Worker::query()->where('is_active', true)
             ->when($this->currentBranchId(), fn($q, $b) => $q->where('branch_id', $b))
             ->orderBy('name')->get();
 
-        $stitchTypes = StitchType::where('is_active', true)->orderBy('name')->get();
-        $branches    = Branch::where('is_active', true)->orderBy('name')->get();
+        $stitchTypes = StitchType::query()->where('is_active', true)->orderBy('name')->get();
+        $branches    = Branch::query()->where('is_active', true)->orderBy('name')->get();
 
         // Pre-select customer if passed via URL (e.g. coming from customer page)
         $preCustomer = $request->input('customer_id')
@@ -101,7 +101,18 @@ class PosController extends Controller
             'suits.*.stitch_type_id' => ['nullable', 'exists:stitch_types,id'],
             'suits.*.worker_id'  => ['nullable', 'exists:workers,id'],
             'suits.*.notes'      => ['nullable', 'string'],
+        ], [
+            'advance_amount.lt' => 'Advance must be less than the total amount.',
         ]);
+
+        $total   = (float) $request->input('total_amount');
+        $advance = (float) $request->input('advance_amount');
+
+        if ($advance >= $total) {
+            return back()
+                ->withErrors(['advance_amount' => 'Advance must be less than the total amount.'])
+                ->withInput();
+        }
 
         DB::transaction(function () use ($request) {
             $branchId = $request->input('branch_id') ?? $this->currentBranchId();
@@ -152,7 +163,7 @@ class PosController extends Controller
                 Payment::create([
                     'order_id'     => $order->id,
                     'branch_id'    => $branchId,
-                    'received_by'  => auth()->id(),
+                    'received_by'  => $request->user()?->id,
                     'amount'       => $advance,
                     'method'       => $request->input('payment_method', 'cash'),
                     'payment_date' => $request->input('order_date'),
@@ -165,8 +176,8 @@ class PosController extends Controller
             // ── 4. Suits ───────────────────────────────────────────────────────
             $this->_order = $order; // store for redirect
             foreach ($request->input('suits') as $suitData) {
-                $worker     = isset($suitData['worker_id']) ? Worker::find($suitData['worker_id']) : null;
-                $stitchType = isset($suitData['stitch_type_id']) ? StitchType::find($suitData['stitch_type_id']) : null;
+                $worker     = isset($suitData['worker_id']) ? Worker::query()->find($suitData['worker_id']) : null;
+                $stitchType = isset($suitData['stitch_type_id']) ? StitchType::query()->find($suitData['stitch_type_id']) : null;
 
                 $earning = null;
                 if ($stitchType) {

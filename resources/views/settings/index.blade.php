@@ -6,7 +6,7 @@
 <div class="max-w-3xl">
     <form method="POST" action="{{ route('settings.update') }}" enctype="multipart/form-data" class="space-y-6">
         @csrf
-        @method('PpT')
+        @method('PUT')
 
         {{-- Company Information --}}
         <div class="bg-white border border-slate-200 rounded-xl p-6 space-y-4">

@@ -157,6 +157,18 @@
 
     $grandTotal      = $order->balance_amount + $previousBalance;
     $showPreviousRow = $previousBalance > 0;
+    $styleMetaLabels = [
+        'collar_style' => 'Neck / Collar Style',
+        'button_type' => 'Button Type',
+        'ghera_style' => 'Ghera (Bottom)',
+        'stitching_style' => 'Stitching Style',
+        'chak_patti' => 'Chak Patti',
+        'kaj_hale' => 'Kaj Hale',
+        'pahuncha_style' => 'Pahuncha',
+        'front_patti_size' => 'Front Patti Size',
+        'design_number' => 'Design Number',
+    ];
+    $styleOptions = collect($measurement?->meta ?? [])->filter(fn ($value) => filled($value));
 
     // Logo base64
     $logoB64  = null;
@@ -367,6 +379,13 @@
     </div>
     @if($order->notes)
     <div class="note-box"><strong>Note:</strong> {{ $order->notes }}</div>
+    @endif
+
+    @if($styleOptions->isNotEmpty())
+    <div class="note-box">
+        <strong>Style &amp; Finishing Options:</strong>
+        {{ $styleOptions->map(fn ($value, $key) => ($styleMetaLabels[$key] ?? ucfirst(str_replace('_', ' ', $key))) . ': ' . $value)->implode(' | ') }}
+    </div>
     @endif
 
     {{-- LEGAL NOTICE --}}
