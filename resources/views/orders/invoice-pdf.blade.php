@@ -157,6 +157,7 @@
 
     $grandTotal      = $order->balance_amount + $previousBalance;
     $showPreviousRow = $previousBalance > 0;
+    $trackingUrl = route('tracking.show', ['tracking' => $order->order_number]);
     $styleMetaLabels = [
         'collar_style' => 'Neck / Collar Style',
         'button_type' => 'Button Type',
@@ -396,7 +397,10 @@
 
     {{-- FOOTER --}}
     <div class="footer">
-        <div class="footer-left">{{ $companyName }} &mdash; {{ $companyTagline }}</div>
+        <div class="footer-left">
+            {{ $companyName }} &mdash; {{ $companyTagline }}
+            <br><span style="font-size:9px;color:#94a3b8">Track order: <a href="{{ $trackingUrl }}" style="color:#2563eb;text-decoration:none">{{ $trackingUrl }}</a></span>
+        </div>
         <div class="footer-right">Printed: {{ now()->format('d M Y, h:i A') }}</div>
     </div>
 

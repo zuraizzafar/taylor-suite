@@ -227,11 +227,6 @@ class SuitController extends Controller
         $qrImage = null;
         if ($suit->qr_code_path && Storage::disk('public')->exists($suit->qr_code_path)) {
             $qrImage = base64_encode(Storage::disk('public')->get($suit->qr_code_path));
-        } else {
-            $qrImage = base64_encode(QrCode::format('svg')
-                ->size(200)
-                ->errorCorrection('H')
-                ->generate(route('scan.show', $suit->suit_code)));
         }
 
         $pdf = Pdf::loadView('suits.tag-pdf', compact('suit', 'qrImage'))

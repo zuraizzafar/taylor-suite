@@ -34,6 +34,8 @@ Route::get('/lang/{locale}', function (string $locale) {
 
 // ─── Public: QR scan (no auth required) ───────────────────────────────────────
 Route::get('/scan/{code}', [ScanController::class, 'show'])->name('scan.show');
+Route::get('/track', [ScanController::class, 'tracking'])->name('tracking.index');
+Route::get('/track/{tracking}', [ScanController::class, 'trackingShow'])->name('tracking.show');
 
 // ─── Auth ──────────────────────────────────────────────────────────────────────
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login')->middleware('guest');
