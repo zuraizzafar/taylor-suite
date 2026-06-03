@@ -45,10 +45,6 @@ class ScanController extends Controller
         $tracking = strtoupper(trim($tracking));
         [$order, $resolvedTracking] = $this->findTrackedOrder($tracking);
 
-        if ($order && Auth::check() && in_array(Auth::user()?->role, ['admin', 'branch_manager'])) {
-            return redirect()->route('orders.show', $order);
-        }
-
         return view('scan.tracking', [
             'order' => $order,
             'tracking' => $resolvedTracking ?: $tracking,
