@@ -169,7 +169,9 @@
                 <div class="customer">{{ $order->customer->name }}</div>
                 <div class="meta">
                     Mobile: {{ $order->customer->mobile }}<br>
-                    @if($order->customer->address){{ $order->customer->address }}<br>@endif
+                    @if($order->customer->address)
+                    {{ $order->customer->address }}<br>
+                    @endif
                     Order Date: {{ $order->order_date?->format('d M Y') }}<br>
                     Delivery Date: {{ $order->delivery_date?->format('d M Y') }}
                 </div>
@@ -217,7 +219,12 @@
                     <tr>
                         <td data-label="Suit Code"><span class="code">{{ $suit->suit_code }}</span></td>
                         <td data-label="Type">{{ $suit->suit_type }}</td>
-                        <td data-label="Fabric">{{ $suit->fabric_meter }} meter@if($suit->fabric_description), {{ $suit->fabric_description }}@endif</td>
+                        <td data-label="Fabric">
+                            {{ $suit->fabric_meter }} meter
+                            @if($suit->fabric_description)
+                            , {{ $suit->fabric_description }}
+                            @endif
+                        </td>
                         <td data-label="Worker">{{ $suit->worker?->name ?? 'Unassigned' }}</td>
                         <td data-label="Status"><span class="status status-{{ $suit->status }}">{{ ucfirst($suit->status) }}</span></td>
                     </tr>
