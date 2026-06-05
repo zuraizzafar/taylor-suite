@@ -6,6 +6,7 @@ use App\Models\Customer;
 use App\Models\Order;
 use App\Models\StitchType;
 use App\Models\Suit;
+use App\Models\SuitType;
 use App\Models\Worker;
 use App\Traits\HasBranchScope;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -52,6 +53,7 @@ class SuitController extends Controller
         $workers = $workersQuery->get();
 
         $stitchTypes = StitchType::where('is_active', true)->orderBy('name')->get();
+        $suitTypes   = SuitType::where('is_active', true)->orderBy('name')->get();
 
         $selectedCustomer = $request->input('customer_id')
             ? Customer::with('measurements')->find($request->input('customer_id'))
@@ -60,7 +62,7 @@ class SuitController extends Controller
             ? Order::find($request->input('order_id'))
             : null;
 
-        return view('suits.create', compact('customers', 'workers', 'stitchTypes', 'selectedCustomer', 'selectedOrder'));
+        return view('suits.create', compact('customers', 'workers', 'stitchTypes', 'selectedCustomer', 'selectedOrder', 'suitTypes'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -124,9 +126,10 @@ class SuitController extends Controller
     {
         $workers      = Worker::where('is_active', true)->get();
         $measurements = $suit->customer->measurements;
-        $stitchTypes  = StitchType::where('is_active', true)->orderBy('name')->get();
+        $stitchTypes = StitchType::where('is_active', true)->orderBy('name')->get();
+        $suitTypes   = SuitType::where('is_active', true)->orderBy('name')->get();
 
-        return view('suits.edit', compact('suit', 'workers', 'measurements', 'stitchTypes'));
+        return view('suits.edit', compact('suit', 'workers', 'measurements', 'stitchTypes', 'suitTypes'));
     }
 
     public function update(Request $request, Suit $suit): RedirectResponse

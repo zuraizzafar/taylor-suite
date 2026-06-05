@@ -188,6 +188,22 @@
                 </div>
             </div>
         </div>
+        @php $meta = $suit->measurement->meta ?? []; @endphp
+        @if(!empty($meta))
+        <div class="mt-4 pt-4 border-t border-slate-100">
+            <h4 class="text-xs font-semibold text-slate-500 uppercase mb-2">Style &amp; Finishing</h4>
+            <div class="flex flex-wrap gap-2">
+                @if(!empty($meta['button_count']))
+                <span class="bg-blue-50 text-blue-700 text-xs px-2 py-1 rounded-full">🔘 Buttons: {{ $meta['button_count'] }}</span>
+                @endif
+                @foreach(['collar_style' => 'Collar', 'button_type' => 'Button Type', 'ghera_style' => 'Ghera', 'stitching_style' => 'Stitching', 'chak_patti' => 'Chak Patti', 'kaj_hale' => 'Kaj Hale', 'pahuncha_style' => 'Pahuncha', 'front_patti_size' => 'Front Patti', 'design_number' => 'Design No.'] as $key => $label)
+                @if(!empty($meta[$key]))
+                <span class="bg-slate-100 text-slate-700 text-xs px-2 py-1 rounded-full">{{ $label }}: {{ $meta[$key] }}</span>
+                @endif
+                @endforeach
+            </div>
+        </div>
+        @endif
         @else
         <div class="rounded-lg border border-dashed border-slate-200 bg-slate-50 px-4 py-5 text-sm text-slate-500">
             {{ __('No measurement set is attached to this suit yet. You can add one directly from here.') }}

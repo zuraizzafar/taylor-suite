@@ -66,6 +66,17 @@
             </div>
 
             <div>
+                <label class="block text-xs font-medium text-slate-600 mb-1">Number of Buttons</label>
+                <select name="meta_button_count"
+                    class="w-full border border-slate-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">— Select —</option>
+                    @for($i = 1; $i <= 15; $i++)
+                    <option value="{{ $i }}" {{ old('meta_button_count', $meta['button_count'] ?? '') == $i ? 'selected' : '' }}>{{ $i }}</option>
+                    @endfor
+                </select>
+            </div>
+
+            <div>
                 <label class="block text-xs font-medium text-slate-600 mb-1">Ghera (Bottom)</label>
                 <select name="meta_ghera_style"
                     class="w-full border border-slate-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">

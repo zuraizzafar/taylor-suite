@@ -52,6 +52,19 @@
         @if($order->notes)
         <p class="mt-3 text-sm text-slate-500">📝 {{ $order->notes }}</p>
         @endif
+
+        @if(!empty($order->extras))
+        <div class="mt-3 pt-3 border-t border-slate-100">
+            <p class="text-xs font-semibold text-slate-500 uppercase mb-2">Extras / Add-ons</p>
+            <div class="flex flex-wrap gap-2">
+                @foreach($order->extras as $extra)
+                <span class="bg-amber-50 text-amber-800 border border-amber-200 text-xs px-2 py-1 rounded-full">
+                    {{ $extra['name'] }} — Rs {{ number_format($extra['price']) }}
+                </span>
+                @endforeach
+            </div>
+        </div>
+        @endif
     </div>
 
     {{-- Suits in this order --}}

@@ -132,6 +132,7 @@ class MeasurementController extends Controller
         return array_filter([
             'collar_style'    => $request->input('meta_collar_style'),
             'button_type'     => $request->input('meta_button_type'),
+            'button_count'    => $request->input('meta_button_count'),
             'ghera_style'     => $request->input('meta_ghera_style'),
             'stitching_style' => $request->input('meta_stitching_style'),
             'chak_patti'      => $request->input('meta_chak_patti'),

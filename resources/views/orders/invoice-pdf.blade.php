@@ -1,10 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ app()->getLocale() === 'ur' ? 'ur' : 'en' }}" dir="{{ app()->getLocale() === 'ur' ? 'rtl' : 'ltr' }}">
 <head>
 <meta charset="UTF-8">
 <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: DejaVu Sans, sans-serif; font-size: 12px; color: #1e293b; background: #fff; }
+    @if(app()->getLocale() === 'ur')
+    body { direction: rtl; text-align: right; }
+    .header-right { text-align: left; }
+    .payment-wrap-inner { text-align: left; }
+    .footer-right { text-align: left; }
+    .footer-left { text-align: right; }
+    @endif
 
     /* Page */
     .page { padding: 36px 40px 30px; page-break-after: always; font-family: DejaVu Sans, sans-serif; }
@@ -158,9 +165,11 @@
     $grandTotal      = $order->balance_amount + $previousBalance;
     $showPreviousRow = $previousBalance > 0;
     $trackingUrl = route('tracking.show', ['tracking' => $order->order_number]);
+    $isUrdu = app()->getLocale() === 'ur';
     $styleMetaLabels = [
         'collar_style' => 'Neck / Collar Style',
         'button_type' => 'Button Type',
+        'button_count' => 'Number of Buttons',
         'ghera_style' => 'Ghera (Bottom)',
         'stitching_style' => 'Stitching Style',
         'chak_patti' => 'Chak Patti',
@@ -194,8 +203,8 @@
     }
 
     $copies = [
-        ['label' => 'Customer Copy', 'show_worker' => false],
-        ['label' => 'Shop Copy',     'show_worker' => true],
+        ['label' => $isUrdu ? __('Customer Copy') : 'Customer Copy', 'show_worker' => false],
+        ['label' => $isUrdu ? __('Shop Copy')     : 'Shop Copy',     'show_worker' => true],
     ];
 @endphp
 
@@ -221,12 +230,12 @@
             </div>
         </div>
         <div class="header-right">
-            <div class="invoice-title">Invoice</div>
+            <div class="invoice-title">{{ $isUrdu ? __('Invoice') : 'Invoice' }}</div>
             <div><span class="invoice-no">{{ $order->order_number }}</span></div>
             <div class="invoice-dates">
-                Order Date: <strong>{{ $order->order_date->format('d M Y') }}</strong><br>
-                Delivery Date: <strong>{{ $order->delivery_date->format('d M Y') }}</strong><br>
-                Suits: <strong>{{ $order->suits->count() }}</strong>
+                {{ $isUrdu ? __('Order Date:') : 'Order Date:' }} <strong>{{ $order->order_date->format('d M Y') }}</strong><br>
+                {{ $isUrdu ? __('Delivery Date:') : 'Delivery Date:' }} <strong>{{ $order->delivery_date->format('d M Y') }}</strong><br>
+                {{ $isUrdu ? __('Suits:') : 'Suits:' }} <strong>{{ $order->suits->count() }}</strong>
             </div>
         </div>
     </div>
@@ -234,7 +243,7 @@
     {{-- CUSTOMER + BANK --}}
     <div class="info-row">
         <div class="info-cell" style="width:52%">
-            <div class="info-cell-title">Billed To</div>
+            <div class="info-cell-title">{{ $isUrdu ? __('Billed To') : 'Billed To' }}</div>
             <div class="info-cell-name">{{ $order->customer->name }}</div>
             <div class="info-cell-sub">
                 File No: <strong>{{ $order->customer->file_number }}</strong><br>
@@ -244,7 +253,7 @@
         </div>
         @if($bankName || $bankAccount)
         <div class="info-cell" style="width:44%">
-            <div class="info-cell-title">Bank Payment Details</div>
+            <div class="info-cell-title">{{ $isUrdu ? __('Bank Payment Details') : 'Bank Payment Details' }}</div>
             @if($bankName)<div class="info-cell-name" style="font-size:11px">{{ $bankName }}</div>@endif
             <div class="info-cell-sub">
                 @if($bankTitle)Title: <strong>{{ $bankTitle }}</strong><br>@endif
@@ -253,7 +262,7 @@
             @if($payQrB64)
             <div style="margin-top:8px">
                 <img src="data:{{ $payQrMime }};base64,{{ $payQrB64 }}" alt="Payment QR" style="width:90px;height:90px">
-                <div style="font-size:9px;color:#94a3b8;margin-top:3px">Scan to pay</div>
+                <div style="font-size:9px;color:#94a3b8;margin-top:3px">{{ $isUrdu ? __('Scan to pay') : 'Scan to pay' }}</div>
             </div>
             @endif
         </div>
@@ -265,11 +274,11 @@
         <thead>
             <tr>
                 <th style="width:24px">#</th>
-                <th>Suit Code</th>
-                <th>Type</th>
-                <th>Fabric</th>
-                @if($copy['show_worker'])<th>Worker</th>@endif
-                <th style="width:70px">Status</th>
+                <th>{{ $isUrdu ? __('Suit Code') : 'Suit Code' }}</th>
+                <th>{{ $isUrdu ? __('Type') : 'Type' }}</th>
+                <th>{{ $isUrdu ? __('Fabric') : 'Fabric' }}</th>
+                @if($copy['show_worker'])<th>{{ $isUrdu ? __('Worker') : 'Worker' }}</th>@endif
+                <th style="width:70px">{{ $isUrdu ? __('Status') : 'Status' }}</th>
             </tr>
         </thead>
         <tbody>
@@ -291,7 +300,7 @@
         </tbody>
         <tfoot>
             <tr>
-                <td colspan="{{ $copy['show_worker'] ? 5 : 4 }}" style="text-align:right">Total Suits:</td>
+                <td colspan="{{ $copy['show_worker'] ? 5 : 4 }}" style="text-align:right">{{ $isUrdu ? __('Total Suits') : 'Total Suits' }}:</td>
                 <td>{{ $order->suits->count() }}</td>
             </tr>
         </tfoot>
@@ -307,14 +316,14 @@
     @if($hasMeas)
     <div class="meas-wrap">
         <div class="meas-title-row">
-            Customer Measurements
+            {{ $isUrdu ? __('Customer Measurements') : 'Customer Measurements' }}
             @if($measurementNotes)
             &nbsp;&middot;&nbsp; <span style="font-weight:400;color:#64748b;text-transform:none;letter-spacing:0">{{ $measurementNotes }}</span>
             @endif
         </div>
 
         {{-- Qameez / Kameez --}}
-        <div class="meas-section-hdr">Qameez / Kameez</div>
+        <div class="meas-section-hdr">{{ $isUrdu ? __('Qameez / Kameez') : 'Qameez / Kameez' }}</div>
         <table class="meas-grid">
             <tr>
                 @foreach($qFields as $field => $label)
@@ -331,7 +340,7 @@
         </table>
 
         {{-- Shalwar / Trouser --}}
-        <div class="meas-section-hdr">Shalwar / Trouser</div>
+        <div class="meas-section-hdr">{{ $isUrdu ? __('Shalwar / Trouser') : 'Shalwar / Trouser' }}</div>
         <table class="meas-grid">
             <tr>
                 @foreach($sFields as $field => $label)
@@ -354,44 +363,53 @@
         <div class="payment-wrap-inner">
         <table class="payment-table">
             <tr>
-                <td class="lbl" style="font-family:DejaVu Sans,sans-serif;color:#64748b">Total Amount</td>
+                <td class="lbl" style="font-family:DejaVu Sans,sans-serif;color:#64748b">{{ $isUrdu ? __('Total Amount') : 'Total Amount' }}</td>
                 <td class="val" style="font-family:DejaVu Sans,sans-serif;color:#1e293b">Rs {{ number_format($order->total_amount) }}</td>
             </tr>
             <tr class="row-advance">
-                <td class="lbl" style="font-family:DejaVu Sans,sans-serif;color:#16a34a">Advance Paid</td>
+                <td class="lbl" style="font-family:DejaVu Sans,sans-serif;color:#16a34a">{{ $isUrdu ? __('Advance Paid') : 'Advance Paid' }}</td>
                 <td class="val" style="font-family:DejaVu Sans,sans-serif;color:#16a34a">Rs {{ number_format($order->advance_amount) }}</td>
             </tr>
             <tr class="row-balance">
-                <td class="lbl" style="font-family:DejaVu Sans,sans-serif;color:#dc2626">Balance Due (this order)</td>
+                <td class="lbl" style="font-family:DejaVu Sans,sans-serif;color:#dc2626">{{ $isUrdu ? __('Balance Due (this order)') : 'Balance Due (this order)' }}</td>
                 <td class="val" style="font-family:DejaVu Sans,sans-serif;color:#dc2626">Rs {{ number_format($order->balance_amount) }}</td>
             </tr>
             @if($showPreviousRow)
             <tr class="row-prev">
-                <td class="lbl" style="font-family:DejaVu Sans,sans-serif;color:#d97706">Previous Dues</td>
+                <td class="lbl" style="font-family:DejaVu Sans,sans-serif;color:#d97706">{{ $isUrdu ? __('Previous Dues') : 'Previous Dues' }}</td>
                 <td class="val" style="font-family:DejaVu Sans,sans-serif;color:#d97706">Rs {{ number_format($previousBalance) }}</td>
             </tr>
             @endif
             <tr class="row-grand">
-                <td class="lbl" style="font-family:DejaVu Sans,sans-serif;color:#e2e8f0;font-weight:700">Grand Total Owed</td>
+                <td class="lbl" style="font-family:DejaVu Sans,sans-serif;color:#e2e8f0;font-weight:700">{{ $isUrdu ? __('Grand Total Owed') : 'Grand Total Owed' }}</td>
                 <td class="val" style="font-family:DejaVu Sans,sans-serif;color:#fbbf24;font-weight:800;font-size:13px">Rs {{ number_format($grandTotal) }}</td>
             </tr>
         </table>
         </div>
     </div>
     @if($order->notes)
-    <div class="note-box"><strong>Note:</strong> {{ $order->notes }}</div>
+    <div class="note-box"><strong>{{ $isUrdu ? __('Note:') : 'Note:' }}</strong> {{ $order->notes }}</div>
+    @endif
+
+    @if(!empty($order->extras))
+    <div class="note-box">
+        <strong>{{ $isUrdu ? __('Extras / Add-ons') : 'Extras / Add-ons' }}:</strong>
+        @foreach($order->extras as $extra)
+        <span>{{ $extra['name'] }} — Rs {{ number_format($extra['price']) }}</span>@if(!$loop->last) &nbsp;|&nbsp; @endif
+        @endforeach
+    </div>
     @endif
 
     @if($styleOptions->isNotEmpty())
     <div class="note-box">
-        <strong>Style &amp; Finishing Options:</strong>
+        <strong>{{ $isUrdu ? __('Style & Finishing Options') : 'Style &amp; Finishing Options' }}:</strong>
         {{ $styleOptions->map(fn ($value, $key) => ($styleMetaLabels[$key] ?? ucfirst(str_replace('_', ' ', $key))) . ': ' . $value)->implode(' | ') }}
     </div>
     @endif
 
     {{-- LEGAL NOTICE --}}
     <div class="legal-box">
-        <div class="legal-title">Payment Notice</div>
+        <div class="legal-title">{{ $isUrdu ? __('Payment Notice') : 'Payment Notice' }}</div>
         <div class="legal-text">{{ $legalNote }}</div>
     </div>
 
@@ -399,9 +417,9 @@
     <div class="footer">
         <div class="footer-left">
             {{ $companyName }} &mdash; {{ $companyTagline }}
-            <br><span style="font-size:9px;color:#94a3b8">Track order: <a href="{{ $trackingUrl }}" style="color:#2563eb;text-decoration:none">{{ $trackingUrl }}</a></span>
+            <br><span style="font-size:9px;color:#94a3b8">{{ $isUrdu ? __('Track order:') : 'Track order:' }} <a href="{{ $trackingUrl }}" style="color:#2563eb;text-decoration:none">{{ $trackingUrl }}</a></span>
         </div>
-        <div class="footer-right">Printed: {{ now()->format('d M Y, h:i A') }}</div>
+        <div class="footer-right">{{ $isUrdu ? __('Printed:') : 'Printed:' }} {{ now()->format('d M Y, h:i A') }}</div>
     </div>
 
 </div>

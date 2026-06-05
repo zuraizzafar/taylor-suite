@@ -55,9 +55,15 @@
             <div class="mb-4">
                 <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Suit Type') }} *</label>
                 <input type="text" name="suit_type" value="{{ old('suit_type') }}"
-                    placeholder="e.g. Shalwar Kameez, Pant Coat…"
+                    list="suit-type-list"
+                    placeholder="e.g. Kameez Shalwar, Sherwani…"
                     class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required>
+                <datalist id="suit-type-list">
+                    @foreach($suitTypes as $st)
+                    <option value="{{ $st->name }}">
+                    @endforeach
+                </datalist>
                 @error('suit_type')<p class="text-xs text-red-600 mt-1">{{ $message }}</p>@enderror
             </div>
 

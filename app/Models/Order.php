@@ -22,11 +22,13 @@ class Order extends Model
         'advance_amount',
         'balance_amount',
         'notes',
+        'extras',
     ];
 
     protected $casts = [
         'order_date'    => 'date',
         'delivery_date' => 'date',
+        'extras'        => 'array',
     ];
 
     public function customer(): BelongsTo

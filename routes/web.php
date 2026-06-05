@@ -17,6 +17,7 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\StitchTypeController;
 use App\Http\Controllers\SuitController;
+use App\Http\Controllers\SuitTypeController;
 use App\Http\Controllers\TranslationController;
 use App\Http\Controllers\WorkerController;
 use App\Http\Controllers\WorkerSalaryController;
@@ -129,6 +130,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:admin')->group(function () {
         Route::resource('branches', BranchController::class);
         Route::resource('stitch-types', StitchTypeController::class)->only(['index', 'store', 'update', 'destroy']);
+        Route::resource('suit-types', SuitTypeController::class)->only(['index', 'store', 'update', 'destroy']);
         Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
         Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
 

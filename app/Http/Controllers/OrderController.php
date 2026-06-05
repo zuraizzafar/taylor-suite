@@ -67,6 +67,8 @@ class OrderController extends Controller
             'notes'          => ['nullable', 'string'],
         ]);
 
+        $data['extras'] = $this->parseExtras($request);
+
         $advanceAmount = (float) $data['advance_amount'];
         unset($data['advance_amount']); // managed via Payment record below
 
@@ -124,6 +126,8 @@ class OrderController extends Controller
             'notes'          => ['nullable', 'string'],
         ]);
 
+        $data['extras'] = $this->parseExtras($request);
+
         $newAdvance = (float) $data['advance_amount'];
         unset($data['advance_amount'], $data['balance_amount']); // computed by recalculateBalance
 
@@ -176,5 +180,21 @@ class OrderController extends Controller
         return env('PDF_MODE', 'download') === 'stream'
             ? $pdf->stream($filename)
             : $pdf->download($filename);
+    }
+
+    private function parseExtras(Request $request): array
+    {
+        $names  = $request->input('extra_name', []);
+        $prices = $request->input('extra_price', []);
+
+        $extras = [];
+        foreach ($names as $i => $name) {
+            $name  = trim($name);
+            $price = (float) ($prices[$i] ?? 0);
+            if ($name !== '') {
+                $extras[] = ['name' => $name, 'price' => $price];
+            }
+        }
+        return $extras;
     }
 }
