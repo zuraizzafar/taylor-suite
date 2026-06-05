@@ -10,6 +10,7 @@ use App\Models\Payment;
 use App\Models\Setting;
 use App\Models\StitchType;
 use App\Models\Suit;
+use App\Models\SuitType;
 use App\Models\Worker;
 use App\Traits\HasBranchScope;
 use Illuminate\Http\JsonResponse;
@@ -32,6 +33,7 @@ class PosController extends Controller
             ->orderBy('name')->get();
 
         $stitchTypes = StitchType::query()->where('is_active', true)->orderBy('name')->get();
+        $suitTypes   = SuitType::where('is_active', true)->orderBy('name')->pluck('name');
         $branches    = Branch::query()->where('is_active', true)->orderBy('name')->get();
 
         // Pre-select customer if passed via URL (e.g. coming from customer page)
@@ -39,7 +41,7 @@ class PosController extends Controller
             ? Customer::with('measurements')->find($request->input('customer_id'))
             : null;
 
-        return view('pos.index', compact('workers', 'stitchTypes', 'branches', 'preCustomer'));
+        return view('pos.index', compact('workers', 'stitchTypes', 'suitTypes', 'branches', 'preCustomer'));
     }
 
     /**
@@ -155,6 +157,7 @@ class PosController extends Controller
                 'advance_amount' => 0,
                 'balance_amount' => $total,
                 'notes'          => $request->input('order_notes'),
+                'extras'         => $this->parsePosExtras($request),
             ]);
 
             if ($advance > 0) {
@@ -214,4 +217,19 @@ class PosController extends Controller
     }
 
     private $_order;
+
+    private function parsePosExtras(Request $request): array
+    {
+        $names  = $request->input('extra_name', []);
+        $prices = $request->input('extra_price', []);
+        $extras = [];
+        foreach ($names as $i => $name) {
+            $name  = trim($name);
+            $price = (float) ($prices[$i] ?? 0);
+            if ($name !== '') {
+                $extras[] = ['name' => $name, 'price' => $price];
+            }
+        }
+        return $extras;
+    }
 }

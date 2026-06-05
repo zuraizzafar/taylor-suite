@@ -30,16 +30,27 @@ function posApp() {
         // ── Order details ──────────────────────────────────────────────────
         orderDate:     new Date().toISOString().substring(0,10),
         deliveryDate:  '',
-        totalAmount:   0,
+        baseAmount:    0,
         advanceAmount: 0,
         paymentMethod: 'cash',
         orderNotes:    '',
 
+        // ── Extras / Add-ons ───────────────────────────────────────────────
+        extras: [],
+
         // ── Suits ──────────────────────────────────────────────────────────
         suits: [],
 
+        get extrasTotal() {
+            return this.extras.reduce((s, e) => s + (parseFloat(e.price) || 0), 0);
+        },
+
+        get totalAmount() {
+            return Math.max(0, (parseFloat(this.baseAmount) || 0) + this.extrasTotal);
+        },
+
         get balance() {
-            return Math.max(0, (parseFloat(this.totalAmount) || 0) - (parseFloat(this.advanceAmount) || 0));
+            return Math.max(0, this.totalAmount - (parseFloat(this.advanceAmount) || 0));
         },
 
         get suitsCount() { return this.suits.length; },
@@ -95,6 +106,14 @@ function posApp() {
 
         removeSuit(i) {
             this.suits.splice(i, 1);
+        },
+
+        addExtra() {
+            this.extras.push({ name: '', price: 0 });
+        },
+
+        removeExtra(i) {
+            this.extras.splice(i, 1);
         },
 
         // ── Auto-calculate total from suit count ───────────────────────────
@@ -370,10 +389,11 @@ function posApp() {
 
             <div class="grid grid-cols-3 gap-3">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">{{ __('Total Amount') }} (Rs) *</label>
-                    <input type="number" name="total_amount" x-model="totalAmount" min="0" step="50" required
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Base Amount (Rs) *</label>
+                    <input type="number" x-model="baseAmount" min="0" step="50"
                         class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="0">
+                    <input type="hidden" name="total_amount" :value="totalAmount">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">{{ __('Advance') }} (Rs)</label>
@@ -387,6 +407,28 @@ function posApp() {
                          :class="balance > 0 ? 'text-red-600' : 'text-green-600'">
                         Rs <span x-text="balance.toLocaleString()"></span>
                     </div>
+                </div>
+            </div>
+
+            {{-- Extras / Add-ons --}}
+            <div>
+                <div class="flex items-center justify-between mb-2">
+                    <label class="text-xs font-semibold text-slate-600">Extras / Add-ons <span class="text-slate-400 font-normal">(optional)</span></label>
+                    <button type="button" @click="addExtra()"
+                        class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-1 rounded-lg">+ Add Extra</button>
+                </div>
+                <template x-for="(extra, i) in extras" :key="i">
+                    <div class="flex items-center gap-2 mb-1.5">
+                        <input type="text" :name="'extra_name[' + i + ']'" x-model="extra.name" placeholder="Description (e.g. Embroidery)"
+                            class="flex-1 border border-slate-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <input type="number" :name="'extra_price[' + i + ']'" x-model.number="extra.price" placeholder="Rs" min="0" step="50"
+                            class="w-24 border border-slate-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <button type="button" @click="removeExtra(i)" class="text-red-400 hover:text-red-600 px-1.5 py-1 rounded">✕</button>
+                    </div>
+                </template>
+                <div x-show="extrasTotal > 0" class="text-xs text-slate-500 mt-1">
+                    Extras total: Rs <span x-text="extrasTotal.toLocaleString()" class="font-semibold text-amber-700"></span>
+                    &nbsp;·&nbsp; Order total: Rs <span x-text="totalAmount.toLocaleString()" class="font-semibold text-slate-800"></span>
                 </div>
             </div>
 
@@ -503,7 +545,12 @@ function posApp() {
                 <div class="text-sm text-slate-600">
                     <span x-text="suitsCount + ' suit' + (suitsCount !== 1 ? 's' : '')"></span>
                     <span class="mx-1.5 text-slate-300">·</span>
-                    {{ __('Total') }}: <span class="font-bold text-slate-800">Rs <span x-text="(parseFloat(totalAmount)||0).toLocaleString()"></span></span>
+                    Base: <span class="font-semibold text-slate-700">Rs <span x-text="(parseFloat(baseAmount)||0).toLocaleString()"></span></span>
+                    <template x-if="extrasTotal > 0">
+                        <span> + Extras: <span class="font-semibold text-amber-700">Rs <span x-text="extrasTotal.toLocaleString()"></span></span></span>
+                    </template>
+                    <span class="mx-1.5 text-slate-300">·</span>
+                    {{ __('Total') }}: <span class="font-bold text-slate-800">Rs <span x-text="totalAmount.toLocaleString()"></span></span>
                     <span class="mx-1.5 text-slate-300">·</span>
                     {{ __('Balance') }}: <span class="font-bold" :class="balance > 0 ? 'text-red-600' : 'text-green-600'">Rs <span x-text="balance.toLocaleString()"></span></span>
                 </div>
@@ -528,15 +575,11 @@ function posApp() {
 
 </div>
 
-{{-- Datalist for common suit types --}}
+{{-- Datalist for suit types (DB-backed) --}}
 <datalist id="suit-type-list">
-    <option value="Kameez Shalwar">
-    <option value="Sherwani">
-    <option value="Coat Pant">
-    <option value="Waistcoat">
-    <option value="Kurta">
-    <option value="Shalwar only">
-    <option value="Kameez only">
+    @foreach($suitTypes as $name)
+    <option value="{{ $name }}">
+    @endforeach
 </datalist>
 
 </form>
