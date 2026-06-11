@@ -175,6 +175,13 @@ class OrderController extends Controller
         $settings        = Setting::allKeyed();
         $previousBalance = $order->customer->outstandingBalance($order->id);
 
+        // Urdu locale: DomPDF cannot shape Arabic script — use browser print page instead
+        if (app()->getLocale() === 'ur') {
+            return response(
+                view('orders.invoice-print', compact('order', 'settings', 'previousBalance'))
+            );
+        }
+
         // Ensure DomPDF font cache directory exists (needed for @font-face metrics)
         $fontCacheDir = storage_path('fonts');
         if (!is_dir($fontCacheDir)) {
