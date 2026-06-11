@@ -126,10 +126,10 @@ function posApp() {
         get canSubmit() {
             const hasCustomer = this.customerMode === 'selected'
                 || (this.customerMode === 'new' && this.newCustomer.name && this.newCustomer.mobile);
-            const hasSuit = this.suits.length > 0 && this.suits.every(s => s.suit_type && s.fabric_meter);
+            const hasSuit = this.suits.length > 0 && this.suits.every(s => s.suit_type);
             const total = parseFloat(this.totalAmount) || 0;
             const advance = parseFloat(this.advanceAmount) || 0;
-            const hasOrder = this.orderDate && this.deliveryDate && total > 0 && advance <= total;
+            const hasOrder = this.orderDate && total > 0 && advance <= total;
             return hasCustomer && hasSuit && hasOrder;
         },
 
@@ -141,8 +141,8 @@ function posApp() {
                 return 'Please select an existing customer or enter a new customer name and mobile number.';
             }
 
-            if (!this.orderDate || !this.deliveryDate) {
-                return 'Please fill in the order date and delivery date.';
+            if (!this.orderDate) {
+                return 'Please fill in the order date.';
             }
 
             if (total <= 0) {
@@ -153,8 +153,8 @@ function posApp() {
                 return 'Advance cannot be greater than the total amount.';
             }
 
-            if (!(this.suits.length > 0 && this.suits.every(s => s.suit_type && s.fabric_meter))) {
-                return 'Please add at least one suit with suit type and fabric size.';
+            if (!(this.suits.length > 0 && this.suits.every(s => s.suit_type))) {
+                return 'Please add at least one suit with a suit type.';
             }
 
             return null;
@@ -174,9 +174,9 @@ function posApp() {
         // ── Init ──────────────────────────────────────────────────────────
         init() {
             this.addSuit();
-            // Delivery date default: 14 days from today
+            // Delivery date default: 10 days from today
             const d = new Date();
-            d.setDate(d.getDate() + 14);
+            d.setDate(d.getDate() + 10);
             this.deliveryDate = d.toISOString().substring(0,10);
 
             @if($preCustomer)
@@ -381,9 +381,14 @@ function posApp() {
                         class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">{{ __('Delivery Date') }} *</label>
-                    <input type="date" name="delivery_date" x-model="deliveryDate" required
-                        class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">{{ __('Delivery Date') }}</label>
+                    <div class="flex items-center gap-1">
+                        <input type="date" name="delivery_date" x-model="deliveryDate"
+                            class="flex-1 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <button type="button" @click="deliveryDate = ''"
+                            title="Clear delivery date"
+                            class="text-slate-400 hover:text-red-500 px-2 py-2 rounded-lg hover:bg-slate-100">✕</button>
+                    </div>
                 </div>
             </div>
 
@@ -415,8 +420,21 @@ function posApp() {
                 <div class="flex items-center justify-between mb-2">
                     <label class="text-xs font-semibold text-slate-600">Extras / Add-ons <span class="text-slate-400 font-normal">(optional)</span></label>
                     <button type="button" @click="addExtra()"
-                        class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-1 rounded-lg">+ Add Extra</button>
+                        class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-1 rounded-lg">+ Custom</button>
                 </div>
+                @if($extraTypes->isNotEmpty())
+                <div class="mb-2">
+                    <select onchange="posAddPreset(this)"
+                        class="w-full border border-slate-200 bg-slate-50 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">— Quick-add preset extra —</option>
+                        @foreach($extraTypes as $et)
+                        <option value="{{ json_encode(['name' => $et->name, 'price' => (float) $et->default_price]) }}">
+                            {{ $et->name }} (Rs {{ number_format($et->default_price) }})
+                        </option>
+                        @endforeach
+                    </select>
+                </div>
+                @endif
                 <template x-for="(extra, i) in extras" :key="i">
                     <div class="flex items-center gap-2 mb-1.5">
                         <input type="text" :name="'extra_name[' + i + ']'" x-model="extra.name" placeholder="Description (e.g. Embroidery)"
@@ -479,9 +497,9 @@ function posApp() {
                                         class="w-full border border-slate-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-semibold text-slate-500 mb-1">{{ __('Fabric Size') }} (meter) *</label>
+                                    <label class="block text-xs font-semibold text-slate-500 mb-1">{{ __('Fabric Size') }} (meter)</label>
                                     <input type="number" :name="'suits['+idx+'][fabric_meter]'" x-model="suit.fabric_meter"
-                                        required min="0.5" step="0.5"
+                                        min="0.5" step="0.5"
                                         class="w-full border border-slate-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 </div>
                             </div>
@@ -567,7 +585,7 @@ function posApp() {
                 </div>
             </div>
             <p x-show="!canSubmit" class="text-xs text-amber-600 mt-2">
-                {{ __('Fill in all required fields to continue.') }}, at least one suit (type + fabric), order date, and delivery date to continue.
+                {{ __('Fill in all required fields to continue.') }}, at least one suit (with suit type), and order date to continue.
             </p>
         </div>
 
@@ -581,6 +599,18 @@ function posApp() {
     <option value="{{ $name }}">
     @endforeach
 </datalist>
+
+<script>
+function posAddPreset(select) {
+    if (!select.value) return;
+    const preset = JSON.parse(select.value);
+    const root = select.closest('[x-data]');
+    if (root && root._x_dataStack) {
+        root._x_dataStack[0].extras.push({ name: preset.name, price: preset.price });
+    }
+    select.value = '';
+}
+</script>
 
 </form>
 </div>

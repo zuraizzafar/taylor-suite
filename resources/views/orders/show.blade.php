@@ -33,7 +33,7 @@
             </div>
             <div>
                 <p class="text-xs text-slate-500">{{ __('Delivery Date') }}</p>
-                <p class="text-sm font-semibold text-slate-700">{{ $order->delivery_date->format('d M Y') }}</p>
+                <p class="text-sm font-semibold text-slate-700">{{ $order->delivery_date?->format('d M Y') ?? '—' }}</p>
             </div>
             <div>
                 <p class="text-xs text-slate-500">{{ __('Total Amount') }}</p>

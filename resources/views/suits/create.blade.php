@@ -86,8 +86,7 @@
                     <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Fabric Size (meter)') }} *</label>
                     <input type="number" name="fabric_meter" value="{{ old('fabric_meter') }}"
                         step="0.1" min="0.1" placeholder="4.5"
-                        class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        required>
+                        class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                     @error('fabric_meter')<p class="text-xs text-red-600 mt-1">{{ $message }}</p>@enderror
                 </div>
                 <div>

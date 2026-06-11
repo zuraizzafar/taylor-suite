@@ -32,7 +32,7 @@
                 <tr class="hover:bg-slate-50">
                     <td class="px-4 py-2 font-mono text-blue-700 font-semibold">{{ $order->order_number }}</td>
                     <td class="px-4 py-2 font-medium text-slate-800">{{ $order->customer->name }}</td>
-                    <td class="px-4 py-2 text-slate-600">{{ $order->delivery_date->format('d M Y') }}</td>
+                    <td class="px-4 py-2 text-slate-600">{{ $order->delivery_date?->format('d M Y') ?? '—' }}</td>
                     <td class="px-4 py-2 text-center">
                         <span class="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full">{{ $order->suits->count() }}</span>
                     </td>

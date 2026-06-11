@@ -167,6 +167,10 @@
                class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('suit-types.*') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">
                 <span>👔</span> {{ __('Suit Types') }}
             </a>
+            <a href="{{ route('extra-types.index') }}"
+               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('extra-types.*') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">
+                <span>➕</span> Extra Types
+            </a>
             <a href="{{ route('users.index') }}"
                class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('users.*') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">
                 <span>👥</span> {{ __('User Management') }}

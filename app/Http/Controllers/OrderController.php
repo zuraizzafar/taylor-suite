@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Branch;
 use App\Models\Customer;
+use App\Models\ExtraType;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\Setting;
@@ -50,9 +51,10 @@ class OrderController extends Controller
             ? Customer::find($request->input('customer_id'))
             : null;
 
-        $branches = Branch::where('is_active', true)->orderBy('name')->get();
+        $branches   = Branch::where('is_active', true)->orderBy('name')->get();
+        $extraTypes = ExtraType::where('is_active', true)->orderBy('name')->get();
 
-        return view('orders.create', compact('customers', 'selectedCustomer', 'branches'));
+        return view('orders.create', compact('customers', 'selectedCustomer', 'branches', 'extraTypes'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -61,7 +63,7 @@ class OrderController extends Controller
             'customer_id'    => ['required', 'exists:customers,id'],
             'branch_id'      => ['nullable', 'exists:branches,id'],
             'order_date'     => ['required', 'date'],
-            'delivery_date'  => ['required', 'date', 'after_or_equal:order_date'],
+            'delivery_date'  => ['nullable', 'date', 'after_or_equal:order_date'],
             'total_amount'   => ['required', 'numeric', 'min:0'],
             'advance_amount' => ['required', 'numeric', 'min:0'],
             'notes'          => ['nullable', 'string'],
@@ -111,8 +113,9 @@ class OrderController extends Controller
     {
         $customers      = Customer::orderBy('name')->get();
         $branches       = Branch::where('is_active', true)->orderBy('name')->get();
+        $extraTypes     = ExtraType::where('is_active', true)->orderBy('name')->get();
         $initialAdvance = (float) $order->payments()->where('reference', 'INITIAL_ADVANCE')->sum('amount');
-        return view('orders.edit', compact('order', 'customers', 'branches', 'initialAdvance'));
+        return view('orders.edit', compact('order', 'customers', 'branches', 'initialAdvance', 'extraTypes'));
     }
 
     public function update(Request $request, Order $order): RedirectResponse
@@ -120,7 +123,7 @@ class OrderController extends Controller
         $data = $request->validate([
             'branch_id'      => ['nullable', 'exists:branches,id'],
             'order_date'     => ['required', 'date'],
-            'delivery_date'  => ['required', 'date', 'after_or_equal:order_date'],
+            'delivery_date'  => ['nullable', 'date', 'after_or_equal:order_date'],
             'total_amount'   => ['required', 'numeric', 'min:0'],
             'advance_amount' => ['required', 'numeric', 'min:0'],
             'notes'          => ['nullable', 'string'],

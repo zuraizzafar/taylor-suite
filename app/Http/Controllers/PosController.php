@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Branch;
 use App\Models\Customer;
+use App\Models\ExtraType;
 use App\Models\Measurement;
 use App\Models\Order;
 use App\Models\Payment;
@@ -34,6 +35,7 @@ class PosController extends Controller
 
         $stitchTypes = StitchType::query()->where('is_active', true)->orderBy('name')->get();
         $suitTypes   = SuitType::where('is_active', true)->orderBy('name')->pluck('name');
+        $extraTypes  = ExtraType::where('is_active', true)->orderBy('name')->get();
         $branches    = Branch::query()->where('is_active', true)->orderBy('name')->get();
 
         // Pre-select customer if passed via URL (e.g. coming from customer page)
@@ -41,7 +43,7 @@ class PosController extends Controller
             ? Customer::with('measurements')->find($request->input('customer_id'))
             : null;
 
-        return view('pos.index', compact('workers', 'stitchTypes', 'suitTypes', 'branches', 'preCustomer'));
+        return view('pos.index', compact('workers', 'stitchTypes', 'suitTypes', 'extraTypes', 'branches', 'preCustomer'));
     }
 
     /**
@@ -92,14 +94,14 @@ class PosController extends Controller
             'branch_id'          => ['nullable', 'exists:branches,id'],
             // Order
             'order_date'         => ['required', 'date'],
-            'delivery_date'      => ['required', 'date', 'after_or_equal:order_date'],
+            'delivery_date'      => ['nullable', 'date', 'after_or_equal:order_date'],
             'total_amount'       => ['required', 'numeric', 'min:0'],
             'advance_amount'     => ['required', 'numeric', 'min:0'],
             'order_notes'        => ['nullable', 'string'],
             // Suits — array
             'suits'              => ['required', 'array', 'min:1'],
             'suits.*.suit_type'  => ['required', 'string', 'max:100'],
-            'suits.*.fabric_meter' => ['required', 'numeric', 'min:0'],
+            'suits.*.fabric_meter' => ['nullable', 'numeric', 'min:0'],
             'suits.*.stitch_type_id' => ['nullable', 'exists:stitch_types,id'],
             'suits.*.worker_id'  => ['nullable', 'exists:workers,id'],
             'suits.*.notes'      => ['nullable', 'string'],

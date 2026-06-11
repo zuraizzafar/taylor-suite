@@ -47,7 +47,7 @@
                     <td class="px-4 py-2 text-slate-600">
                         @if($suit->order)
                         <a href="{{ route('orders.show', $suit->order) }}"
-                           class="text-blue-600 hover:underline">{{ $suit->order->delivery_date->format('d M') }}</a>
+                           class="text-blue-600 hover:underline">{{ $suit->order->delivery_date?->format('d M') ?? '—' }}</a>
                         @else —
                         @endif
                     </td>

@@ -114,7 +114,7 @@
                 <div>
                     <p class="text-sm font-medium text-slate-800">{{ $order->order_number }}</p>
                     <p class="text-xs text-slate-500">
-                        {{ $order->order_date->format('d M Y') }} · {{ __('Delivery') }}: {{ $order->delivery_date->format('d M Y') }}
+                        {{ $order->order_date->format('d M Y') }} · {{ __('Delivery') }}: {{ $order->delivery_date?->format('d M Y') ?? '—' }}
                         · {{ $order->suits->count() }} suit(s)
                     </p>
                 </div>

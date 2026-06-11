@@ -7,6 +7,7 @@ use App\Http\Controllers\PosController;
 use App\Http\Controllers\SyncController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ExtraTypeController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\MeasurementController;
 use App\Http\Controllers\OrderController;
@@ -131,6 +132,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('branches', BranchController::class);
         Route::resource('stitch-types', StitchTypeController::class)->only(['index', 'store', 'update', 'destroy']);
         Route::resource('suit-types', SuitTypeController::class)->only(['index', 'store', 'update', 'destroy']);
+        Route::resource('extra-types', ExtraTypeController::class)->only(['index', 'store', 'update', 'destroy']);
         Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
         Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
 

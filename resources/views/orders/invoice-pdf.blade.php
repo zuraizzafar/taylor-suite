@@ -6,7 +6,14 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: DejaVu Sans, sans-serif; font-size: 12px; color: #1e293b; background: #fff; }
     @if(app()->getLocale() === 'ur')
-    body { direction: rtl; text-align: right; }
+    @font-face {
+        font-family: 'UrduFont';
+        src: url('{{ str_replace('\\', '/', public_path('fonts/urdu.ttf')) }}') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+    }
+    body { direction: rtl; text-align: right; font-family: 'UrduFont', DejaVu Sans, sans-serif !important; }
+    body * { font-family: 'UrduFont', DejaVu Sans, sans-serif !important; }
     .header-right { text-align: left; }
     .payment-wrap-inner { text-align: left; }
     .footer-right { text-align: left; }
@@ -234,7 +241,7 @@
             <div><span class="invoice-no">{{ $order->order_number }}</span></div>
             <div class="invoice-dates">
                 {{ $isUrdu ? __('Order Date:') : 'Order Date:' }} <strong>{{ $order->order_date->format('d M Y') }}</strong><br>
-                {{ $isUrdu ? __('Delivery Date:') : 'Delivery Date:' }} <strong>{{ $order->delivery_date->format('d M Y') }}</strong><br>
+                {{ $isUrdu ? __('Delivery Date:') : 'Delivery Date:' }} <strong>{{ $order->delivery_date?->format('d M Y') ?? '—' }}</strong><br>
                 {{ $isUrdu ? __('Suits:') : 'Suits:' }} <strong>{{ $order->suits->count() }}</strong>
             </div>
         </div>

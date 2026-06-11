@@ -42,10 +42,15 @@
             @error('order_date')<p class="text-xs text-red-600 mt-1">{{ $message }}</p>@enderror
         </div>
         <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Delivery Date') }} *</label>
-            <input type="date" name="delivery_date" value="{{ old('delivery_date', isset($order) ? $order->delivery_date->format('Y-m-d') : '') }}"
-                class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required>
+            <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Delivery Date') }}</label>
+            <div class="flex items-center gap-1">
+                <input type="date" id="delivery_date_input" name="delivery_date"
+                    value="{{ old('delivery_date', isset($order) ? $order->delivery_date?->format('Y-m-d') : now()->addDays(10)->format('Y-m-d')) }}"
+                    class="flex-1 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <button type="button" onclick="document.getElementById('delivery_date_input').value=''"
+                    title="Clear delivery date"
+                    class="text-slate-400 hover:text-red-500 px-2 py-2 rounded-lg hover:bg-slate-100 transition">✕</button>
+            </div>
             @error('delivery_date')<p class="text-xs text-red-600 mt-1">{{ $message }}</p>@enderror
         </div>
     </div>
@@ -74,8 +79,21 @@
             <div class="flex items-center justify-between mb-2">
                 <label class="text-sm font-medium text-slate-700">Extras / Add-ons</label>
                 <button type="button" @click="addExtra()"
-                    class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-1 rounded-lg">+ Add Extra</button>
+                    class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-1 rounded-lg">+ Custom</button>
             </div>
+            @if(isset($extraTypes) && $extraTypes->isNotEmpty())
+            <div class="mb-2">
+                <select onchange="orderFormAddPreset(this)"
+                    class="w-full border border-slate-200 bg-slate-50 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">— Quick-add preset extra —</option>
+                    @foreach($extraTypes as $et)
+                    <option value="{{ json_encode(['name' => $et->name, 'price' => (float) $et->default_price]) }}">
+                        {{ $et->name }} (Rs {{ number_format($et->default_price) }})
+                    </option>
+                    @endforeach
+                </select>
+            </div>
+            @endif
             <template x-for="(extra, i) in extras" :key="i">
                 <div class="flex items-center gap-2 mb-2">
                     <input type="text" :name="'extra_name[' + i + ']'" x-model="extra.name" placeholder="Description (e.g. Embroidery)"
@@ -131,6 +149,16 @@ function orderForm() {
         addExtra()    { this.extras.push({ name: '', price: 0 }); },
         removeExtra(i){ this.extras.splice(i, 1); },
     };
+}
+function orderFormAddPreset(select) {
+    if (!select.value) return;
+    const preset = JSON.parse(select.value);
+    // find Alpine component and push the extra
+    const el = select.closest('[x-data]');
+    if (el && el._x_dataStack) {
+        el._x_dataStack[0].extras.push({ name: preset.name, price: preset.price });
+    }
+    select.value = '';
 }
 </script>
 @endonce

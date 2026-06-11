@@ -74,7 +74,7 @@ class SuitController extends Controller
             'worker_id'          => ['nullable', 'exists:workers,id'],
             'stitch_type_id'     => ['nullable', 'exists:stitch_types,id'],
             'suit_type'          => ['required', 'string', 'max:100'],
-            'fabric_meter'       => ['required', 'numeric', 'min:0.1'],
+            'fabric_meter'       => ['nullable', 'numeric', 'min:0.1'],
             'fabric_description' => ['nullable', 'string', 'max:255'],
             'notes'              => ['nullable', 'string'],
         ]);
@@ -139,7 +139,7 @@ class SuitController extends Controller
             'worker_id'         => ['nullable', 'exists:workers,id'],
             'stitch_type_id'    => ['nullable', 'exists:stitch_types,id'],
             'suit_type'         => ['required', 'string', 'max:100'],
-            'fabric_meter'      => ['required', 'numeric', 'min:0.1'],
+            'fabric_meter'      => ['nullable', 'numeric', 'min:0.1'],
             'fabric_description'=> ['nullable', 'string', 'max:255'],
             'notes'             => ['nullable', 'string'],
         ]);
