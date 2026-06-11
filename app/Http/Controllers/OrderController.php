@@ -175,6 +175,12 @@ class OrderController extends Controller
         $settings        = Setting::allKeyed();
         $previousBalance = $order->customer->outstandingBalance($order->id);
 
+        // Ensure DomPDF font cache directory exists (needed for @font-face metrics)
+        $fontCacheDir = storage_path('fonts');
+        if (!is_dir($fontCacheDir)) {
+            mkdir($fontCacheDir, 0775, true);
+        }
+
         $pdf = Pdf::loadView('orders.invoice-pdf', compact('order', 'settings', 'previousBalance'))
             ->setPaper('a4', 'portrait');
 

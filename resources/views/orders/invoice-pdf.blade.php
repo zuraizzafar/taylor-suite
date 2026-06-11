@@ -6,7 +6,7 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: DejaVu Sans, sans-serif; font-size: 12px; color: #1e293b; background: #fff; }
     @if(app()->getLocale() === 'ur')
-    @font-face {
+    @@font-face {
         font-family: 'UrduFont';
         src: url('{{ str_replace('\\', '/', public_path('fonts/urdu.ttf')) }}') format('truetype');
         font-weight: normal;
