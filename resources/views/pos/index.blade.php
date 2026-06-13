@@ -591,21 +591,21 @@ function posApp() {
                     </div>
                 </div>
 
-                <div class="notes-container">
-                    <div class="flex items-center justify-between mb-0.5">
-                        <label class="block text-[10px] text-slate-500">Notes</label>
+                <div class="notes-container mt-2 pt-2 border-t border-slate-100">
+                    <div class="flex items-center justify-between mb-1">
+                        <label class="block text-[10px] font-semibold text-slate-500 uppercase tracking-wide">Notes</label>
                         @if(!empty($notesList))
-                        <select onchange="selectPredefinedNote(this)" class="text-[9px] border border-slate-300 rounded px-1 py-0.5 bg-slate-50 text-slate-600 focus:outline-none cursor-pointer">
+                        <select onchange="selectPredefinedNote(this)" class="text-[10px] border border-slate-200 rounded-md px-1.5 py-0.5 bg-slate-50 text-slate-500 focus:outline-none focus:ring-1 focus:ring-blue-400 cursor-pointer">
                             <option value="">— Preset —</option>
                             @foreach($notesList as $note)
                             <option value="{{ $note }}">{{ $note }}</option>
                             @endforeach
-                            <option value="custom">+ Custom/Clear</option>
+                            <option value="custom">+ Custom / Clear</option>
                         </select>
                         @endif
                     </div>
                     <input type="text" name="measurement[notes]" x-model="meas.notes"
-                        class="w-full border border-slate-200 rounded-md px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400"
+                        class="w-full border border-slate-200 rounded-md px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white"
                         placeholder="Any special measurement notes">
                 </div>
             </div>
