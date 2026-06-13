@@ -68,8 +68,12 @@
     <div class="bg-white rounded-xl shadow-sm border border-slate-100">
         <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
             <h3 class="font-semibold text-slate-700">👔 Suits ({{ $customer->suits->count() }})</h3>
-            <a href="{{ route('suits.create', ['customer_id' => $customer->id]) }}"
-               class="text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg">+ {{ __('Add Suit') }}</a>
+            <div class="flex gap-2">
+                <a href="{{ route('customers.tags.pending', $customer) }}" target="_blank"
+                   class="text-xs bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded-lg">🏷️ {{ __('Print Pending Tags') }}</a>
+                <a href="{{ route('suits.create', ['customer_id' => $customer->id]) }}"
+                   class="text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg">+ {{ __('Add Suit') }}</a>
+            </div>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full text-sm">

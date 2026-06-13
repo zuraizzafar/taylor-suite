@@ -198,6 +198,39 @@ class OrderController extends Controller
             : $pdf->download($filename);
     }
 
+    public function tags(Order $order): Response
+    {
+        $order->load(['customer', 'suits.worker']);
+        
+        // Ensure DomPDF font cache directory exists (needed for @font-face metrics)
+        $fontCacheDir = storage_path('fonts');
+        if (!is_dir($fontCacheDir)) {
+            mkdir($fontCacheDir, 0775, true);
+        }
+
+        // Generate QRs
+        $suitsWithQr = [];
+        foreach ($order->suits as $suit) {
+            $qrImage = null;
+            if ($suit->qr_code_path && \Illuminate\Support\Facades\Storage::disk('public')->exists($suit->qr_code_path)) {
+                $qrImage = base64_encode(\Illuminate\Support\Facades\Storage::disk('public')->get($suit->qr_code_path));
+            }
+            $suitsWithQr[] = [
+                'suit' => $suit,
+                'qrImage' => $qrImage
+            ];
+        }
+
+        $pdf = Pdf::loadView('orders.tags-pdf', compact('order', 'suitsWithQr'))
+            ->setPaper('a4', 'portrait');
+
+        $filename = "tags-{$order->order_number}.pdf";
+
+        return env('PDF_MODE', 'download') === 'stream'
+            ? $pdf->stream($filename)
+            : $pdf->download($filename);
+    }
+
     private function parseExtras(Request $request): array
     {
         $names  = $request->input('extra_name', []);

@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Branch;
 use App\Models\Customer;
 use App\Traits\HasBranchScope;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class CustomerController extends Controller
@@ -103,5 +106,43 @@ class CustomerController extends Controller
 
         return redirect()->route('customers.index')
             ->with('success', 'Customer deleted.');
+    }
+
+    public function pendingTags(Customer $customer): Response|RedirectResponse
+    {
+        $customer->load(['suits' => function ($query) {
+            $query->where('status', 'pending')->with('worker');
+        }]);
+
+        if ($customer->suits->isEmpty()) {
+            return back()->with('error', 'No pending suits found to print tags for.');
+        }
+
+        // Ensure DomPDF font cache directory exists
+        $fontCacheDir = storage_path('fonts');
+        if (!is_dir($fontCacheDir)) {
+            mkdir($fontCacheDir, 0775, true);
+        }
+
+        $suitsWithQr = [];
+        foreach ($customer->suits as $suit) {
+            $qrImage = null;
+            if ($suit->qr_code_path && Storage::disk('public')->exists($suit->qr_code_path)) {
+                $qrImage = base64_encode(Storage::disk('public')->get($suit->qr_code_path));
+            }
+            $suitsWithQr[] = [
+                'suit' => $suit,
+                'qrImage' => $qrImage
+            ];
+        }
+
+        $pdf = Pdf::loadView('orders.tags-pdf', compact('suitsWithQr'))
+            ->setPaper('a4', 'portrait');
+
+        $filename = "pending-tags-{$customer->file_number}.pdf";
+
+        return env('PDF_MODE', 'download') === 'stream'
+            ? $pdf->stream($filename)
+            : $pdf->download($filename);
     }
 }

@@ -67,6 +67,7 @@ Route::middleware('auth')->group(function () {
 
         // Customers
         Route::resource('customers', CustomerController::class);
+        Route::get('/customers/{customer}/tags/pending', [CustomerController::class, 'pendingTags'])->name('customers.tags.pending');
 
         // Measurements (nested under customer)
         Route::get('/customers/{customer}/measurements/create', [MeasurementController::class, 'create'])
@@ -84,6 +85,7 @@ Route::middleware('auth')->group(function () {
         // Orders
         Route::resource('orders', OrderController::class);
         Route::get('/orders/{order}/invoice', [OrderController::class, 'invoice'])->name('orders.invoice');
+        Route::get('/orders/{order}/tags', [OrderController::class, 'tags'])->name('orders.tags');
 
         // Payments (nested under orders + standalone create/search/edit/update/delete)
         Route::get('/payments/create', [PaymentController::class, 'create'])->name('payments.create');
