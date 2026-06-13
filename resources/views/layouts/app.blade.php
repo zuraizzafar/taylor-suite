@@ -176,8 +176,12 @@
                 <span>👥</span> {{ __('User Management') }}
             </a>
             <a href="{{ route('settings.index') }}"
-               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('settings.*') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">
+               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('settings.index') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">
                 <span>⚙️</span> {{ __('Settings') }}
+            </a>
+            <a href="{{ route('settings.predefined-notes') }}"
+               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('settings.predefined-notes') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">
+                <span>📝</span> {{ __('Predefined Notes') }}
             </a>
             <a href="{{ route('translations.index') }}"
                class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('translations.*') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">

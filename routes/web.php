@@ -135,6 +135,8 @@ Route::middleware('auth')->group(function () {
         Route::resource('extra-types', ExtraTypeController::class)->only(['index', 'store', 'update', 'destroy']);
         Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
         Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
+        Route::get('/settings/predefined-notes', [SettingController::class, 'predefinedNotes'])->name('settings.predefined-notes');
+        Route::put('/settings/predefined-notes', [SettingController::class, 'updatePredefinedNotes'])->name('settings.predefined-notes.update');
 
         // User management (branch managers + workers)
         Route::get('/users', [UserController::class, 'index'])->name('users.index');

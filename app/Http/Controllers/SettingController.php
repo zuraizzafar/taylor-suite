@@ -33,6 +33,25 @@ class SettingController extends Controller
         return view('settings.index', compact('settings'));
     }
 
+    public function predefinedNotes(): View
+    {
+        $settings = Setting::allKeyed();
+        return view('settings.predefined_notes', compact('settings'));
+    }
+
+    public function updatePredefinedNotes(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'predefined_notes_en' => ['nullable', 'string'],
+            'predefined_notes_ur' => ['nullable', 'string'],
+        ]);
+
+        Setting::set('predefined_notes_en', $data['predefined_notes_en'] ?? '');
+        Setting::set('predefined_notes_ur', $data['predefined_notes_ur'] ?? '');
+
+        return back()->with('success', 'Predefined notes saved successfully.');
+    }
+
     public function update(Request $request): RedirectResponse
     {
         $data = $request->validate([
