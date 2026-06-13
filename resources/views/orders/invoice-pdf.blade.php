@@ -480,9 +480,10 @@
     @endif
 
     {{-- Handwritten notes placeholder --}}
-    <div style="margin: 12px 0; font-size: 10px; color: #64748b;">
-        <span style="font-weight: 700; color: #475569;">{{ $isUrdu ? 'اضافی نوٹ / ہدایات:' : 'Handwritten Notes / Instructions:' }}</span>
-        <span style="display: inline-block; width: 65%; border-bottom: 1px dotted #cbd5e1; margin-left: 8px; height: 14px; vertical-align: bottom;"></span>
+    <div style="margin: 12px 0; border: 1px dashed #cbd5e1; border-radius: 4px; padding: 6px 10px; height: 50px;">
+        <div style="font-size: 8.5px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">
+            {{ $isUrdu ? 'اضافی نوٹ / ہدایات (دستخطی):' : 'Handwritten Notes / Instructions:' }}
+        </div>
     </div>
 
     {{-- LEGAL NOTICE --}}

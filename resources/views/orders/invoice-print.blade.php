@@ -505,9 +505,10 @@
     @endif
 
     {{-- Handwritten notes placeholder --}}
-    <div style="margin: 12px 0; font-size: 11px; color: #64748b;">
-        <span style="font-weight: 700; color: #475569;">اضافی نوٹ / ہدایات:</span>
-        <span style="display: inline-block; width: 65%; border-bottom: 1px dotted #cbd5e1; margin-right: 8px; height: 14px; vertical-align: bottom;"></span>
+    <div style="margin: 12px 0; border: 1px dashed #cbd5e1; border-radius: 4px; padding: 6px 10px; height: 50px;">
+        <div style="font-size: 9px; font-weight: 700; color: #64748b; margin-bottom: 4px;">
+            اضافی نوٹ / ہدایات (دستخطی):
+        </div>
     </div>
 
     <div class="legal-box">
