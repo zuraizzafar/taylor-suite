@@ -55,6 +55,7 @@
         'pahuncha_style'   => 'پہنچہ',
         'front_patti_size' => 'اگلی پٹی',
         'design_number'    => 'ڈیزائن نمبر',
+        'fashion_style'    => 'فیشن اسٹائل',
     ];
     $styleOptions = collect($measurement?->meta ?? [])->filter(fn ($value) => filled($value));
 
@@ -341,11 +342,91 @@
         </tfoot>
     </table>
 
-    {{-- MEASUREMENTS --}}
     @php
-        $hasMeas = $measurement
-            && collect($qFields)->keys()->merge(collect($sFields)->keys())
-                ->some(fn($k) => !empty($measurement->$k));
+        $measType = $measurement->type ?? 'shalwar_kameez';
+        $measSections = [];
+        if ($measurement) {
+            if ($measType === 'waistcoat') {
+                $measSections = [
+                    [
+                        'title' => 'واسٹ کوٹ کی پیمائش (Waistcoat)',
+                        'fields' => [
+                            'q_length'   => 'لمبائی',
+                            'q_chest'    => 'سینہ',
+                            'q_waist'    => 'کمر',
+                            'q_shoulder' => 'کندھا',
+                            'q_collar'   => 'کالر',
+                            'q_armhole'  => 'بغل',
+                        ],
+                        'col_width' => '16.66%'
+                    ]
+                ];
+            } elseif ($measType === 'pent_coat') {
+                $measSections = [
+                    [
+                        'title' => 'کوٹ کی پیمائش (Coat)',
+                        'fields' => [
+                            'q_chest'    => 'سینہ',
+                            'q_waist'    => 'کمر',
+                            'q_shoulder' => 'کندھا',
+                            'q_back'     => 'کراس بیک',
+                            'q_length'   => 'کوٹ لمبائی',
+                            'q_sleeve'   => 'بازو',
+                        ],
+                        'col_width' => '16.66%'
+                    ],
+                    [
+                        'title' => 'پینٹ کی پیمائش (Pant)',
+                        'fields' => [
+                            's_length'   => 'پینٹ لمبائی',
+                            's_crotch'   => 'ان سائیڈ',
+                            's_waist'    => 'کمر پینٹ',
+                            's_seat'     => 'ہپس',
+                            's_thigh'    => 'ران',
+                            's_bottom'   => 'پانچہ',
+                            's_ankle'    => 'بیک پاکٹ',
+                        ],
+                        'col_width' => '14.28%'
+                    ]
+                ];
+            } else {
+                $measSections = [
+                    [
+                        'title' => 'قمیض کی پیمائش (Qameez)',
+                        'fields' => [
+                            'q_length'      => 'لمبائی',
+                            'q_shoulder'    => 'کندھا',
+                            'q_collar'      => 'کالر',
+                            'q_sleeve'      => 'آستین',
+                            'q_armhole'     => 'بغل',
+                            'q_cuff'        => 'کف',
+                            'q_chest'       => 'سینہ',
+                            'q_waist'       => 'کمر',
+                            'q_seat'        => 'چوڑائی',
+                            'q_sleeve_width'=> 'آستین چوڑائی',
+                            'q_front'       => 'آگے',
+                            'q_back'        => 'پیچھے',
+                        ],
+                        'col_width' => '8.33%'
+                    ],
+                    [
+                        'title' => 'شلوار کی پیمائش (Shalwar)',
+                        'fields' => [
+                            's_length'  => 'لمبائی',
+                            's_bottom'  => 'پانچہ',
+                            's_seat'    => 'چوڑائی',
+                            's_crotch'  => 'کروچ',
+                            's_waist'   => 'کمر',
+                            's_thigh'   => 'ران',
+                            's_knee'    => 'گھٹنہ',
+                            's_ankle'   => 'ٹخنہ',
+                        ],
+                        'col_width' => '12.5%'
+                    ]
+                ];
+            }
+        }
+        $hasMeas = !empty($measSections);
         $measurementNotes = $measurement?->notes;
     @endphp
     @if($hasMeas)
@@ -354,11 +435,13 @@
             پیمائش
             @if($measurementNotes)&nbsp;·&nbsp; <span style="font-weight:400;color:#64748b;text-transform:none;font-family:'Noto Nastaliq Urdu',serif">{{ $measurementNotes }}</span>@endif
         </div>
-        <div class="meas-section-hdr">قمیض / کمیز</div>
+
+        @foreach($measSections as $section)
+        <div class="meas-section-hdr">{{ $section['title'] }}</div>
         <table class="meas-grid">
             <tr>
-                @foreach($qFields as $field => $label)
-                <td style="width:8.33%">
+                @foreach($section['fields'] as $field => $label)
+                <td style="width:{{ $section['col_width'] }}">
                     <span class="meas-lbl">{{ $label }}</span>
                     @if(!empty($measurement->$field))
                     <span class="meas-val">{{ $measurement->$field }}</span>
@@ -369,21 +452,7 @@
                 @endforeach
             </tr>
         </table>
-        <div class="meas-section-hdr">شلوار / تراؤزر</div>
-        <table class="meas-grid">
-            <tr>
-                @foreach($sFields as $field => $label)
-                <td style="width:12.5%">
-                    <span class="meas-lbl">{{ $label }}</span>
-                    @if(!empty($measurement->$field))
-                    <span class="meas-val">{{ $measurement->$field }}</span>
-                    @else
-                    <span class="meas-val meas-empty">—</span>
-                    @endif
-                </td>
-                @endforeach
-            </tr>
-        </table>
+        @endforeach
     </div>
     @endif
 
@@ -434,6 +503,12 @@
         {{ $styleOptions->map(fn ($v, $k) => ($styleMetaLabels[$k] ?? $k) . ': ' . $v)->implode(' | ') }}
     </div>
     @endif
+
+    {{-- Handwritten notes placeholder --}}
+    <div style="margin: 12px 0; font-size: 11px; color: #64748b;">
+        <span style="font-weight: 700; color: #475569;">اضافی نوٹ / ہدایات:</span>
+        <span style="display: inline-block; width: 65%; border-bottom: 1px dotted #cbd5e1; margin-right: 8px; height: 14px; vertical-align: bottom;"></span>
+    </div>
 
     <div class="legal-box">
         <div class="legal-title">PAYMENT NOTICE</div>

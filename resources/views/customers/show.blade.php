@@ -47,8 +47,13 @@
                 <div>
                     <p class="text-sm font-medium text-slate-800">{{ $m->label }}</p>
                     <p class="text-xs text-slate-500 mt-0.5">
-                        Qameez: L{{ $m->q_length }} S{{ $m->q_shoulder }} C{{ $m->q_chest }} ·
-                        Shalwar: L{{ $m->s_length }} W{{ $m->s_waist }}
+                        @if(($m->type ?? 'shalwar_kameez') === 'waistcoat')
+                            Waistcoat: L{{ $m->q_length ?? '—' }} C{{ $m->q_chest ?? '—' }} W{{ $m->q_waist ?? '—' }} S{{ $m->q_shoulder ?? '—' }}
+                        @elseif(($m->type ?? 'shalwar_kameez') === 'pent_coat')
+                            Pent Coat: L{{ $m->q_length ?? '—' }} C{{ $m->q_chest ?? '—' }} W{{ $m->q_waist ?? '—' }} · Pant: L{{ $m->s_length ?? '—' }} W{{ $m->s_waist ?? '—' }}
+                        @else
+                            Qameez: L{{ $m->q_length ?? '—' }} S{{ $m->q_shoulder ?? '—' }} C{{ $m->q_chest ?? '—' }} · Shalwar: L{{ $m->s_length ?? '—' }} W{{ $m->s_waist ?? '—' }}
+                        @endif
                     </p>
                 </div>
                 <a href="{{ route('measurements.edit', [$customer, $m]) }}"

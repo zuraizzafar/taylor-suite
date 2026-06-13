@@ -12,7 +12,7 @@ class Measurement extends Model
     use HasFactory;
 
     protected $fillable = [
-        'customer_id', 'label',
+        'customer_id', 'label', 'type',
         'q_length', 'q_shoulder', 'q_chest', 'q_waist', 'q_seat',
         'q_sleeve', 'q_sleeve_width', 'q_collar', 'q_front', 'q_back',
         'q_armhole', 'q_cuff',

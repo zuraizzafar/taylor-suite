@@ -174,16 +174,17 @@
     $trackingUrl = route('tracking.show', ['tracking' => $order->order_number]);
     $isUrdu = app()->getLocale() === 'ur';
     $styleMetaLabels = [
-        'collar_style' => 'Neck / Collar Style',
-        'button_type' => 'Button Type',
-        'button_count' => 'Number of Buttons',
-        'ghera_style' => 'Ghera (Bottom)',
-        'stitching_style' => 'Stitching Style',
-        'chak_patti' => 'Chak Patti',
-        'kaj_hale' => 'Kaj Hale',
-        'pahuncha_style' => 'Pahuncha',
-        'front_patti_size' => 'Front Patti Size',
-        'design_number' => 'Design Number',
+        'collar_style' => $isUrdu ? 'کالر کا انداز' : 'Neck / Collar Style',
+        'button_type' => $isUrdu ? 'بٹن کی قسم' : 'Button Type',
+        'button_count' => $isUrdu ? 'بٹن کی تعداد' : 'Number of Buttons',
+        'ghera_style' => $isUrdu ? 'گھیرا' : 'Ghera (Bottom)',
+        'stitching_style' => $isUrdu ? 'سلائی کا انداز' : 'Stitching Style',
+        'chak_patti' => $isUrdu ? 'چاک پٹی' : 'Chak Patti',
+        'kaj_hale' => $isUrdu ? 'کاج ہال' : 'Kaj Hale',
+        'pahuncha_style' => $isUrdu ? 'پانچہ' : 'Pahuncha',
+        'front_patti_size' => $isUrdu ? 'فرنٹ پٹی سائز' : 'Front Patti Size',
+        'design_number' => $isUrdu ? 'ڈیزائن نمبر' : 'Design Number',
+        'fashion_style' => $isUrdu ? 'فیشن اسٹائل' : 'Fashion Style',
     ];
     $styleOptions = collect($measurement?->meta ?? [])->filter(fn ($value) => filled($value));
 
@@ -313,11 +314,91 @@
         </tfoot>
     </table>
 
-    {{-- MEASUREMENTS --}}
     @php
-        $hasMeas = $measurement
-            && collect($qFields)->keys()->merge(collect($sFields)->keys())
-                ->some(fn($k) => !empty($measurement->$k));
+        $measType = $measurement->type ?? 'shalwar_kameez';
+        $measSections = [];
+        if ($measurement) {
+            if ($measType === 'waistcoat') {
+                $measSections = [
+                    [
+                        'title' => $isUrdu ? 'واسٹ کوٹ کی پیمائش (Waistcoat)' : 'Waistcoat Measurements',
+                        'fields' => [
+                            'q_length'   => $isUrdu ? 'لمبائی' : 'Length',
+                            'q_chest'    => $isUrdu ? 'چھاتی' : 'Chest',
+                            'q_waist'    => $isUrdu ? 'کمر' : 'Waist',
+                            'q_shoulder' => $isUrdu ? 'تیرا' : 'Shoulder',
+                            'q_collar'   => $isUrdu ? 'کالر' : 'Collar',
+                            'q_armhole'  => $isUrdu ? 'موڈہ' : 'Armhole',
+                        ],
+                        'col_width' => '16.66%'
+                    ]
+                ];
+            } elseif ($measType === 'pent_coat') {
+                $measSections = [
+                    [
+                        'title' => $isUrdu ? 'کوٹ کی پیمائش (Coat)' : 'Coat Measurements',
+                        'fields' => [
+                            'q_chest'    => $isUrdu ? 'چھاتی' : 'Chest',
+                            'q_waist'    => $isUrdu ? 'کمر' : 'Waist',
+                            'q_shoulder' => $isUrdu ? 'تیرا' : 'Shoulder',
+                            'q_back'     => $isUrdu ? 'کراس بیک' : 'Cross Back',
+                            'q_length'   => $isUrdu ? 'کوٹ لمبائی' : 'Coat Length',
+                            'q_sleeve'   => $isUrdu ? 'بازو' : 'Sleeve',
+                        ],
+                        'col_width' => '16.66%'
+                    ],
+                    [
+                        'title' => $isUrdu ? 'پینٹ کی پیمائش (Pant)' : 'Pant Measurements',
+                        'fields' => [
+                            's_length'   => $isUrdu ? 'پینٹ لمبائی' : 'Pant Length',
+                            's_crotch'   => $isUrdu ? 'آسن' : 'In Side',
+                            's_waist'    => $isUrdu ? 'کمر' : 'Waist (Pants)',
+                            's_seat'     => $isUrdu ? 'ہپس' : 'Hipps',
+                            's_thigh'    => $isUrdu ? 'ران' : 'Thigh',
+                            's_bottom'   => $isUrdu ? 'پانچہ' : 'Bottom',
+                            's_ankle'    => $isUrdu ? 'بیک پاکٹ' : 'Back Pocket',
+                        ],
+                        'col_width' => '14.28%'
+                    ]
+                ];
+            } else {
+                $measSections = [
+                    [
+                        'title' => $isUrdu ? 'قمیض کی پیمائش (Qameez)' : 'Qameez / Kameez',
+                        'fields' => [
+                            'q_length'      => $isUrdu ? 'لمبائی' : 'Length',
+                            'q_shoulder'    => $isUrdu ? 'تیرا' : 'Shoulder',
+                            'q_collar'      => $isUrdu ? 'کالر' : 'Collar',
+                            'q_sleeve'      => $isUrdu ? 'بازو' : 'Sleeve',
+                            'q_armhole'     => $isUrdu ? 'موڈہ' : 'Armhole',
+                            'q_cuff'        => $isUrdu ? 'کف' : 'Cuff',
+                            'q_chest'       => $isUrdu ? 'چھاتی' : 'Chest',
+                            'q_waist'       => $isUrdu ? 'کمر' : 'Waist',
+                            'q_seat'        => $isUrdu ? 'گھیرا' : 'Hips',
+                            'q_sleeve_width'=> $isUrdu ? 'بازو چوڑائی' : 'Slv. W',
+                            'q_front'       => $isUrdu ? 'سامنے' : 'Front',
+                            'q_back'        => $isUrdu ? 'بیک' : 'Back',
+                        ],
+                        'col_width' => '8.33%'
+                    ],
+                    [
+                        'title' => $isUrdu ? 'شلوار کی پیمائش (Shalwar)' : 'Shalwar / Trouser',
+                        'fields' => [
+                            's_length'  => $isUrdu ? 'لمبائی' : 'Length',
+                            's_bottom'  => $isUrdu ? 'پانچہ' : 'Bottom',
+                            's_seat'    => $isUrdu ? 'گھیرا' : 'Seat',
+                            's_crotch'  => $isUrdu ? 'آسن' : 'Crotch',
+                            's_waist'   => $isUrdu ? 'کمر' : 'Waist',
+                            's_thigh'   => $isUrdu ? 'ران' : 'Thigh',
+                            's_knee'    => $isUrdu ? 'گھٹنا' : 'Knee',
+                            's_ankle'   => $isUrdu ? 'ٹخنہ' : 'Ankle',
+                        ],
+                        'col_width' => '12.5%'
+                    ]
+                ];
+            }
+        }
+        $hasMeas = !empty($measSections);
         $measurementNotes = $measurement?->notes;
     @endphp
     @if($hasMeas)
@@ -329,12 +410,12 @@
             @endif
         </div>
 
-        {{-- Qameez / Kameez --}}
-        <div class="meas-section-hdr">{{ $isUrdu ? __('Qameez / Kameez') : 'Qameez / Kameez' }}</div>
+        @foreach($measSections as $section)
+        <div class="meas-section-hdr">{{ $section['title'] }}</div>
         <table class="meas-grid">
             <tr>
-                @foreach($qFields as $field => $label)
-                <td style="width:8.33%">
+                @foreach($section['fields'] as $field => $label)
+                <td style="width:{{ $section['col_width'] }}">
                     <span class="meas-lbl">{{ $label }}</span>
                     @if(!empty($measurement->$field))
                     <span class="meas-val">{{ $measurement->$field }}</span>
@@ -345,23 +426,7 @@
                 @endforeach
             </tr>
         </table>
-
-        {{-- Shalwar / Trouser --}}
-        <div class="meas-section-hdr">{{ $isUrdu ? __('Shalwar / Trouser') : 'Shalwar / Trouser' }}</div>
-        <table class="meas-grid">
-            <tr>
-                @foreach($sFields as $field => $label)
-                <td style="width:12.5%">
-                    <span class="meas-lbl">{{ $label }}</span>
-                    @if(!empty($measurement->$field))
-                    <span class="meas-val">{{ $measurement->$field }}</span>
-                    @else
-                    <span class="meas-val meas-empty">&mdash;</span>
-                    @endif
-                </td>
-                @endforeach
-            </tr>
-        </table>
+        @endforeach
     </div>
     @endif
 
@@ -413,6 +478,12 @@
         {{ $styleOptions->map(fn ($value, $key) => ($styleMetaLabels[$key] ?? ucfirst(str_replace('_', ' ', $key))) . ': ' . $value)->implode(' | ') }}
     </div>
     @endif
+
+    {{-- Handwritten notes placeholder --}}
+    <div style="margin: 12px 0; font-size: 10px; color: #64748b;">
+        <span style="font-weight: 700; color: #475569;">{{ $isUrdu ? 'اضافی نوٹ / ہدایات:' : 'Handwritten Notes / Instructions:' }}</span>
+        <span style="display: inline-block; width: 65%; border-bottom: 1px dotted #cbd5e1; margin-left: 8px; height: 14px; vertical-align: bottom;"></span>
+    </div>
 
     {{-- LEGAL NOTICE --}}
     <div class="legal-box">

@@ -1,4 +1,9 @@
 @extends('layouts.app')
+@php
+    $locale = app()->getLocale();
+    $notesStr = \App\Models\Setting::get("predefined_notes_{$locale}", '');
+    $notesList = array_filter(array_map('trim', explode("\n", $notesStr)));
+@endphp
 @section('title', __('New Order (POS)'))
 @section('page-title', '🛒 ' . __('New Order (POS)'))
 
@@ -19,12 +24,18 @@ function posApp() {
         // ── Measurements ───────────────────────────────────────────────────
         showMeasurements: false,
         meas: {
+            type: 'shalwar_kameez',
             q_length:'', q_shoulder:'', q_chest:'', q_waist:'', q_seat:'',
             q_sleeve:'', q_sleeve_width:'', q_collar:'', q_front:'', q_back:'',
             q_armhole:'', q_cuff:'',
             s_length:'', s_waist:'', s_seat:'', s_thigh:'', s_knee:'',
             s_bottom:'', s_crotch:'', s_ankle:'',
-            notes:''
+            notes:'',
+            meta: {
+                collar_style: '', button_type: '', button_count: '', ghera_style: '',
+                stitching_style: '', chak_patti: '', kaj_hale: '', pahuncha_style: '',
+                front_patti_size: '', design_number: '', fashion_style: ''
+            }
         },
 
         // ── Order details ──────────────────────────────────────────────────
@@ -80,7 +91,27 @@ function posApp() {
                 this.showMeasurements = true;
                 const m = c.measurement;
                 for (const k in this.meas) {
-                    this.meas[k] = m[k] ?? '';
+                    if (k === 'meta') {
+                        const metaObj = m.meta || {};
+                        this.meas.meta = {
+                            collar_style: metaObj.collar_style ?? '',
+                            button_type: metaObj.button_type ?? '',
+                            button_count: metaObj.button_count ?? '',
+                            ghera_style: metaObj.ghera_style ?? '',
+                            stitching_style: metaObj.stitching_style ?? '',
+                            chak_patti: metaObj.chak_patti ?? '',
+                            kaj_hale: metaObj.kaj_hale ?? '',
+                            pahuncha_style: metaObj.pahuncha_style ?? '',
+                            front_patti_size: metaObj.front_patti_size ?? '',
+                            design_number: metaObj.design_number ?? '',
+                            fashion_style: metaObj.fashion_style ?? ''
+                        };
+                    } else {
+                        this.meas[k] = m[k] ?? '';
+                    }
+                }
+                if (!this.meas.type) {
+                    this.meas.type = 'shalwar_kameez';
                 }
             }
         },
@@ -88,7 +119,20 @@ function posApp() {
         clearCustomer() {
             this.customer     = null;
             this.customerMode = 'search';
-            this.meas = Object.fromEntries(Object.keys(this.meas).map(k => [k,'']));
+            this.meas = {
+                type: 'shalwar_kameez',
+                q_length:'', q_shoulder:'', q_chest:'', q_waist:'', q_seat:'',
+                q_sleeve:'', q_sleeve_width:'', q_collar:'', q_front:'', q_back:'',
+                q_armhole:'', q_cuff:'',
+                s_length:'', s_waist:'', s_seat:'', s_thigh:'', s_knee:'',
+                s_bottom:'', s_crotch:'', s_ankle:'',
+                notes:'',
+                meta: {
+                    collar_style: '', button_type: '', button_count: '', ghera_style: '',
+                    stitching_style: '', chak_patti: '', kaj_hale: '', pahuncha_style: '',
+                    front_patti_size: '', design_number: '', fashion_style: ''
+                }
+            };
             this.showMeasurements = false;
         },
 
@@ -319,43 +363,247 @@ function posApp() {
             </button>
 
             <div x-show="showMeasurements" x-cloak class="px-4 pb-4 space-y-3 border-t border-slate-100">
+                
+                {{-- Type select --}}
                 <div class="pt-3">
-                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">{{ __('Qameez') }} / Kameez</p>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Measurement Type / پیمائش کی قسم</label>
+                    <select name="measurement[type]" x-model="meas.type"
+                        class="w-full border border-slate-300 bg-white rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="shalwar_kameez">Shalwar Kameez (شلوار قمیض)</option>
+                        <option value="waistcoat">Waistcoat (واسٹ کوٹ)</option>
+                        <option value="pent_coat">Pent Coat (پینٹ کوٹ)</option>
+                    </select>
+                </div>
+
+                {{-- Type 1: Shalwar Kameez --}}
+                <div x-show="meas.type === 'shalwar_kameez'" class="space-y-3">
+                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">👘 Qameez / Kameez</p>
                     <div class="grid grid-cols-3 gap-2">
                         @foreach([
-                            ['q_length','Length'],['q_shoulder','Shoulder'],['q_chest','Chest'],
-                            ['q_waist','Waist'],['q_seat','Seat'],['q_sleeve','Sleeve'],
-                            ['q_sleeve_width','Slv Width'],['q_collar','Collar'],['q_front','Front'],
-                            ['q_back','Back'],['q_armhole','Armhole'],['q_cuff','Cuff'],
+                            ['q_length','Length (قمیض لمبائی)'],
+                            ['q_shoulder','Shoulder (تیرا)'],
+                            ['q_collar','Collar (کالر)'],
+                            ['q_sleeve','Sleeve (بازو)'],
+                            ['q_armhole','Arm Hole (موڈہ)'],
+                            ['q_cuff','Cuff /Hole (کف)'],
+                            ['q_chest','Chest (چھاتی)'],
+                            ['q_waist','Waist (کمر)'],
+                            ['q_seat','Hips (قمیض گھیرا)'],
                         ] as [$field,$label])
                         <div>
                             <label class="block text-[10px] text-slate-500 mb-0.5">{{ $label }}</label>
                             <input type="number" step="0.5" name="measurement[{{ $field }}]" x-model="meas.{{ $field }}"
+                                :disabled="meas.type !== 'shalwar_kameez'"
+                                class="w-full border border-slate-200 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400"
+                                placeholder="—">
+                        </div>
+                        @endforeach
+                    </div>
+
+                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1 pt-1">👖 Shalwar</p>
+                    <div class="grid grid-cols-3 gap-2">
+                        @foreach([
+                            ['s_length','Shalwar Length (شلوار لمبائی)'],
+                            ['s_bottom','Bottom (پانچہ)'],
+                            ['s_seat','Shalwar Ghera (شلوار گھیرا)'],
+                            ['s_crotch','Shalwar Assan (آسن)'],
+                        ] as [$field,$label])
+                        <div>
+                            <label class="block text-[10px] text-slate-500 mb-0.5">{{ $label }}</label>
+                            <input type="number" step="0.5" name="measurement[{{ $field }}]" x-model="meas.{{ $field }}"
+                                :disabled="meas.type !== 'shalwar_kameez'"
                                 class="w-full border border-slate-200 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400"
                                 placeholder="—">
                         </div>
                         @endforeach
                     </div>
                 </div>
-                <div>
-                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">{{ __('Shalwar') }} / Trouser</p>
+
+                {{-- Type 2: Waistcoat --}}
+                <div x-show="meas.type === 'waistcoat'" class="space-y-3">
+                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">🧥 Waistcoat Details</p>
                     <div class="grid grid-cols-3 gap-2">
                         @foreach([
-                            ['s_length','Length'],['s_waist','Waist'],['s_seat','Seat'],
-                            ['s_thigh','Thigh'],['s_knee','Knee'],['s_bottom','Bottom'],
-                            ['s_crotch','Crotch'],['s_ankle','Ankle'],
+                            ['q_length','Length (لمبائی)'],
+                            ['q_chest','Chest (چھاتی)'],
+                            ['q_waist','Waist (کمر)'],
+                            ['q_shoulder','Shoulder (تیرا)'],
+                            ['q_collar','Collar (کالر)'],
+                            ['q_armhole','Arm Hole (موڈہ)'],
                         ] as [$field,$label])
                         <div>
                             <label class="block text-[10px] text-slate-500 mb-0.5">{{ $label }}</label>
                             <input type="number" step="0.5" name="measurement[{{ $field }}]" x-model="meas.{{ $field }}"
+                                :disabled="meas.type !== 'waistcoat'"
                                 class="w-full border border-slate-200 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400"
                                 placeholder="—">
                         </div>
                         @endforeach
                     </div>
                 </div>
-                <div>
-                    <label class="block text-[10px] text-slate-500 mb-0.5">Notes</label>
+
+                {{-- Type 3: Pent Coat --}}
+                <div x-show="meas.type === 'pent_coat'" class="space-y-3">
+                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">👔 Coat Details</p>
+                    <div class="grid grid-cols-3 gap-2">
+                        @foreach([
+                            ['q_chest','Chest'],
+                            ['q_waist','Waist'],
+                            ['q_shoulder','Shoulder'],
+                            ['q_back','Crose Back'],
+                            ['q_length','Coat Length'],
+                            ['q_sleeve','Sleeve'],
+                        ] as [$field,$label])
+                        <div>
+                            <label class="block text-[10px] text-slate-500 mb-0.5">{{ $label }}</label>
+                            <input type="number" step="0.5" name="measurement[{{ $field }}]" x-model="meas.{{ $field }}"
+                                :disabled="meas.type !== 'pent_coat'"
+                                class="w-full border border-slate-200 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400"
+                                placeholder="—">
+                        </div>
+                        @endforeach
+                    </div>
+
+                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1 pt-1">👖 Pant Details</p>
+                    <div class="grid grid-cols-3 gap-2">
+                        @foreach([
+                            ['s_length','Pant Length'],
+                            ['s_crotch','In Side'],
+                            ['s_waist','Waist (Pants)'],
+                            ['s_seat','Hipps'],
+                            ['s_thigh','Thai'],
+                            ['s_bottom','Bottom'],
+                            ['s_ankle','Back Pocket'],
+                        ] as [$field,$label])
+                        <div>
+                            <label class="block text-[10px] text-slate-500 mb-0.5">{{ $label }}</label>
+                            <input type="number" step="0.5" name="measurement[{{ $field }}]" x-model="meas.{{ $field }}"
+                                :disabled="meas.type !== 'pent_coat'"
+                                class="w-full border border-slate-200 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400"
+                                placeholder="—">
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+
+                {{-- Style & Finishing Options section --}}
+                <div class="pt-2 border-t border-slate-100 space-y-2">
+                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide">✂️ Style & Finishing Options</p>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-[10px] text-slate-500 mb-0.5">Neck / Collar Style</label>
+                            <select name="measurement[meta][collar_style]" x-model="meas.meta.collar_style"
+                                class="w-full border border-slate-200 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white">
+                                <option value="">— Select —</option>
+                                @foreach(['Cuff' => 'Cuff', 'Gol Bazoo' => 'Gol Bazoo', 'BAN' => 'BAN', 'Collar' => 'Collar'] as $v => $l)
+                                <option value="{{ $v }}">{{ $l }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-slate-500 mb-0.5">Button Type</label>
+                            <select name="measurement[meta][button_type]" x-model="meas.meta.button_type"
+                                class="w-full border border-slate-200 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white">
+                                <option value="">— Select —</option>
+                                @foreach(['Fancy Button' => 'Fancy Button', 'Tech Button' => 'Tech Button (Snap)'] as $v => $l)
+                                <option value="{{ $v }}">{{ $l }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-slate-500 mb-0.5">Number of Buttons</label>
+                            <select name="measurement[meta][button_count]" x-model="meas.meta.button_count"
+                                class="w-full border border-slate-200 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white">
+                                <option value="">— Select —</option>
+                                @for($i = 1; $i <= 15; $i++)
+                                <option value="{{ $i }}">{{ $i }}</option>
+                                @endfor
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-slate-500 mb-0.5">Ghera (Bottom)</label>
+                            <select name="measurement[meta][ghera_style]" x-model="meas.meta.ghera_style"
+                                class="w-full border border-slate-200 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white">
+                                <option value="">— Select —</option>
+                                @foreach(['Gol Ghera' => 'Gol Ghera', 'Chauras Ghera' => 'Chauras Ghera (Square)'] as $v => $l)
+                                <option value="{{ $v }}">{{ $l }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-slate-500 mb-0.5">Stitching Style</label>
+                            <select name="measurement[meta][stitching_style]" x-model="meas.meta.stitching_style"
+                                class="w-full border border-slate-200 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white">
+                                <option value="">— Select —</option>
+                                @foreach(['Single Silai' => 'Single Silai', 'Double Silai' => 'Double Silai', 'Triple Silai' => 'Triple Silai'] as $v => $l)
+                                <option value="{{ $v }}">{{ $l }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-slate-500 mb-0.5">Chak Patti</label>
+                            <select name="measurement[meta][chak_patti]" x-model="meas.meta.chak_patti"
+                                class="w-full border border-slate-200 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white">
+                                <option value="">— Select —</option>
+                                @foreach(['Ghum' => 'Ghum (Hidden)', 'Open' => 'Open'] as $v => $l)
+                                <option value="{{ $v }}">{{ $l }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-slate-500 mb-0.5">Kaj Hale (Buttonhole)</label>
+                            <select name="measurement[meta][kaj_hale]" x-model="meas.meta.kaj_hale"
+                                class="w-full border border-slate-200 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white">
+                                <option value="">— Select —</option>
+                                @foreach(['Machine' => 'Machine', 'Hand' => 'Hand'] as $v => $l)
+                                <option value="{{ $v }}">{{ $l }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-slate-500 mb-0.5">Pahuncha (Shalwar Bottom)</label>
+                            <select name="measurement[meta][pahuncha_style]" x-model="meas.meta.pahuncha_style"
+                                class="w-full border border-slate-200 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white">
+                                <option value="">— Select —</option>
+                                @foreach(['Plain' => 'Plain', 'Kadhai Pahuncha' => 'Kadhai (Embroidered)', 'Jali Pahuncha' => 'Jali (Lace/Net)'] as $v => $l)
+                                <option value="{{ $v }}">{{ $l }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-slate-500 mb-0.5">Front Patti Size (in)</label>
+                            <input type="text" name="measurement[meta][front_patti_size]" x-model="meas.meta.front_patti_size"
+                                placeholder="e.g. 1.5"
+                                class="w-full border border-slate-200 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-slate-500 mb-0.5">Design Number</label>
+                            <input type="text" name="measurement[meta][design_number]" x-model="meas.meta.design_number"
+                                placeholder="e.g. D-01"
+                                class="w-full border border-slate-200 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400">
+                        </div>
+                        <div x-show="meas.type === 'shalwar_kameez'">
+                            <label class="block text-[10px] text-slate-500 mb-0.5">Fashion Style / فیشن اسٹائل</label>
+                            <input type="text" name="measurement[meta][fashion_style]" x-model="meas.meta.fashion_style"
+                                placeholder="e.g. Double pocket..."
+                                class="w-full border border-slate-200 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="notes-container">
+                    <div class="flex items-center justify-between mb-0.5">
+                        <label class="block text-[10px] text-slate-500">Notes</label>
+                        @if(!empty($notesList))
+                        <select onchange="selectPredefinedNote(this)" class="text-[9px] border border-slate-300 rounded px-1 py-0.5 bg-slate-50 text-slate-600 focus:outline-none cursor-pointer">
+                            <option value="">— Preset —</option>
+                            @foreach($notesList as $note)
+                            <option value="{{ $note }}">{{ $note }}</option>
+                            @endforeach
+                            <option value="custom">+ Custom/Clear</option>
+                        </select>
+                        @endif
+                    </div>
                     <input type="text" name="measurement[notes]" x-model="meas.notes"
                         class="w-full border border-slate-200 rounded-md px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400"
                         placeholder="Any special measurement notes">
@@ -461,8 +709,19 @@ function posApp() {
                         <option value="online">Online</option>
                     </select>
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">{{ __('Order Notes') }}</label>
+                <div class="notes-container">
+                    <div class="flex items-center justify-between mb-1">
+                        <label class="block text-xs font-semibold text-slate-600">{{ __('Order Notes') }}</label>
+                        @if(!empty($notesList))
+                        <select onchange="selectPredefinedNote(this)" class="text-[10px] border border-slate-300 rounded px-1.5 py-0.5 bg-slate-50 text-slate-600 focus:outline-none cursor-pointer">
+                            <option value="">— Preset —</option>
+                            @foreach($notesList as $note)
+                            <option value="{{ $note }}">{{ $note }}</option>
+                            @endforeach
+                            <option value="custom">+ Custom / Clear</option>
+                        </select>
+                        @endif
+                    </div>
                     <input type="text" name="order_notes" x-model="orderNotes"
                         class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="Optional">
@@ -540,8 +799,19 @@ function posApp() {
                                     placeholder="Colour, material…"
                                     class="w-full border border-slate-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                             </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-500 mb-1">{{ __('Notes') }}</label>
+                            <div class="notes-container">
+                                <div class="flex items-center justify-between mb-1">
+                                    <label class="block text-xs font-semibold text-slate-500">{{ __('Notes') }}</label>
+                                    @if(!empty($notesList))
+                                    <select onchange="selectPredefinedNote(this)" class="text-[10px] border border-slate-300 rounded px-1.5 py-0.5 bg-slate-50 text-slate-600 focus:outline-none cursor-pointer">
+                                        <option value="">— Preset —</option>
+                                        @foreach($notesList as $note)
+                                        <option value="{{ $note }}">{{ $note }}</option>
+                                        @endforeach
+                                        <option value="custom">+ Custom / Clear</option>
+                                    </select>
+                                    @endif
+                                </div>
                                 <input type="text" :name="'suits['+idx+'][notes]'" x-model="suit.notes"
                                     placeholder="Special instructions…"
                                     class="w-full border border-slate-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">

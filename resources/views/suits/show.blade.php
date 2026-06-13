@@ -160,11 +160,85 @@
             </a>
         </div>
         @if($suit->measurement)
+        @php
+            $meas = $suit->measurement;
+            $type = $meas->type ?? 'shalwar_kameez';
+            $sections = [];
+            if ($type === 'waistcoat') {
+                $sections[] = [
+                    'title' => 'Waistcoat Details',
+                    'fields' => [
+                        'q_length' => 'Length',
+                        'q_chest' => 'Chest',
+                        'q_waist' => 'Waist',
+                        'q_shoulder' => 'Shoulder',
+                        'q_collar' => 'Collar',
+                        'q_armhole' => 'Armhole',
+                    ],
+                ];
+            } elseif ($type === 'pent_coat') {
+                $sections[] = [
+                    'title' => 'Coat Details',
+                    'fields' => [
+                        'q_chest' => 'Chest',
+                        'q_waist' => 'Waist',
+                        'q_shoulder' => 'Shoulder',
+                        'q_back' => 'Cross Back',
+                        'q_length' => 'Coat Length',
+                        'q_sleeve' => 'Sleeve',
+                    ],
+                ];
+                $sections[] = [
+                    'title' => 'Pant Details',
+                    'fields' => [
+                        's_length' => 'Pant Length',
+                        's_crotch' => 'In Side',
+                        's_waist' => 'Waist (Pants)',
+                        's_seat' => 'Hipps',
+                        's_thigh' => 'Thai',
+                        's_bottom' => 'Bottom',
+                        's_ankle' => 'Back Pocket',
+                    ],
+                ];
+            } else {
+                $sections[] = [
+                    'title' => 'Qameez / Kameez',
+                    'fields' => [
+                        'q_length' => 'Length',
+                        'q_shoulder' => 'Shoulder',
+                        'q_chest' => 'Chest',
+                        'q_waist' => 'Waist',
+                        'q_seat' => 'Seat',
+                        'q_sleeve' => 'Sleeve',
+                        'q_sleeve_width' => 'Sleeve W.',
+                        'q_collar' => 'Collar',
+                        'q_front' => 'Front',
+                        'q_back' => 'Back',
+                        'q_armhole' => 'Armhole',
+                        'q_cuff' => 'Cuff',
+                    ],
+                ];
+                $sections[] = [
+                    'title' => 'Shalwar',
+                    'fields' => [
+                        's_length' => 'Length',
+                        's_waist' => 'Waist',
+                        's_seat' => 'Seat',
+                        's_thigh' => 'Thigh',
+                        's_knee' => 'Knee',
+                        's_bottom' => 'Bottom',
+                        's_crotch' => 'Crotch',
+                        's_ankle' => 'Ankle',
+                    ],
+                ];
+            }
+        @endphp
         <div class="grid grid-cols-2 gap-4">
+            @foreach($sections as $sect)
             <div>
-                <h4 class="text-xs font-semibold text-slate-500 uppercase mb-2">{{ __('Qameez') }}</h4>
+                <h4 class="text-xs font-semibold text-slate-500 uppercase mb-2">{{ $sect['title'] }}</h4>
                 <div class="grid grid-cols-2 gap-1 text-sm">
-                    @foreach(['q_length' => 'Length', 'q_shoulder' => 'Shoulder', 'q_chest' => 'Chest', 'q_waist' => 'Waist', 'q_seat' => 'Seat', 'q_sleeve' => 'Sleeve', 'q_sleeve_width' => 'Sleeve W.', 'q_collar' => 'Collar', 'q_front' => 'Front', 'q_back' => 'Back', 'q_armhole' => 'Armhole', 'q_cuff' => 'Cuff'] as $f => $l)
+                    @foreach($sect['fields'] as $f => $l)
                     @if($suit->measurement->$f)
                     <div class="flex justify-between border-b border-slate-50 py-0.5">
                         <span class="text-slate-500">{{ $l }}</span>
@@ -174,19 +248,7 @@
                     @endforeach
                 </div>
             </div>
-            <div>
-                <h4 class="text-xs font-semibold text-slate-500 uppercase mb-2">{{ __('Shalwar') }}</h4>
-                <div class="grid grid-cols-2 gap-1 text-sm">
-                    @foreach(['s_length' => 'Length', 's_waist' => 'Waist', 's_seat' => 'Seat', 's_thigh' => 'Thigh', 's_knee' => 'Knee', 's_bottom' => 'Bottom', 's_crotch' => 'Crotch', 's_ankle' => 'Ankle'] as $f => $l)
-                    @if($suit->measurement->$f)
-                    <div class="flex justify-between border-b border-slate-50 py-0.5">
-                        <span class="text-slate-500">{{ $l }}</span>
-                        <span class="font-medium">{{ $suit->measurement->$f }}"</span>
-                    </div>
-                    @endif
-                    @endforeach
-                </div>
-            </div>
+            @endforeach
         </div>
         @php $meta = $suit->measurement->meta ?? []; @endphp
         @if(!empty($meta))
@@ -196,7 +258,7 @@
                 @if(!empty($meta['button_count']))
                 <span class="bg-blue-50 text-blue-700 text-xs px-2 py-1 rounded-full">🔘 Buttons: {{ $meta['button_count'] }}</span>
                 @endif
-                @foreach(['collar_style' => 'Collar', 'button_type' => 'Button Type', 'ghera_style' => 'Ghera', 'stitching_style' => 'Stitching', 'chak_patti' => 'Chak Patti', 'kaj_hale' => 'Kaj Hale', 'pahuncha_style' => 'Pahuncha', 'front_patti_size' => 'Front Patti', 'design_number' => 'Design No.'] as $key => $label)
+                @foreach(['collar_style' => 'Collar', 'button_type' => 'Button Type', 'ghera_style' => 'Ghera', 'stitching_style' => 'Stitching', 'chak_patti' => 'Chak Patti', 'kaj_hale' => 'Kaj Hale', 'pahuncha_style' => 'Pahuncha', 'front_patti_size' => 'Front Patti', 'design_number' => 'Design No.', 'fashion_style' => 'Fashion Style'] as $key => $label)
                 @if(!empty($meta[$key]))
                 <span class="bg-slate-100 text-slate-700 text-xs px-2 py-1 rounded-full">{{ $label }}: {{ $meta[$key] }}</span>
                 @endif

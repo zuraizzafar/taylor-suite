@@ -21,6 +21,7 @@ class MeasurementController extends Controller
     {
         $data = $request->validate([
             'label'          => ['required', 'string', 'max:100'],
+            'type'           => ['nullable', 'string', 'in:shalwar_kameez,waistcoat,pent_coat'],
             'q_length'       => ['nullable', 'numeric', 'min:0'],
             'q_shoulder'     => ['nullable', 'numeric', 'min:0'],
             'q_chest'        => ['nullable', 'numeric', 'min:0'],
@@ -63,6 +64,7 @@ class MeasurementController extends Controller
     {
         $data = $request->validate([
             'label'          => ['required', 'string', 'max:100'],
+            'type'           => ['nullable', 'string', 'in:shalwar_kameez,waistcoat,pent_coat'],
             'q_length'       => ['nullable', 'numeric', 'min:0'],
             'q_shoulder'     => ['nullable', 'numeric', 'min:0'],
             'q_chest'        => ['nullable', 'numeric', 'min:0'],
@@ -140,6 +142,7 @@ class MeasurementController extends Controller
             'pahuncha_style'  => $request->input('meta_pahuncha_style'),
             'front_patti_size'=> $request->input('meta_front_patti_size'),
             'design_number'   => $request->input('meta_design_number'),
+            'fashion_style'   => $request->input('meta_fashion_style'),
         ], fn($v) => $v !== null && $v !== '');
     }
 }

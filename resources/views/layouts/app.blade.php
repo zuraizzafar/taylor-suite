@@ -343,6 +343,24 @@
         function closePayModal() {
             document.getElementById('qp-overlay').style.display = 'none';
         }
+        function selectPredefinedNote(selectEl) {
+            if (!selectEl.value) return;
+            const container = selectEl.closest('.notes-container');
+            if (container) {
+                const field = container.querySelector('textarea, input[type=text]');
+                if (field) {
+                    if (selectEl.value === 'custom') {
+                        field.value = '';
+                    } else {
+                        field.value = field.value ? (field.value + ' · ' + selectEl.value) : selectEl.value;
+                    }
+                    field.dispatchEvent(new Event('input', { bubbles: true }));
+                    field.dispatchEvent(new Event('change', { bubbles: true }));
+                    field.focus();
+                }
+            }
+            selectEl.value = '';
+        }
     </script>
 </body>
 </html>

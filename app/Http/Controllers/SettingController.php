@@ -23,6 +23,8 @@ class SettingController extends Controller
         'invoice_legal_note',
         'logo_path',
         'payment_qr_path',
+        'predefined_notes_en',
+        'predefined_notes_ur',
     ];
 
     public function index(): View
@@ -45,6 +47,8 @@ class SettingController extends Controller
             'invoice_legal_note'  => ['nullable', 'string', 'max:500'],
             'logo'               => ['nullable', 'image', 'max:2048', 'mimes:png,jpg,jpeg,webp'],
             'payment_qr'         => ['nullable', 'image', 'max:2048', 'mimes:png,jpg,jpeg,webp'],
+            'predefined_notes_en' => ['nullable', 'string'],
+            'predefined_notes_ur' => ['nullable', 'string'],
         ]);
 
         // Handle logo upload

@@ -74,8 +74,24 @@
                 </select>
             </div>
 
-            <div class="mb-6">
-                <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Notes') }}</label>
+            <div class="mb-6 notes-container">
+                <div class="flex items-center justify-between mb-1">
+                    <label class="block text-sm font-medium text-slate-700">{{ __('Notes') }}</label>
+                    @php
+                        $locale = app()->getLocale();
+                        $notesStr = \App\Models\Setting::get("predefined_notes_{$locale}", '');
+                        $notesList = array_filter(array_map('trim', explode("\n", $notesStr)));
+                    @endphp
+                    @if(!empty($notesList))
+                    <select onchange="selectPredefinedNote(this)" class="text-xs border border-slate-300 rounded px-2 py-0.5 bg-slate-50 text-slate-600 focus:outline-none cursor-pointer">
+                        <option value="">— Preset Notes —</option>
+                        @foreach($notesList as $note)
+                        <option value="{{ $note }}">{{ $note }}</option>
+                        @endforeach
+                        <option value="custom">+ Custom / Clear</option>
+                    </select>
+                    @endif
+                </div>
                 <textarea name="notes" rows="2"
                     class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">{{ old('notes', $suit->notes) }}</textarea>
             </div>
