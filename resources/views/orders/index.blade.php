@@ -52,6 +52,8 @@
                         <div class="flex gap-1">
                             <a href="{{ route('orders.show', $order) }}"
                                class="text-xs bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded">{{ __('View') }}</a>
+                            <a href="{{ route('orders.tags', $order) }}" target="_blank"
+                               class="text-xs bg-purple-50 hover:bg-purple-100 text-purple-700 px-2 py-1 rounded">{{ __('Tags') }}</a>
                             <a href="{{ route('orders.invoice', $order) }}"
                                class="text-xs bg-green-50 hover:bg-green-100 text-green-700 px-2 py-1 rounded">PDF</a>
                         </div>

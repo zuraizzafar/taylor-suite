@@ -19,7 +19,7 @@
                     <a href="{{ route('orders.edit', $order) }}"
                        class="text-xs bg-slate-100 hover:bg-slate-200 px-3 py-1 rounded-lg">{{ __('Edit') }}</a>
                     <a href="{{ route('orders.tags', $order) }}" target="_blank"
-                       class="text-xs bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded-lg">🏷️ {{ __('Print All Tags') }}</a>
+                       class="text-xs bg-purple-100 hover:bg-purple-200 text-purple-700 px-3 py-1 rounded-lg">{{ __('Print Tags') }}</a>
                     <a href="{{ route('orders.invoice', $order) }}"
                        class="text-xs bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-lg">🖸 {{ __('Print PDF') }}</a>
                     <a href="{{ route('suits.create', ['order_id' => $order->id, 'customer_id' => $order->customer_id]) }}"

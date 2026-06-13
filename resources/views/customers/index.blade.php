@@ -48,6 +48,8 @@
                                class="text-xs bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded">{{ __('View') }}</a>
                             <a href="{{ route('customers.edit', $customer) }}"
                                class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 px-2 py-1 rounded">{{ __('Edit') }}</a>
+                            <a href="{{ route('customers.tags.pending', $customer) }}" target="_blank"
+                               class="text-xs bg-purple-50 hover:bg-purple-100 text-purple-700 px-2 py-1 rounded">{{ __('Tags') }}</a>
                         </div>
                     </td>
                 </tr>
