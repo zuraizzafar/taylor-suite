@@ -240,7 +240,7 @@ function posApp() {
 @endpush
 
 @section('content')
-<div x-data="posApp()" x-init="init()" class="pt-1">
+<div x-data="posApp()" class="pt-1">
 <form method="POST" action="{{ route('pos.store') }}" @submit.prevent="submitForm($event)">
 @csrf
 
