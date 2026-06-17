@@ -438,8 +438,8 @@
         @if(app()->getLocale() === 'ur')
             <div style="display: table-cell; vertical-align: bottom; text-align: right; width: 50%;">
                 <div style="display: inline-block; text-align: center;">
-                    <img src="data:image/png;base64,{{ $trackingQrB64 }}" alt="Track order QR" style="width:55px;height:55px;display:block;margin:0 auto 2px;">
-                    <span style="font-size:7px;color:#94a3b8;font-family:DejaVu Sans,sans-serif">ٹریکنگ کیلئے اسکین کریں</span>
+                    <img src="data:image/png;base64,{{ $trackingQrB64 }}" alt="Track order QR" style="width:70px;height:70px;display:block;margin:0 auto 4px;">
+                    <span style="font-size:7.5px;color:#94a3b8;font-family:DejaVu Sans,sans-serif">ٹریکنگ کیلئے اسکین کریں</span>
                 </div>
             </div>
             <div class="payment-wrap-inner" style="display: table-cell; vertical-align: top; text-align: left; width: 50%;">
@@ -471,8 +471,8 @@
         @else
             <div style="display: table-cell; vertical-align: bottom; text-align: left; width: 50%;">
                 <div style="display: inline-block; text-align: center;">
-                    <img src="data:image/png;base64,{{ $trackingQrB64 }}" alt="Track order QR" style="width:55px;height:55px;display:block;margin:0 auto 2px;">
-                    <span style="font-size:7px;color:#94a3b8;font-family:DejaVu Sans,sans-serif">Scan to Track</span>
+                    <img src="data:image/png;base64,{{ $trackingQrB64 }}" alt="Track order QR" style="width:70px;height:70px;display:block;margin:0 auto 4px;">
+                    <span style="font-size:7.5px;color:#94a3b8;font-family:DejaVu Sans,sans-serif">Scan to Track</span>
                 </div>
             </div>
             <div class="payment-wrap-inner" style="display: table-cell; vertical-align: top; text-align: right; width: 50%;">

@@ -44,7 +44,7 @@
     $showPreviousRow = $previousBalance > 0;
     $trackingUrl     = route('tracking.show', ['tracking' => $order->order_number]);
     // Generate SVG QR code for browser printing (SVG renders better in HTML)
-    $trackingQrSvg   = \SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(50)->errorCorrection('M')->generate($trackingUrl);
+    $trackingQrSvg   = \SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(70)->errorCorrection('M')->generate($trackingUrl);
 
     $styleMetaLabels = [
         'collar_style'     => 'گلا / کالر',
@@ -461,8 +461,8 @@
 
     {{-- PAYMENT SUMMARY --}}
     <div class="payment-wrap" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px;">
-        <div style="display: flex; align-items: center; gap: 8px;">
-            <a href="{{ $trackingUrl }}" title="Tap to track order" style="display:block; border:1px solid #e2e8f0; border-radius:4px; padding:3px; background:#fff; width: 50px; height: 50px;">
+        <div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 4px;">
+            <a href="{{ $trackingUrl }}" title="Tap to track order" style="display:block; border:1px solid #e2e8f0; border-radius:4px; padding:3px; background:#fff; width: 70px; height: 70px;">
                 {!! $trackingQrSvg !!}
             </a>
             <div>
