@@ -200,8 +200,8 @@
 
     /* ── Payment summary ──────────────────────────────── */
     .payment-wrap { display: flex; justify-content: flex-start; margin-bottom: 10px; }
-    .payment-table { min-width: 250px; border: 1px solid #e2e8f0; border-radius: 6px; border-collapse: collapse; }
-    .payment-table td { padding: 4px 8px; font-size: 11px; }
+    .payment-table { min-width: 220px; border: 1px solid #e2e8f0; border-radius: 6px; border-collapse: collapse; }
+    .payment-table td { padding: 4px 8px; font-size: 9.5px; }
     .payment-table tr { border-bottom: 1px solid #f1f5f9; }
     .payment-table tr:last-child { border-bottom: none; }
     .lbl { color: #64748b; }
@@ -209,7 +209,7 @@
     .row-advance td { background: #f0fdf4; }
     .row-grand td { background: #1e293b; }
     .row-grand .lbl { color: #e2e8f0; font-weight: 700; }
-    .row-grand .val { color: #fbbf24; font-weight: 800; font-size: 13px; }
+    .row-grand .val { color: #fbbf24; font-weight: 800; font-size: 11.5px; }
 
     /* ── Notes / extras / legal ───────────────────────── */
     .note-box { margin-bottom: 6px; font-size: 10px; color: #64748b; padding: 5px 8px; background: #f8fafc; border-right: 3px solid #cbd5e1; border-radius: 3px; }

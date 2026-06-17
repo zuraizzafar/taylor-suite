@@ -86,8 +86,8 @@
     /* Payment summary */
     .payment-wrap       { display: table; width: 100%; margin-bottom: 16px; }
     .payment-wrap-inner { display: table-cell; text-align: right; }
-    .payment-table      { width: 270px; border: 1px solid #e2e8f0; border-radius: 6px; border-collapse: collapse; font-family: DejaVu Sans, sans-serif; }
-    .payment-table td   { padding: 6px 12px; font-size: 11px; font-family: DejaVu Sans, sans-serif; color: #1e293b; }
+    .payment-table      { width: 230px; border: 1px solid #e2e8f0; border-radius: 6px; border-collapse: collapse; font-family: DejaVu Sans, sans-serif; }
+    .payment-table td   { padding: 4px 10px; font-size: 9.5px; font-family: DejaVu Sans, sans-serif; color: #1e293b; }
     .payment-table tr   { border-bottom: 1px solid #f1f5f9; }
     .payment-table tr:last-child { border-bottom: none; }
     .lbl { color: #64748b; font-family: DejaVu Sans, sans-serif; }
@@ -450,7 +450,7 @@
                 </div>
             </div>
             <div class="payment-wrap-inner" style="display: table-cell; vertical-align: top; text-align: left; width: 50%;">
-                <table class="payment-table" style="display: inline-table; width: 270px; text-align: right; border-collapse: collapse;">
+                <table class="payment-table" style="display: inline-table; width: 230px; text-align: right; border-collapse: collapse;">
                     <tr>
                         <td class="lbl" style="font-family:DejaVu Sans,sans-serif;color:#64748b">{{ $isUrdu ? __('Total Amount') : 'Total Amount' }}</td>
                         <td class="val" style="font-family:DejaVu Sans,sans-serif;color:#1e293b">Rs {{ number_format($order->total_amount) }}</td>
@@ -471,7 +471,7 @@
                     @endif
                     <tr class="row-grand">
                         <td class="lbl" style="font-family:DejaVu Sans,sans-serif;color:#e2e8f0;font-weight:700">{{ $isUrdu ? __('Grand Total Owed') : 'Grand Total Owed' }}</td>
-                        <td class="val" style="font-family:DejaVu Sans,sans-serif;color:#fbbf24;font-weight:800;font-size:13px">Rs {{ number_format($grandTotal) }}</td>
+                        <td class="val" style="font-family:DejaVu Sans,sans-serif;color:#fbbf24;font-weight:800;font-size:11.5px">Rs {{ number_format($grandTotal) }}</td>
                     </tr>
                 </table>
             </div>
@@ -484,7 +484,7 @@
                 </div>
             </div>
             <div class="payment-wrap-inner" style="display: table-cell; vertical-align: top; text-align: right; width: 50%;">
-                <table class="payment-table" style="display: inline-table; width: 270px; border-collapse: collapse;">
+                <table class="payment-table" style="display: inline-table; width: 230px; border-collapse: collapse;">
                     <tr>
                         <td class="lbl" style="font-family:DejaVu Sans,sans-serif;color:#64748b">{{ $isUrdu ? __('Total Amount') : 'Total Amount' }}</td>
                         <td class="val" style="font-family:DejaVu Sans,sans-serif;color:#1e293b">Rs {{ number_format($order->total_amount) }}</td>
@@ -505,7 +505,7 @@
                     @endif
                     <tr class="row-grand">
                         <td class="lbl" style="font-family:DejaVu Sans,sans-serif;color:#e2e8f0;font-weight:700">{{ $isUrdu ? __('Grand Total Owed') : 'Grand Total Owed' }}</td>
-                        <td class="val" style="font-family:DejaVu Sans,sans-serif;color:#fbbf24;font-weight:800;font-size:13px">Rs {{ number_format($grandTotal) }}</td>
+                        <td class="val" style="font-family:DejaVu Sans,sans-serif;color:#fbbf24;font-weight:800;font-size:11.5px">Rs {{ number_format($grandTotal) }}</td>
                     </tr>
                 </table>
             </div>
