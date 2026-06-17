@@ -471,7 +471,8 @@
         @else
             <div style="display: table-cell; vertical-align: bottom; text-align: left; width: 50%;">
                 <div style="display: inline-block; text-align: center;">
-                    <img src="data:image/png;base64,{{ $trackingQrB64 }}" alt="Track order QR" style="width:70px;height:70px;display:block;margin:0 auto 4px;">
+                    <img src="data:image/png;base64,{{ $trackingQrB64 }}" alt="Track order QR" style="width:100px;height:100px;display:block;margin:0 auto 4px;">
+                    <br/>
                     <span style="font-size:7.5px;color:#94a3b8;font-family:DejaVu Sans,sans-serif">Scan to Track</span>
                 </div>
             </div>
