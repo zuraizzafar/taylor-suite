@@ -166,15 +166,16 @@
     $bankAccount    = $settings['bank_account_number'] ?? '';
     $logoPath       = $settings['logo_path']           ?? null;
     $paymentQrPath  = $settings['payment_qr_path']     ?? null;
-    $legalNote      = $settings['invoice_legal_note']
-                        ?? 'Payments are only accepted via the authorised bank account listed on this invoice. The shop and company are not responsible for any issues arising from payments made to any other account.';
+    $isUrdu = app()->getLocale() === 'ur';
+    $legalNote      = $isUrdu
+                        ? ($settings['invoice_legal_note_ur'] ?? ($settings['invoice_legal_note'] ?? 'ادائیگی صرف اس انوائس پر درج مجاز بینک اکاؤنٹ کے ذریعے قبول کی جاتی ہے۔ کسی اور اکاؤنٹ پر کی گئی ادائیگی کی ذمہ داری دکان یا کمپنی پر نہیں ہوگی۔'))
+                        : ($settings['invoice_legal_note_en'] ?? ($settings['invoice_legal_note'] ?? 'Payments are only accepted via the authorised bank account listed on this invoice. The shop and company are not responsible for any issues arising from payments made to any other account.'));
 
     $grandTotal      = $order->balance_amount + $previousBalance;
     $showPreviousRow = $previousBalance > 0;
     $trackingUrl = route('tracking.show', ['tracking' => $order->order_number]);
     // Generate QR code as base64 PNG for embedding in PDF
     $trackingQrB64 = base64_encode(\SimpleSoftwareIO\QrCode\Facades\QrCode::format('png')->size(80)->errorCorrection('M')->generate($trackingUrl));
-    $isUrdu = app()->getLocale() === 'ur';
     $styleMetaLabels = [
         'collar_style'     => $isUrdu ? 'کالر کا انداز' : 'Neck / Collar Style',
         'cuff_style'       => $isUrdu ? 'کف / آستین کا انداز' : 'Cuff / Arm Style',

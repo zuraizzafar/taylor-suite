@@ -37,8 +37,8 @@
     $bankAccount    = $settings['bank_account_number'] ?? '';
     $logoPath       = $settings['logo_path']           ?? null;
     $paymentQrPath  = $settings['payment_qr_path']     ?? null;
-    $legalNote      = $settings['invoice_legal_note']
-                        ?? 'ادائیگی صرف اس انوائس پر درج مجاز بینک اکاؤنٹ کے ذریعے قبول کی جاتی ہے۔ کسی اور اکاؤنٹ پر کی گئی ادائیگی کی ذمہ داری دکان یا کمپنی پر نہیں ہوگی۔';
+    $legalNote      = $settings['invoice_legal_note_ur']
+                        ?? ($settings['invoice_legal_note'] ?? 'ادائیگی صرف اس انوائس پر درج مجاز بینک اکاؤنٹ کے ذریعے قبول کی جاتی ہے۔ کسی اور اکاؤنٹ پر کی گئی ادائیگی کی ذمہ داری دکان یا کمپنی پر نہیں ہوگی۔');
 
     $grandTotal      = $order->balance_amount + $previousBalance;
     $showPreviousRow = $previousBalance > 0;

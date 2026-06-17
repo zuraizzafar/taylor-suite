@@ -70,12 +70,21 @@
                 </div>
             </div>
 
-            <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('PAYMENT NOTICE') }}</label>
-                <textarea name="invoice_legal_note" rows="3"
-                    class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Only Bank payment accept hai...">{{ old('invoice_legal_note', $settings['invoice_legal_note'] ?? 'Only Bank payment accept hai. Kisi aur Bank me payment krny me issue hota to shop waly aur company zimydar nahi.') }}</textarea>
-                <p class="text-xs text-slate-400 mt-1">{{ __('This note prints on every invoice.') }}</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('PAYMENT NOTICE (English)') }}</label>
+                    <textarea name="invoice_legal_note_en" rows="3"
+                        class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Payments are only accepted via the authorised bank account...">{{ old('invoice_legal_note_en', $settings['invoice_legal_note_en'] ?? ($settings['invoice_legal_note'] ?? 'Payments are only accepted via the authorised bank account listed on this invoice. The shop and company are not responsible for any issues arising from payments made to any other account.')) }}</textarea>
+                    <p class="text-xs text-slate-400 mt-1">{{ __('Prints on English invoices.') }}</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('PAYMENT NOTICE (Urdu)') }}</label>
+                    <textarea name="invoice_legal_note_ur" rows="3"
+                        class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="ادائیگی صرف دیے گئے بینک اکاؤنٹ میں قبول ہوگی...">{{ old('invoice_legal_note_ur', $settings['invoice_legal_note_ur'] ?? ($settings['invoice_legal_note'] ?? 'ادائیگی صرف اس انوائس پر درج مجاز بینک اکاؤنٹ کے ذریعے قبول کی جاتی ہے۔ کسی اور اکاؤنٹ پر کی گئی ادائیگی کی ذمہ داری دکان یا کمپنی پر نہیں ہوگی۔')) }}</textarea>
+                    <p class="text-xs text-slate-400 mt-1">{{ __('Prints on Urdu invoices.') }}</p>
+                </div>
             </div>
         </div>
 
