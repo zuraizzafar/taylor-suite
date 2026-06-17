@@ -281,7 +281,7 @@
 
     {{-- CUSTOMER + BANK --}}
     <div class="info-row">
-        <div class="info-cell">
+        <div class="info-cell" style="flex: 1;">
             <div class="info-cell-title">BILLED TO</div>
             <div class="info-cell-name">{{ $order->customer->name }}</div>
             <div class="info-cell-sub">
@@ -291,19 +291,23 @@
             </div>
         </div>
         @if($bankName || $bankAccount)
-        <div class="info-cell">
-            <div class="info-cell-title">BANK DETAILS</div>
-            @if($bankName)<div class="info-cell-name" style="font-size:11.5px">{{ $bankName }}</div>@endif
-            <div class="info-cell-sub">
-                @if($bankTitle)Title: <strong>{{ $bankTitle }}</strong><br>@endif
-                @if($bankAccount)Account: <strong>{{ $bankAccount }}</strong>@endif
+        <div class="info-cell" style="flex: 1.3;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+                <div>
+                    <div class="info-cell-title">BANK DETAILS</div>
+                    @if($bankName)<div class="info-cell-name" style="font-size:11.5px; margin-bottom: 2px;">{{ $bankName }}</div>@endif
+                    <div class="info-cell-sub">
+                        @if($bankTitle)Title: <strong>{{ $bankTitle }}</strong><br>@endif
+                        @if($bankAccount)Account: <strong>{{ $bankAccount }}</strong>@endif
+                    </div>
+                </div>
+                @if($payQrB64)
+                <div style="text-align: center; flex-shrink: 0;">
+                    <img src="data:{{ $payQrMime }};base64,{{ $payQrB64 }}" alt="QR" style="width:60px;height:60px;display:block;margin:0 auto 2px;">
+                    <div style="font-size:7.5px;color:#94a3b8;">اسکین کر کے ادائیگی کریں</div>
+                </div>
+                @endif
             </div>
-            @if($payQrB64)
-            <div style="margin-top:6px">
-                <img src="data:{{ $payQrMime }};base64,{{ $payQrB64 }}" alt="QR" style="width:60px;height:60px">
-                <div style="font-size:8px;color:#94a3b8;margin-top:2px">اسکین کر کے ادائیگی کریں</div>
-            </div>
-            @endif
         </div>
         @endif
     </div>

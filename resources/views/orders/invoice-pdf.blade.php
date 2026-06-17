@@ -254,7 +254,7 @@
 
     {{-- CUSTOMER + BANK --}}
     <div class="info-row">
-        <div class="info-cell" style="width:52%">
+        <div class="info-cell" style="width:{{ ($bankName || $bankAccount) ? '44%' : '96%' }}">
             <div class="info-cell-title">{{ $isUrdu ? __('Billed To') : 'Billed To' }}</div>
             <div class="info-cell-name">{{ $order->customer->name }}</div>
             <div class="info-cell-sub">
@@ -264,19 +264,25 @@
             </div>
         </div>
         @if($bankName || $bankAccount)
-        <div class="info-cell" style="width:44%">
-            <div class="info-cell-title">{{ $isUrdu ? __('Bank Payment Details') : 'Bank Payment Details' }}</div>
-            @if($bankName)<div class="info-cell-name" style="font-size:11px">{{ $bankName }}</div>@endif
-            <div class="info-cell-sub">
-                @if($bankTitle)Title: <strong>{{ $bankTitle }}</strong><br>@endif
-                @if($bankAccount)Account: <strong>{{ $bankAccount }}</strong>@endif
-            </div>
-            @if($payQrB64)
-            <div style="margin-top:8px">
-                <img src="data:{{ $payQrMime }};base64,{{ $payQrB64 }}" alt="Payment QR" style="width:90px;height:90px">
-                <div style="font-size:9px;color:#94a3b8;margin-top:3px">{{ $isUrdu ? __('Scan to pay') : 'Scan to pay' }}</div>
-            </div>
-            @endif
+        <div class="info-cell" style="width:52%">
+            <table style="width:100%; border-collapse:collapse; border:none; margin:0; padding:0;" dir="{{ app()->getLocale() === 'ur' ? 'rtl' : 'ltr' }}">
+                <tr>
+                    <td style="border:none; padding:0; vertical-align:top; text-align:{{ app()->getLocale() === 'ur' ? 'right' : 'left' }};">
+                        <div class="info-cell-title">{{ $isUrdu ? __('Bank Payment Details') : 'Bank Payment Details' }}</div>
+                        @if($bankName)<div class="info-cell-name" style="font-size:11px; margin-bottom:4px;">{{ $bankName }}</div>@endif
+                        <div class="info-cell-sub">
+                            @if($bankTitle)Title: <strong>{{ $bankTitle }}</strong><br>@endif
+                            @if($bankAccount)Account: <strong>{{ $bankAccount }}</strong>@endif
+                        </div>
+                    </td>
+                    @if($payQrB64)
+                    <td style="border:none; padding:{{ app()->getLocale() === 'ur' ? '0 10px 0 0' : '0 0 0 10px' }}; vertical-align:middle; text-align:{{ app()->getLocale() === 'ur' ? 'left' : 'right' }}; width:75px;">
+                        <img src="data:{{ $payQrMime }};base64,{{ $payQrB64 }}" alt="Payment QR" style="width:65px;height:65px;display:block;margin:0 auto 2px;">
+                        <div style="font-size:7px;color:#94a3b8;text-align:center;">{{ $isUrdu ? __('Scan to pay') : 'Scan to pay' }}</div>
+                    </td>
+                    @endif
+                </tr>
+            </table>
         </div>
         @endif
     </div>
