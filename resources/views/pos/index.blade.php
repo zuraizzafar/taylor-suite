@@ -95,6 +95,7 @@ function posApp() {
                         const metaObj = m.meta || {};
                         this.meas.meta = {
                             collar_style: metaObj.collar_style ?? '',
+                            cuff_style: metaObj.cuff_style ?? '',
                             button_type: metaObj.button_type ?? '',
                             button_count: metaObj.button_count ?? '',
                             ghera_style: metaObj.ghera_style ?? '',
@@ -128,7 +129,7 @@ function posApp() {
                 s_bottom:'', s_crotch:'', s_ankle:'',
                 notes:'',
                 meta: {
-                    collar_style: '', button_type: '', button_count: '', ghera_style: '',
+                    collar_style: '', cuff_style: '', button_type: '', button_count: '', ghera_style: '',
                     stitching_style: '', chak_patti: '', kaj_hale: '', pahuncha_style: '',
                     front_patti_size: '', design_number: '', fashion_style: ''
                 }
@@ -488,102 +489,112 @@ function posApp() {
 
                 {{-- Style & Finishing Options section --}}
                 <div class="pt-2 border-t border-slate-100 space-y-2">
-                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide">✂️ Style & Finishing Options</p>
+                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide">✂️ {{ __('Style & Finishing Options') }}</p>
                     <div class="grid grid-cols-2 gap-2">
                         <div>
-                            <label class="block text-[10px] text-slate-500 mb-0.5">Neck / Collar Style</label>
+                            <label class="block text-[10px] text-slate-500 mb-0.5">{{ __('Neck / Collar Style') }}</label>
                             <select name="measurement[meta][collar_style]" x-model="meas.meta.collar_style"
                                 class="w-full border border-slate-200 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white">
-                                <option value="">— Select —</option>
-                                @foreach(['Cuff' => 'Cuff', 'Gol Bazoo' => 'Gol Bazoo', 'BAN' => 'BAN', 'Collar' => 'Collar'] as $v => $l)
+                                <option value="">— {{ __('Select') }} —</option>
+                                @foreach(['BAN' => 'BAN', 'Collar' => 'Collar'] as $v => $l)
                                 <option value="{{ $v }}">{{ $l }}</option>
                                 @endforeach
                             </select>
                         </div>
                         <div>
-                            <label class="block text-[10px] text-slate-500 mb-0.5">Button Type</label>
+                            <label class="block text-[10px] text-slate-500 mb-0.5">{{ __('Cuff / Arm Style') }}</label>
+                            <select name="measurement[meta][cuff_style]" x-model="meas.meta.cuff_style"
+                                class="w-full border border-slate-200 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white">
+                                <option value="">— {{ __('Select') }} —</option>
+                                @foreach(['Cuff' => 'Cuff (Plain)', 'Gol Bazoo' => 'Gol Bazoo', 'Folded Cuff' => 'Folded Cuff'] as $v => $l)
+                                <option value="{{ $v }}">{{ $l }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-slate-500 mb-0.5">{{ __('Button Type') }}</label>
                             <select name="measurement[meta][button_type]" x-model="meas.meta.button_type"
                                 class="w-full border border-slate-200 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white">
-                                <option value="">— Select —</option>
+                                <option value="">— {{ __('Select') }} —</option>
                                 @foreach(['Fancy Button' => 'Fancy Button', 'Tech Button' => 'Tech Button (Snap)'] as $v => $l)
                                 <option value="{{ $v }}">{{ $l }}</option>
                                 @endforeach
                             </select>
                         </div>
                         <div>
-                            <label class="block text-[10px] text-slate-500 mb-0.5">Number of Buttons</label>
+                            <label class="block text-[10px] text-slate-500 mb-0.5">{{ __('Number of Buttons') }}</label>
                             <select name="measurement[meta][button_count]" x-model="meas.meta.button_count"
                                 class="w-full border border-slate-200 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white">
-                                <option value="">— Select —</option>
+                                <option value="">— {{ __('Select') }} —</option>
                                 @for($i = 1; $i <= 15; $i++)
                                 <option value="{{ $i }}">{{ $i }}</option>
                                 @endfor
                             </select>
                         </div>
                         <div>
-                            <label class="block text-[10px] text-slate-500 mb-0.5">Ghera (Bottom)</label>
+                            <label class="block text-[10px] text-slate-500 mb-0.5">{{ __('Ghera (Bottom)') }}</label>
                             <select name="measurement[meta][ghera_style]" x-model="meas.meta.ghera_style"
                                 class="w-full border border-slate-200 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white">
-                                <option value="">— Select —</option>
+                                <option value="">— {{ __('Select') }} —</option>
                                 @foreach(['Gol Ghera' => 'Gol Ghera', 'Chauras Ghera' => 'Chauras Ghera (Square)'] as $v => $l)
                                 <option value="{{ $v }}">{{ $l }}</option>
                                 @endforeach
                             </select>
                         </div>
                         <div>
-                            <label class="block text-[10px] text-slate-500 mb-0.5">Stitching Style</label>
+                            <label class="block text-[10px] text-slate-500 mb-0.5">{{ __('Stitching Style') }}</label>
                             <select name="measurement[meta][stitching_style]" x-model="meas.meta.stitching_style"
                                 class="w-full border border-slate-200 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white">
-                                <option value="">— Select —</option>
+                                <option value="">— {{ __('Select') }} —</option>
                                 @foreach(['Single Silai' => 'Single Silai', 'Double Silai' => 'Double Silai', 'Triple Silai' => 'Triple Silai'] as $v => $l)
                                 <option value="{{ $v }}">{{ $l }}</option>
                                 @endforeach
                             </select>
                         </div>
                         <div>
-                            <label class="block text-[10px] text-slate-500 mb-0.5">Chak Patti</label>
+                            <label class="block text-[10px] text-slate-500 mb-0.5">{{ __('Chak Patti') }}</label>
                             <select name="measurement[meta][chak_patti]" x-model="meas.meta.chak_patti"
                                 class="w-full border border-slate-200 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white">
-                                <option value="">— Select —</option>
+                                <option value="">— {{ __('Select') }} —</option>
                                 @foreach(['Ghum' => 'Ghum (Hidden)', 'Open' => 'Open'] as $v => $l)
                                 <option value="{{ $v }}">{{ $l }}</option>
                                 @endforeach
                             </select>
                         </div>
                         <div>
-                            <label class="block text-[10px] text-slate-500 mb-0.5">Kaj Hale (Buttonhole)</label>
+                            <label class="block text-[10px] text-slate-500 mb-0.5">{{ __('Kaj Hale (Buttonhole)') }}</label>
                             <select name="measurement[meta][kaj_hale]" x-model="meas.meta.kaj_hale"
                                 class="w-full border border-slate-200 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white">
-                                <option value="">— Select —</option>
+                                <option value="">— {{ __('Select') }} —</option>
                                 @foreach(['Machine' => 'Machine', 'Hand' => 'Hand'] as $v => $l)
                                 <option value="{{ $v }}">{{ $l }}</option>
                                 @endforeach
                             </select>
                         </div>
                         <div>
-                            <label class="block text-[10px] text-slate-500 mb-0.5">Pahuncha (Shalwar Bottom)</label>
+                            <label class="block text-[10px] text-slate-500 mb-0.5">{{ __('Pahuncha (Shalwar Bottom)') }}</label>
                             <select name="measurement[meta][pahuncha_style]" x-model="meas.meta.pahuncha_style"
                                 class="w-full border border-slate-200 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white">
-                                <option value="">— Select —</option>
+                                <option value="">— {{ __('Select') }} —</option>
                                 @foreach(['Plain' => 'Plain', 'Kadhai Pahuncha' => 'Kadhai (Embroidered)', 'Jali Pahuncha' => 'Jali (Lace/Net)'] as $v => $l)
                                 <option value="{{ $v }}">{{ $l }}</option>
                                 @endforeach
                             </select>
                         </div>
                         <div>
-                            <label class="block text-[10px] text-slate-500 mb-0.5">Front Patti Size (in)</label>
+                            <label class="block text-[10px] text-slate-500 mb-0.5">{{ __('Front Patti Size (in)') }}</label>
                             <input type="text" name="measurement[meta][front_patti_size]" x-model="meas.meta.front_patti_size"
                                 placeholder="e.g. 1.5"
                                 class="w-full border border-slate-200 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400">
                         </div>
                         <div>
-                            <label class="block text-[10px] text-slate-500 mb-0.5">Design Number</label>
+                            <label class="block text-[10px] text-slate-500 mb-0.5">{{ __('Design Number') }}</label>
                             <input type="text" name="measurement[meta][design_number]" x-model="meas.meta.design_number"
                                 placeholder="e.g. D-01"
                                 class="w-full border border-slate-200 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400">
                         </div>
                         <div x-show="meas.type === 'shalwar_kameez'">
-                            <label class="block text-[10px] text-slate-500 mb-0.5">Fashion Style / فیشن اسٹائل</label>
+                            <label class="block text-[10px] text-slate-500 mb-0.5">{{ __('Fashion Style') }}</label>
                             <input type="text" name="measurement[meta][fashion_style]" x-model="meas.meta.fashion_style"
                                 placeholder="e.g. Double pocket..."
                                 class="w-full border border-slate-200 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400">

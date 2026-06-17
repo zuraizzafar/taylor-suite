@@ -96,7 +96,7 @@ class PosController extends Controller
             'order_date'         => ['required', 'date'],
             'delivery_date'      => ['nullable', 'date', 'after_or_equal:order_date'],
             'total_amount'       => ['required', 'numeric', 'min:0'],
-            'advance_amount'     => ['required', 'numeric', 'min:0'],
+            'advance_amount'     => ['nullable', 'numeric', 'min:0'],
             'order_notes'        => ['nullable', 'string'],
             // Suits — array
             'suits'              => ['required', 'array', 'min:1'],
@@ -108,7 +108,7 @@ class PosController extends Controller
         ]);
 
         $total   = (float) $request->input('total_amount');
-        $advance = (float) $request->input('advance_amount');
+        $advance = (float) ($request->input('advance_amount') ?? 0);
 
         if ($advance > $total) {
             return back()

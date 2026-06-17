@@ -172,19 +172,22 @@
     $grandTotal      = $order->balance_amount + $previousBalance;
     $showPreviousRow = $previousBalance > 0;
     $trackingUrl = route('tracking.show', ['tracking' => $order->order_number]);
+    // Generate QR code as base64 PNG for embedding in PDF
+    $trackingQrB64 = base64_encode(\SimpleSoftwareIO\QrCode\Facades\QrCode::format('png')->size(80)->errorCorrection('M')->generate($trackingUrl));
     $isUrdu = app()->getLocale() === 'ur';
     $styleMetaLabels = [
-        'collar_style' => $isUrdu ? 'کالر کا انداز' : 'Neck / Collar Style',
-        'button_type' => $isUrdu ? 'بٹن کی قسم' : 'Button Type',
-        'button_count' => $isUrdu ? 'بٹن کی تعداد' : 'Number of Buttons',
-        'ghera_style' => $isUrdu ? 'گھیرا' : 'Ghera (Bottom)',
-        'stitching_style' => $isUrdu ? 'سلائی کا انداز' : 'Stitching Style',
-        'chak_patti' => $isUrdu ? 'چاک پٹی' : 'Chak Patti',
-        'kaj_hale' => $isUrdu ? 'کاج ہال' : 'Kaj Hale',
-        'pahuncha_style' => $isUrdu ? 'پانچہ' : 'Pahuncha',
+        'collar_style'     => $isUrdu ? 'کالر کا انداز' : 'Neck / Collar Style',
+        'cuff_style'       => $isUrdu ? 'کف / آستین کا انداز' : 'Cuff / Arm Style',
+        'button_type'      => $isUrdu ? 'بٹن کی قسم' : 'Button Type',
+        'button_count'     => $isUrdu ? 'بٹن کی تعداد' : 'Number of Buttons',
+        'ghera_style'      => $isUrdu ? 'گھیرا' : 'Ghera (Bottom)',
+        'stitching_style'  => $isUrdu ? 'سلائی کا انداز' : 'Stitching Style',
+        'chak_patti'       => $isUrdu ? 'چاک پٹی' : 'Chak Patti',
+        'kaj_hale'         => $isUrdu ? 'کاج ہال' : 'Kaj Hale',
+        'pahuncha_style'   => $isUrdu ? 'پانچہ' : 'Pahuncha',
         'front_patti_size' => $isUrdu ? 'فرنٹ پٹی سائز' : 'Front Patti Size',
-        'design_number' => $isUrdu ? 'ڈیزائن نمبر' : 'Design Number',
-        'fashion_style' => $isUrdu ? 'فیشن اسٹائل' : 'Fashion Style',
+        'design_number'    => $isUrdu ? 'ڈیزائن نمبر' : 'Design Number',
+        'fashion_style'    => $isUrdu ? 'فیشن اسٹائل' : 'Fashion Style',
     ];
     $styleOptions = collect($measurement?->meta ?? [])->filter(fn ($value) => filled($value));
 
@@ -496,9 +499,16 @@
     <div class="footer">
         <div class="footer-left">
             {{ $companyName }} &mdash; {{ $companyTagline }}
-            <br><span style="font-size:9px;color:#94a3b8">{{ $isUrdu ? __('Track order:') : 'Track order:' }} <a href="{{ $trackingUrl }}" style="color:#2563eb;text-decoration:none">{{ $trackingUrl }}</a></span>
+            <br><span style="font-size:8.5px;color:#94a3b8">
+                {{ $isUrdu ? __('Track order:') : 'Track order:' }}
+                <a href="{{ $trackingUrl }}" style="color:#2563eb;text-decoration:none;font-size:7.5px">{{ $trackingUrl }}</a>
+            </span>
         </div>
-        <div class="footer-right">{{ $isUrdu ? __('Printed:') : 'Printed:' }} {{ now()->format('d M Y, h:i A') }}</div>
+        <div class="footer-right" style="text-align:right">
+            <div style="margin-bottom:3px;font-size:8.5px;color:#94a3b8">{{ $isUrdu ? __('Printed:') : 'Printed:' }} {{ now()->format('d M Y, h:i A') }}</div>
+            <div style="font-size:7.5px;color:#94a3b8;margin-bottom:2px">{{ $isUrdu ? 'اسکین کریں' : 'Scan to track' }}</div>
+            <img src="data:image/png;base64,{{ $trackingQrB64 }}" alt="Track order QR" style="width:60px;height:60px;display:block">
+        </div>
     </div>
 
 </div>

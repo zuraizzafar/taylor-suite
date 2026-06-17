@@ -54,7 +54,15 @@ class ReportController extends Controller
 
         $suits = $query->latest('delivered_at')->get();
 
-        return view('reports.delivered', compact('suits', 'from', 'to'));
+        // Today's delivery summary card
+        $todayQuery = Suit::with('order')->where('status', 'delivered')
+            ->whereDate('delivered_at', today());
+        $this->branchQuery($todayQuery);
+        $todaySuits      = $todayQuery->get();
+        $todayCount      = $todaySuits->count();
+        $todayWorth      = $todaySuits->sum(fn($s) => (float) ($s->order->total_amount ?? 0));
+
+        return view('reports.delivered', compact('suits', 'from', 'to', 'todayCount', 'todayWorth'));
     }
 
     public function salary(Request $request): View

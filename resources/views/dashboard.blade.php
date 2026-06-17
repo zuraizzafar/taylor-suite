@@ -50,9 +50,11 @@
             <p class="text-xs text-slate-500 mb-1">{{ __('Ready to Deliver') }}</p>
             <p class="text-2xl font-bold text-green-600">{{ $stats['ready_suits'] }}</p>
         </div>
-        <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-100">
-            <p class="text-xs text-slate-500 mb-1">{{ __('Delivered Today') }}</p>
-            <p class="text-2xl font-bold text-purple-600">{{ $stats['delivered_today'] }}</p>
+        <div class="bg-gradient-to-br from-purple-50 to-violet-50 rounded-xl p-4 shadow-sm border border-purple-100">
+            <p class="text-xs text-purple-600 font-medium mb-1">{{ __('Delivered Today') }}</p>
+            <p class="text-2xl font-bold text-purple-700">{{ $stats['delivered_today'] }} <span class="text-sm font-normal text-purple-500">{{ __('suits') }}</span></p>
+            <p class="text-xs text-purple-500 mt-1 font-semibold">Rs {{ number_format($stats['delivered_today_worth']) }}</p>
+            <a href="{{ route('reports.delivered') }}" class="text-xs text-purple-400 mt-1 hover:underline block">{{ __('View →') }}</a>
         </div>
         <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-100">
             <p class="text-xs text-slate-500 mb-1">{{ __('Total Suits') }}</p>

@@ -65,11 +65,11 @@
                     required>
             </div>
             <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Advance') }} *</label>
+                <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Advance') }} (Rs)</label>
                 <input type="number" name="advance_amount" x-model.number="advanceAmount"
                     step="0.01" min="0"
                     class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required>
+                    placeholder="0">
                 @error('advance_amount')<p class="text-xs text-red-600 mt-1">{{ $message }}</p>@enderror
             </div>
         </div>

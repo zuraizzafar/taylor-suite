@@ -65,13 +65,13 @@ class OrderController extends Controller
             'order_date'     => ['required', 'date'],
             'delivery_date'  => ['nullable', 'date', 'after_or_equal:order_date'],
             'total_amount'   => ['required', 'numeric', 'min:0'],
-            'advance_amount' => ['required', 'numeric', 'min:0'],
+            'advance_amount' => ['nullable', 'numeric', 'min:0'],
             'notes'          => ['nullable', 'string'],
         ]);
 
         $data['extras'] = $this->parseExtras($request);
 
-        $advanceAmount = (float) $data['advance_amount'];
+        $advanceAmount = (float) ($data['advance_amount'] ?? 0);
         unset($data['advance_amount']); // managed via Payment record below
 
         $data['order_number']   = Order::nextOrderNumber();
@@ -125,13 +125,13 @@ class OrderController extends Controller
             'order_date'     => ['required', 'date'],
             'delivery_date'  => ['nullable', 'date', 'after_or_equal:order_date'],
             'total_amount'   => ['required', 'numeric', 'min:0'],
-            'advance_amount' => ['required', 'numeric', 'min:0'],
+            'advance_amount' => ['nullable', 'numeric', 'min:0'],
             'notes'          => ['nullable', 'string'],
         ]);
 
         $data['extras'] = $this->parseExtras($request);
 
-        $newAdvance = (float) $data['advance_amount'];
+        $newAdvance = (float) ($data['advance_amount'] ?? 0);
         unset($data['advance_amount'], $data['balance_amount']); // computed by recalculateBalance
 
         $order->update($data);

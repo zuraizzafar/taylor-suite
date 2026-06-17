@@ -43,9 +43,12 @@
     $grandTotal      = $order->balance_amount + $previousBalance;
     $showPreviousRow = $previousBalance > 0;
     $trackingUrl     = route('tracking.show', ['tracking' => $order->order_number]);
+    // Generate SVG QR code for browser printing (SVG renders better in HTML)
+    $trackingQrSvg   = \SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(80)->errorCorrection('M')->generate($trackingUrl);
 
     $styleMetaLabels = [
         'collar_style'     => 'گلا / کالر',
+        'cuff_style'       => 'کف / آستین',
         'button_type'      => 'بٹن کی قسم',
         'button_count'     => 'بٹن کی تعداد',
         'ghera_style'      => 'گھیرا',
@@ -518,7 +521,20 @@
 
     <div class="footer">
         <div>{{ $companyName }} — {{ $companyTagline }}</div>
-        <div>ٹریک کریں: <a href="{{ $trackingUrl }}">{{ $trackingUrl }}</a> &nbsp;|&nbsp; پرنٹ: {{ now()->format('d M Y, h:i A') }}</div>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:4px">
+            <div>
+                <div style="font-size:8px;color:#64748b;margin-bottom:3px">ٹریک کریں / Scan to Track:</div>
+                <div style="font-size:7px;color:#94a3b8;word-break:break-all">{{ $trackingUrl }}</div>
+            </div>
+            <div>
+                <a href="{{ $trackingUrl }}" title="Tap to track order" style="display:block;border:1px solid #e2e8f0;border-radius:4px;padding:3px">
+                    {!! $trackingQrSvg !!}
+                </a>
+            </div>
+            <div style="margin-right:auto;text-align:left">
+                پرنٹ: {{ now()->format('d M Y, h:i A') }}
+            </div>
+        </div>
     </div>
 
 </div>

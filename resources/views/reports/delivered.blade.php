@@ -20,6 +20,26 @@
         </div>
     </form>
 
+    {{-- Delivered Today Summary Card --}}
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+        <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl shadow p-5 text-white">
+            <div class="flex items-center justify-between mb-3">
+                <div class="text-sm font-semibold opacity-90">{{ __('Delivered Today') }}</div>
+                <div class="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center text-lg">📦</div>
+            </div>
+            <div class="text-3xl font-bold tracking-tight">{{ $todayCount }}</div>
+            <div class="text-xs opacity-75 mt-1">{{ __('suits delivered today') }}</div>
+        </div>
+        <div class="bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl shadow p-5 text-white">
+            <div class="flex items-center justify-between mb-3">
+                <div class="text-sm font-semibold opacity-90">{{ __('Today\'s Worth') }}</div>
+                <div class="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center text-lg">💰</div>
+            </div>
+            <div class="text-3xl font-bold tracking-tight">Rs {{ number_format($todayWorth) }}</div>
+            <div class="text-xs opacity-75 mt-1">{{ __('total order value delivered today') }}</div>
+        </div>
+    </div>
+
     <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
         <div class="px-5 py-3 border-b border-slate-100 flex items-center justify-between">
             <h3 class="font-semibold text-slate-700">{{ __('Delivered Suits') }}</h3>

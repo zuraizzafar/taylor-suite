@@ -35,6 +35,9 @@ class DashboardController extends Controller
             'pending_suits'   => (clone $statsBase(Suit::class))->whereIn('status', ['pending', 'cutting', 'stitching'])->count(),
             'ready_suits'     => (clone $statsBase(Suit::class))->where('status', 'ready')->count(),
             'delivered_today' => (clone $statsBase(Suit::class))->where('status', 'delivered')->whereDate('delivered_at', today())->count(),
+            'delivered_today_worth' => (float) Order::when($bid, fn($q) => $q->where('branch_id', $bid))
+                ->whereHas('suits', fn($q) => $q->where('status', 'delivered')->whereDate('delivered_at', today()))
+                ->sum('total_amount'),
             'total_suits'     => (clone $statsBase(Suit::class))->count(),
         ];
 
