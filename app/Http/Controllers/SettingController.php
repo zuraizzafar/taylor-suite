@@ -94,7 +94,9 @@ class SettingController extends Controller
 
         // Save all text settings
         foreach (Arr::except($data, ['logo', 'payment_qr']) as $key => $value) {
-            Setting::set($key, $value ?? '');
+            if ($request->has($key)) {
+                Setting::set($key, $value ?? '');
+            }
         }
 
         return back()->with('success', 'Settings saved successfully.');

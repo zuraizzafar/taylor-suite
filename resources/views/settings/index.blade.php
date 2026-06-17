@@ -4,6 +4,16 @@
 
 @section('content')
 <div class="max-w-3xl">
+    @if ($errors->any())
+        <div class="bg-red-50 border border-red-200 text-red-600 rounded-lg p-4 mb-6 text-sm">
+            <ul class="list-disc pl-5 space-y-1">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     <form method="POST" action="{{ route('settings.update') }}" enctype="multipart/form-data" class="space-y-6">
         @csrf
         @method('PUT')
