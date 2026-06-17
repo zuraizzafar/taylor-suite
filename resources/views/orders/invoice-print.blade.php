@@ -44,7 +44,7 @@
     $showPreviousRow = $previousBalance > 0;
     $trackingUrl     = route('tracking.show', ['tracking' => $order->order_number]);
     // Generate SVG QR code for browser printing (SVG renders better in HTML)
-    $trackingQrSvg   = \SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(80)->errorCorrection('M')->generate($trackingUrl);
+    $trackingQrSvg   = \SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(50)->errorCorrection('M')->generate($trackingUrl);
 
     $styleMetaLabels = [
         'collar_style'     => 'گلا / کالر',
@@ -460,8 +460,17 @@
     @endif
 
     {{-- PAYMENT SUMMARY --}}
-    <div class="payment-wrap">
-        <table class="payment-table">
+    <div class="payment-wrap" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <a href="{{ $trackingUrl }}" title="Tap to track order" style="display:block; border:1px solid #e2e8f0; border-radius:4px; padding:3px; background:#fff; width: 50px; height: 50px;">
+                {!! $trackingQrSvg !!}
+            </a>
+            <div>
+                <div style="font-size: 8px; color: #64748b; font-weight: bold; margin-bottom: 2px;">ٹریکنگ QR / Scan to Track</div>
+                <div style="font-size: 7px; color: #94a3b8; word-break: break-all; max-width: 150px;">{{ $trackingUrl }}</div>
+            </div>
+        </div>
+        <table class="payment-table" style="margin: 0;">
             <tr>
                 <td class="lbl">کل رقم</td>
                 <td class="val">Rs {{ number_format($order->total_amount) }}</td>
@@ -524,12 +533,7 @@
         <div style="display:flex;align-items:center;gap:10px;margin-top:4px">
             <div>
                 <div style="font-size:8px;color:#64748b;margin-bottom:3px">ٹریک کریں / Scan to Track:</div>
-                <div style="font-size:7px;color:#94a3b8;word-break:break-all">{{ $trackingUrl }}</div>
-            </div>
-            <div>
-                <a href="{{ $trackingUrl }}" title="Tap to track order" style="display:block;border:1px solid #e2e8f0;border-radius:4px;padding:3px">
-                    {!! $trackingQrSvg !!}
-                </a>
+                <div style="font-size:7px;color:#94a3b8;word-break:break-all"><a href="{{ $trackingUrl }}" target="_blank">{{ $trackingUrl }}</a></div>
             </div>
             <div style="margin-right:auto;text-align:left">
                 پرنٹ: {{ now()->format('d M Y, h:i A') }}

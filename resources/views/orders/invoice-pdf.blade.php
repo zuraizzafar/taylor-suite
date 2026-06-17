@@ -434,33 +434,74 @@
     @endif
 
     {{-- PAYMENT SUMMARY --}}
-    <div class="payment-wrap">
-        <div class="payment-wrap-inner">
-        <table class="payment-table">
-            <tr>
-                <td class="lbl" style="font-family:DejaVu Sans,sans-serif;color:#64748b">{{ $isUrdu ? __('Total Amount') : 'Total Amount' }}</td>
-                <td class="val" style="font-family:DejaVu Sans,sans-serif;color:#1e293b">Rs {{ number_format($order->total_amount) }}</td>
-            </tr>
-            <tr class="row-advance">
-                <td class="lbl" style="font-family:DejaVu Sans,sans-serif;color:#16a34a">{{ $isUrdu ? __('Advance Paid') : 'Advance Paid' }}</td>
-                <td class="val" style="font-family:DejaVu Sans,sans-serif;color:#16a34a">Rs {{ number_format($order->advance_amount) }}</td>
-            </tr>
-            <tr class="row-balance">
-                <td class="lbl" style="font-family:DejaVu Sans,sans-serif;color:#dc2626">{{ $isUrdu ? __('Balance Due (this order)') : 'Balance Due (this order)' }}</td>
-                <td class="val" style="font-family:DejaVu Sans,sans-serif;color:#dc2626">Rs {{ number_format($order->balance_amount) }}</td>
-            </tr>
-            @if($showPreviousRow)
-            <tr class="row-prev">
-                <td class="lbl" style="font-family:DejaVu Sans,sans-serif;color:#d97706">{{ $isUrdu ? __('Previous Dues') : 'Previous Dues' }}</td>
-                <td class="val" style="font-family:DejaVu Sans,sans-serif;color:#d97706">Rs {{ number_format($previousBalance) }}</td>
-            </tr>
-            @endif
-            <tr class="row-grand">
-                <td class="lbl" style="font-family:DejaVu Sans,sans-serif;color:#e2e8f0;font-weight:700">{{ $isUrdu ? __('Grand Total Owed') : 'Grand Total Owed' }}</td>
-                <td class="val" style="font-family:DejaVu Sans,sans-serif;color:#fbbf24;font-weight:800;font-size:13px">Rs {{ number_format($grandTotal) }}</td>
-            </tr>
-        </table>
-        </div>
+    <div class="payment-wrap" style="display: table; width: 100%; margin-bottom: 16px;">
+        @if(app()->getLocale() === 'ur')
+            <div style="display: table-cell; vertical-align: bottom; text-align: right; width: 50%;">
+                <div style="display: inline-block; text-align: center;">
+                    <img src="data:image/png;base64,{{ $trackingQrB64 }}" alt="Track order QR" style="width:55px;height:55px;display:block;margin:0 auto 2px;">
+                    <span style="font-size:7px;color:#94a3b8;font-family:DejaVu Sans,sans-serif">ٹریکنگ کیلئے اسکین کریں</span>
+                </div>
+            </div>
+            <div class="payment-wrap-inner" style="display: table-cell; vertical-align: top; text-align: left; width: 50%;">
+                <table class="payment-table" style="display: inline-table; width: 270px; text-align: right; border-collapse: collapse;">
+                    <tr>
+                        <td class="lbl" style="font-family:DejaVu Sans,sans-serif;color:#64748b">{{ $isUrdu ? __('Total Amount') : 'Total Amount' }}</td>
+                        <td class="val" style="font-family:DejaVu Sans,sans-serif;color:#1e293b">Rs {{ number_format($order->total_amount) }}</td>
+                    </tr>
+                    <tr class="row-advance">
+                        <td class="lbl" style="font-family:DejaVu Sans,sans-serif;color:#16a34a">{{ $isUrdu ? __('Advance Paid') : 'Advance Paid' }}</td>
+                        <td class="val" style="font-family:DejaVu Sans,sans-serif;color:#16a34a">Rs {{ number_format($order->advance_amount) }}</td>
+                    </tr>
+                    <tr class="row-balance">
+                        <td class="lbl" style="font-family:DejaVu Sans,sans-serif;color:#dc2626">{{ $isUrdu ? __('Balance Due (this order)') : 'Balance Due (this order)' }}</td>
+                        <td class="val" style="font-family:DejaVu Sans,sans-serif;color:#dc2626">Rs {{ number_format($order->balance_amount) }}</td>
+                    </tr>
+                    @if($showPreviousRow)
+                    <tr class="row-prev">
+                        <td class="lbl" style="font-family:DejaVu Sans,sans-serif;color:#d97706">{{ $isUrdu ? __('Previous Dues') : 'Previous Dues' }}</td>
+                        <td class="val" style="font-family:DejaVu Sans,sans-serif;color:#d97706">Rs {{ number_format($previousBalance) }}</td>
+                    </tr>
+                    @endif
+                    <tr class="row-grand">
+                        <td class="lbl" style="font-family:DejaVu Sans,sans-serif;color:#e2e8f0;font-weight:700">{{ $isUrdu ? __('Grand Total Owed') : 'Grand Total Owed' }}</td>
+                        <td class="val" style="font-family:DejaVu Sans,sans-serif;color:#fbbf24;font-weight:800;font-size:13px">Rs {{ number_format($grandTotal) }}</td>
+                    </tr>
+                </table>
+            </div>
+        @else
+            <div style="display: table-cell; vertical-align: bottom; text-align: left; width: 50%;">
+                <div style="display: inline-block; text-align: center;">
+                    <img src="data:image/png;base64,{{ $trackingQrB64 }}" alt="Track order QR" style="width:55px;height:55px;display:block;margin:0 auto 2px;">
+                    <span style="font-size:7px;color:#94a3b8;font-family:DejaVu Sans,sans-serif">Scan to Track</span>
+                </div>
+            </div>
+            <div class="payment-wrap-inner" style="display: table-cell; vertical-align: top; text-align: right; width: 50%;">
+                <table class="payment-table" style="display: inline-table; width: 270px; border-collapse: collapse;">
+                    <tr>
+                        <td class="lbl" style="font-family:DejaVu Sans,sans-serif;color:#64748b">{{ $isUrdu ? __('Total Amount') : 'Total Amount' }}</td>
+                        <td class="val" style="font-family:DejaVu Sans,sans-serif;color:#1e293b">Rs {{ number_format($order->total_amount) }}</td>
+                    </tr>
+                    <tr class="row-advance">
+                        <td class="lbl" style="font-family:DejaVu Sans,sans-serif;color:#16a34a">{{ $isUrdu ? __('Advance Paid') : 'Advance Paid' }}</td>
+                        <td class="val" style="font-family:DejaVu Sans,sans-serif;color:#16a34a">Rs {{ number_format($order->advance_amount) }}</td>
+                    </tr>
+                    <tr class="row-balance">
+                        <td class="lbl" style="font-family:DejaVu Sans,sans-serif;color:#dc2626">{{ $isUrdu ? __('Balance Due (this order)') : 'Balance Due (this order)' }}</td>
+                        <td class="val" style="font-family:DejaVu Sans,sans-serif;color:#dc2626">Rs {{ number_format($order->balance_amount) }}</td>
+                    </tr>
+                    @if($showPreviousRow)
+                    <tr class="row-prev">
+                        <td class="lbl" style="font-family:DejaVu Sans,sans-serif;color:#d97706">{{ $isUrdu ? __('Previous Dues') : 'Previous Dues' }}</td>
+                        <td class="val" style="font-family:DejaVu Sans,sans-serif;color:#d97706">Rs {{ number_format($previousBalance) }}</td>
+                    </tr>
+                    @endif
+                    <tr class="row-grand">
+                        <td class="lbl" style="font-family:DejaVu Sans,sans-serif;color:#e2e8f0;font-weight:700">{{ $isUrdu ? __('Grand Total Owed') : 'Grand Total Owed' }}</td>
+                        <td class="val" style="font-family:DejaVu Sans,sans-serif;color:#fbbf24;font-weight:800;font-size:13px">Rs {{ number_format($grandTotal) }}</td>
+                    </tr>
+                </table>
+            </div>
+        @endif
     </div>
     @if($order->notes)
     <div class="note-box"><strong>{{ $isUrdu ? __('Note:') : 'Note:' }}</strong> {{ $order->notes }}</div>
@@ -506,8 +547,6 @@
         </div>
         <div class="footer-right" style="text-align:right">
             <div style="margin-bottom:3px;font-size:8.5px;color:#94a3b8">{{ $isUrdu ? __('Printed:') : 'Printed:' }} {{ now()->format('d M Y, h:i A') }}</div>
-            <div style="font-size:7.5px;color:#94a3b8;margin-bottom:2px">{{ $isUrdu ? 'اسکین کریں' : 'Scan to track' }}</div>
-            <img src="data:image/png;base64,{{ $trackingQrB64 }}" alt="Track order QR" style="width:60px;height:60px;display:block">
         </div>
     </div>
 

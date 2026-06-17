@@ -71,7 +71,7 @@
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Invoice Legal Note') }}</label>
+                <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('PAYMENT NOTICE') }}</label>
                 <textarea name="invoice_legal_note" rows="3"
                     class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Only Bank payment accept hai...">{{ old('invoice_legal_note', $settings['invoice_legal_note'] ?? 'Only Bank payment accept hai. Kisi aur Bank me payment krny me issue hota to shop waly aur company zimydar nahi.') }}</textarea>
