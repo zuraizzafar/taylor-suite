@@ -9,6 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('fabric_sales', function (Blueprint $table) {
+            $table->engine = 'InnoDB';
             $table->id();
             $table->foreignId('fabric_id')->constrained()->restrictOnDelete();
             $table->foreignId('branch_id')->nullable()->constrained()->nullOnDelete();

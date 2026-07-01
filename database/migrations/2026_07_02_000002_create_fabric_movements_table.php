@@ -9,6 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('fabric_movements', function (Blueprint $table) {
+            $table->engine = 'InnoDB';
             $table->id();
             $table->foreignId('fabric_id')->constrained()->cascadeOnDelete();
             $table->string('type', 20); // added|suit_used|fabric_sale|return|damage|adjustment

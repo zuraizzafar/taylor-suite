@@ -9,6 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('fabrics', function (Blueprint $table) {
+            $table->engine = 'InnoDB';
             $table->id();
             $table->foreignId('branch_id')->nullable()->constrained()->nullOnDelete();
             $table->string('fabric_type', 100);
