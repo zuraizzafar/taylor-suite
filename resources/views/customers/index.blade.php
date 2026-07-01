@@ -26,6 +26,7 @@
                     <th class="px-4 py-3 text-left font-medium">{{ __('Name') }}</th>
                     <th class="px-4 py-3 text-left font-medium">{{ __('Mobile') }}</th>
                     <th class="px-4 py-3 text-left font-medium">{{ __('Suits') }}</th>
+                    <th class="px-4 py-3 text-left font-medium">{{ __('Balance') }}</th>
                     <th class="px-4 py-3 text-left font-medium">{{ __('Address') }}</th>
                     <th class="px-4 py-3 text-left font-medium">{{ __('Actions') }}</th>
                 </tr>
@@ -40,6 +41,9 @@
                         <span class="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full font-medium">
                             {{ $customer->suits_count }}
                         </span>
+                    </td>
+                    <td class="px-4 py-3 {{ $customer->outstanding_balance > 0 ? 'text-red-600' : 'text-green-600' }} font-medium">
+                        Rs {{ number_format($customer->outstanding_balance ?? 0) }}
                     </td>
                     <td class="px-4 py-3 text-slate-500">{{ $customer->address ?? '—' }}</td>
                     <td class="px-4 py-3">

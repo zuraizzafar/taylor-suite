@@ -56,6 +56,13 @@
                                class="text-xs bg-purple-50 hover:bg-purple-100 text-purple-700 px-2 py-1 rounded">{{ __('Tags') }}</a>
                             <a href="{{ route('orders.invoice', $order) }}"
                                class="text-xs bg-green-50 hover:bg-green-100 text-green-700 px-2 py-1 rounded">PDF</a>
+                            <form method="POST" action="{{ route('orders.destroy', $order) }}"
+                                  onsubmit="return confirm('{{ __('Are you sure? This will permanently delete this order.') }}')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit"
+                                        class="text-xs bg-red-50 hover:bg-red-100 text-red-600 px-2 py-1 rounded">{{ __('Delete') }}</button>
+                            </form>
                         </div>
                     </td>
                 </tr>

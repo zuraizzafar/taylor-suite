@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
+use App\Models\Fabric;
 use App\Models\Order;
 use App\Models\StitchType;
 use App\Models\Suit;
@@ -55,6 +56,10 @@ class SuitController extends Controller
         $stitchTypes = StitchType::where('is_active', true)->orderBy('name')->get();
         $suitTypes   = SuitType::where('is_active', true)->orderBy('name')->get();
 
+        $fabricsQuery = Fabric::where('available_meter', '>', 0)->orderBy('roll_number');
+        $this->branchQuery($fabricsQuery);
+        $fabrics = $fabricsQuery->get();
+
         $selectedCustomer = $request->input('customer_id')
             ? Customer::with('measurements')->find($request->input('customer_id'))
             : null;
@@ -62,7 +67,7 @@ class SuitController extends Controller
             ? Order::find($request->input('order_id'))
             : null;
 
-        return view('suits.create', compact('customers', 'workers', 'stitchTypes', 'selectedCustomer', 'selectedOrder', 'suitTypes'));
+        return view('suits.create', compact('customers', 'workers', 'stitchTypes', 'selectedCustomer', 'selectedOrder', 'suitTypes', 'fabrics'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -74,6 +79,7 @@ class SuitController extends Controller
             'worker_id'          => ['nullable', 'exists:workers,id'],
             'stitch_type_id'     => ['nullable', 'exists:stitch_types,id'],
             'suit_type'          => ['required', 'string', 'max:100'],
+            'fabric_id'          => ['nullable', 'exists:fabrics,id'],
             'fabric_meter'       => ['nullable', 'numeric', 'min:0.1'],
             'fabric_description' => ['nullable', 'string', 'max:255'],
             'notes'              => ['nullable', 'string'],
@@ -102,7 +108,17 @@ class SuitController extends Controller
                 $data['worker_earning'] = $worker?->rate_per_suit ?? null;
             }
 
+            // Deduct shop fabric stock when the suit is cut from a tracked roll (not customer's own cloth)
+            if (! empty($data['fabric_id']) && ! empty($data['fabric_meter'])) {
+                $data['fabric_meter_deducted'] = $data['fabric_meter'];
+            }
+
             $suit = Suit::create($data);
+
+            if (! empty($data['fabric_id']) && ! empty($data['fabric_meter'])) {
+                $fabric = Fabric::lockForUpdate()->findOrFail($data['fabric_id']);
+                $fabric->deduct((float) $data['fabric_meter'], 'suit_used', $suit->id, "Used for suit {$suit->suit_code}");
+            }
 
             $suit->qr_code_path = $this->generateQrCode($suit, $customer);
             $suit->saveQuietly();
@@ -129,7 +145,13 @@ class SuitController extends Controller
         $stitchTypes = StitchType::where('is_active', true)->orderBy('name')->get();
         $suitTypes   = SuitType::where('is_active', true)->orderBy('name')->get();
 
-        return view('suits.edit', compact('suit', 'workers', 'measurements', 'stitchTypes', 'suitTypes'));
+        $fabricsQuery = Fabric::where(function ($q) use ($suit) {
+            $q->where('available_meter', '>', 0)->orWhere('id', $suit->fabric_id);
+        })->orderBy('roll_number');
+        $this->branchQuery($fabricsQuery);
+        $fabrics = $fabricsQuery->get();
+
+        return view('suits.edit', compact('suit', 'workers', 'measurements', 'stitchTypes', 'suitTypes', 'fabrics'));
     }
 
     public function update(Request $request, Suit $suit): RedirectResponse
@@ -139,6 +161,7 @@ class SuitController extends Controller
             'worker_id'         => ['nullable', 'exists:workers,id'],
             'stitch_type_id'    => ['nullable', 'exists:stitch_types,id'],
             'suit_type'         => ['required', 'string', 'max:100'],
+            'fabric_id'         => ['nullable', 'exists:fabrics,id'],
             'fabric_meter'      => ['nullable', 'numeric', 'min:0.1'],
             'fabric_description'=> ['nullable', 'string', 'max:255'],
             'notes'             => ['nullable', 'string'],
@@ -158,7 +181,27 @@ class SuitController extends Controller
             $data['worker_earning'] = null;
         }
 
-        $suit->update($data);
+        DB::transaction(function () use ($suit, $data) {
+            // Restore whatever was previously deducted, then deduct against the new selection.
+            // This single restore-then-deduct pattern transparently covers: meter changed,
+            // fabric roll swapped, fabric added where none existed, and fabric removed
+            // (switched to customer's own cloth) — insufficient-stock validation applies to edits too.
+            if ($suit->fabric_id && $suit->fabric_meter_deducted) {
+                $oldFabric = Fabric::lockForUpdate()->find($suit->fabric_id);
+                $oldFabric?->restore((float) $suit->fabric_meter_deducted, 'suit_used', $suit->id, "Suit {$suit->suit_code} edited");
+            }
+
+            if (! empty($data['fabric_id']) && ! empty($data['fabric_meter'])) {
+                $newFabric = Fabric::lockForUpdate()->findOrFail($data['fabric_id']);
+                $newFabric->deduct((float) $data['fabric_meter'], 'suit_used', $suit->id, "Suit {$suit->suit_code} edited");
+                $data['fabric_meter_deducted'] = $data['fabric_meter'];
+            } else {
+                $data['fabric_id'] = null;
+                $data['fabric_meter_deducted'] = null;
+            }
+
+            $suit->update($data);
+        });
 
         return redirect()->route('suits.show', $suit)
             ->with('success', 'Suit updated.');
@@ -244,6 +287,11 @@ class SuitController extends Controller
 
     public function destroy(Suit $suit): RedirectResponse
     {
+        if ($suit->fabric_id && $suit->fabric_meter_deducted) {
+            $fabric = Fabric::lockForUpdate()->find($suit->fabric_id);
+            $fabric?->restore((float) $suit->fabric_meter_deducted, 'suit_used', $suit->id, "Suit {$suit->suit_code} deleted");
+        }
+
         if ($suit->qr_code_path) {
             Storage::disk('public')->delete($suit->qr_code_path);
         }

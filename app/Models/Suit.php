@@ -20,7 +20,9 @@ class Suit extends Model
         'suit_number',
         'suit_code',
         'suit_type',
+        'fabric_id',
         'fabric_meter',
+        'fabric_meter_deducted',
         'fabric_description',
         'status',
         'notes',
@@ -65,6 +67,11 @@ class Suit extends Model
     public function branch(): BelongsTo
     {
         return $this->belongsTo(Branch::class);
+    }
+
+    public function fabric(): BelongsTo
+    {
+        return $this->belongsTo(Fabric::class);
     }
 
     public function getStatusBadgeAttribute(): string

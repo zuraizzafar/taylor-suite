@@ -18,7 +18,8 @@ class CustomerController extends Controller
 
     public function index(Request $request): View
     {
-        $query = Customer::with('branch')->withCount('suits');
+        $query = Customer::with('branch')->withCount('suits')
+            ->withSum(['orders as outstanding_balance' => fn($q) => $q->where('balance_amount', '>', 0)], 'balance_amount');
 
         $this->branchQuery($query);
 

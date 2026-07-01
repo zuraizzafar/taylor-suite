@@ -104,6 +104,18 @@
             </a>
 
             <div class="pt-3 pb-1 px-3">
+                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">{{ __('Inventory') }}</p>
+            </div>
+            <a href="{{ route('fabrics.index') }}"
+               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('fabrics.*') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">
+                <span>🧶</span> {{ __('Fabric Stock') }}
+            </a>
+            <a href="{{ route('fabric-sales.create') }}"
+               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('fabric-sales.*') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">
+                <span>🧾</span> {{ __('Fabric Sale') }}
+            </a>
+
+            <div class="pt-3 pb-1 px-3">
                 <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">{{ __('Finance') }}</p>
             </div>
             <a href="{{ route('expenses.index') }}"
@@ -149,6 +161,10 @@
             <a href="{{ route('reports.workers') }}"
                class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('reports.workers') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">
                 <span>👷</span> {{ __('Workers Report') }}
+            </a>
+            <a href="{{ route('reports.fabric-profit') }}"
+               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('reports.fabric-profit') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">
+                <span>📊</span> {{ __('Fabric Profit') }}
             </a>
 
             @if(auth()->user()->isAdmin())

@@ -24,6 +24,7 @@
                         <th class="px-4 py-2 text-left font-medium">Name</th>
                         <th class="px-4 py-2 text-left font-medium">Mobile</th>
                         <th class="px-4 py-2 text-left font-medium">{{ __('Suits') }}</th>
+                        <th class="px-4 py-2 text-left font-medium">{{ __('Balance') }}</th>
                         <th class="px-4 py-2 text-left font-medium">Action</th>
                     </tr>
                 </thead>
@@ -35,6 +36,9 @@
                         <td class="px-4 py-2 text-slate-600">{{ $c->mobile }}</td>
                         <td class="px-4 py-2 text-center">
                             <span class="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full">{{ $c->suits_count }}</span>
+                        </td>
+                        <td class="px-4 py-2 {{ $c->outstanding_balance > 0 ? 'text-red-600' : 'text-green-600' }} font-medium">
+                            Rs {{ number_format($c->outstanding_balance) }}
                         </td>
                         <td class="px-4 py-2">
                             <a href="{{ route('customers.show', $c) }}"

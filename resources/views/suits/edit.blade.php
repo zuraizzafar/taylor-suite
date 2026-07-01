@@ -34,12 +34,28 @@
                 <p class="text-xs text-slate-400 mt-1">Changing this recalculates the worker earning.</p>
             </div>
 
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Fabric Source') }}</label>
+                <select name="fabric_id"
+                    class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">— {{ __("Customer's own cloth") }} —</option>
+                    @foreach($fabrics as $f)
+                    <option value="{{ $f->id }}" {{ old('fabric_id', $suit->fabric_id) == $f->id ? 'selected' : '' }}>
+                        {{ $f->roll_number }} — {{ $f->fabric_type }} {{ $f->color }} ({{ number_format($f->available_meter, 1) }}m {{ __('available') }})
+                    </option>
+                    @endforeach
+                </select>
+                <p class="text-xs text-slate-400 mt-1">{{ __('Changing this restores stock to the old roll and deducts from the new selection.') }}</p>
+                @error('fabric_id')<p class="text-xs text-red-600 mt-1">{{ $message }}</p>@enderror
+            </div>
+
             <div class="grid grid-cols-2 gap-4 mb-4">
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Fabric Meter') }}</label>
                     <input type="number" name="fabric_meter" value="{{ old('fabric_meter', $suit->fabric_meter) }}"
                         step="0.1" min="0.1"
                         class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    @error('fabric_meter')<p class="text-xs text-red-600 mt-1">{{ $message }}</p>@enderror
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Fabric Description') }}</label>

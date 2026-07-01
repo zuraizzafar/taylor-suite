@@ -114,8 +114,11 @@
 
     {{-- Orders --}}
     <div class="bg-white rounded-xl shadow-sm border border-slate-100">
-        <div class="px-5 py-4 border-b border-slate-100">
+        <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
             <h3 class="font-semibold text-slate-700">🧾 Orders ({{ $customer->orders->count() }})</h3>
+            <p class="text-sm font-semibold {{ $customer->outstandingBalance() > 0 ? 'text-red-600' : 'text-green-600' }}">
+                {{ __('Total Balance') }}: Rs {{ number_format($customer->outstandingBalance()) }}
+            </p>
         </div>
         <div class="divide-y divide-slate-50">
             @forelse($customer->orders as $order)

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Branch;
 use App\Models\Customer;
+use App\Models\FabricSale;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\Suit;
@@ -256,6 +257,23 @@ class ReportController extends Controller
         ))->setPaper('a4', 'landscape');
 
         return $pdf->stream("salary-report-{$from}-{$to}.pdf");
+    }
+
+    public function fabricProfit(Request $request): View
+    {
+        [$from, $to, $preset] = $this->resolvePeriod($request);
+
+        $salesQuery = FabricSale::with('fabric')
+            ->whereBetween('created_at', [$from . ' 00:00:00', $to . ' 23:59:59']);
+        $this->branchQuery($salesQuery);
+
+        $sales = $salesQuery->latest()->get();
+
+        $cost   = (float) $sales->sum(fn($s) => $s->meter * ($s->fabric->cost_price ?? 0));
+        $sale   = (float) $sales->sum('total_amount');
+        $profit = $sale - $cost;
+
+        return view('reports.fabric-profit', compact('sales', 'from', 'to', 'preset', 'cost', 'sale', 'profit'));
     }
 
     // ── Helper ───────────────────────────────────────────────────────────────

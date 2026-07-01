@@ -9,6 +9,8 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExtraTypeController;
 use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\FabricController;
+use App\Http\Controllers\FabricSaleController;
 use App\Http\Controllers\MeasurementController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
@@ -127,6 +129,21 @@ Route::middleware('auth')->group(function () {
 
         // Expenses
         Route::resource('expenses', ExpenseController::class);
+
+        // Fabrics (stock module)
+        Route::resource('fabrics', FabricController::class)->except(['show']);
+        Route::patch('/fabrics/{fabric}/add-meter', [FabricController::class, 'addMeter'])->name('fabrics.add-meter');
+        Route::patch('/fabrics/{fabric}/reduce-meter', [FabricController::class, 'reduceMeter'])->name('fabrics.reduce-meter');
+        Route::get('/fabrics/{fabric}/history', [FabricController::class, 'history'])->name('fabrics.history');
+        Route::get('/fabrics/{fabric}/sticker', [FabricController::class, 'sticker'])->name('fabrics.sticker');
+        Route::get('/fabrics-lookup', [FabricController::class, 'lookup'])->name('fabrics.lookup');
+
+        // Fabric Sales (walk-in retail sale)
+        Route::get('/fabric-sales/create', [FabricSaleController::class, 'create'])->name('fabric-sales.create');
+        Route::post('/fabric-sales', [FabricSaleController::class, 'store'])->name('fabric-sales.store');
+        Route::get('/fabric-sales/{fabricSale}/invoice', [FabricSaleController::class, 'invoice'])->name('fabric-sales.invoice');
+
+        Route::get('/reports/fabric-profit', [ReportController::class, 'fabricProfit'])->name('reports.fabric-profit');
     });
 
     // ── Admin-only routes ──────────────────────────────────────────────────────

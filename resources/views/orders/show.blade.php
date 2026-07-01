@@ -24,6 +24,13 @@
                        class="text-xs bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-lg">🖸 {{ __('Print PDF') }}</a>
                     <a href="{{ route('suits.create', ['order_id' => $order->id, 'customer_id' => $order->customer_id]) }}"
                        class="text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg">+ {{ __('Add Suit') }}</a>
+                    <form method="POST" action="{{ route('orders.destroy', $order) }}"
+                          onsubmit="return confirm('{{ __('Are you sure? This will permanently delete this order.') }}')">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit"
+                                class="text-xs bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1 rounded-lg">{{ __('Delete Order') }}</button>
+                    </form>
                 </div>
             </div>
         </div>

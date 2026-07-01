@@ -31,6 +31,7 @@ class SearchController extends Controller
             })->withCount('suits');
             $this->branchQuery($customerQuery);
             $customers = $customerQuery->take(20)->get();
+            $customers->each(fn($c) => $c->outstanding_balance = $c->outstandingBalance());
 
             // Suits
             $suitQuery = Suit::with(['customer', 'worker'])
