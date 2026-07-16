@@ -126,45 +126,13 @@
             <div class="pt-3 pb-1 px-3">
                 <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">{{ __('Reports') }}</p>
             </div>
-            <a href="{{ route('reports.daily') }}"
-               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('reports.daily') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">
-                <span>📅</span> {{ __('Daily Orders') }}
-            </a>
-            <a href="{{ route('reports.pending') }}"
-               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('reports.pending') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">
-                <span>⏳</span> {{ __('Pending Orders') }}
-            </a>
-            <a href="{{ route('reports.delivered') }}"
-               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('reports.delivered') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">
-                <span>✅</span> {{ __('Delivered') }}
-            </a>
-            <a href="{{ route('reports.salary') }}"
-               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('reports.salary') && !request()->routeIs('reports.salary-report*') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">
-                <span>💼</span> {{ __('Salary Report') }}
-            </a>
-            <a href="{{ route('reports.salary-report') }}"
-               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('reports.salary-report*') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">
-                <span>💰</span> {{ __('Salary Disbursement') }}
-            </a>
-            <a href="{{ route('reports.pending-balances') }}"
-               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('reports.pending-balances') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">
-                <span>🔴</span> {{ __('Pending Balances') }}
-            </a>
-            <a href="{{ route('reports.payments') }}"
-               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('reports.payments') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">
-                <span>💳</span> {{ __('Payments') }}
+            <a href="{{ route('reports.index') }}"
+               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('reports.*') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">
+                <span>📊</span> {{ __('All Reports') }}
             </a>
             <a href="{{ route('payments.create') }}"
                class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('payments.create') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">
                 <span>➕</span> {{ __('Add Payment') }}
-            </a>
-            <a href="{{ route('reports.workers') }}"
-               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('reports.workers') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">
-                <span>👷</span> {{ __('Workers Report') }}
-            </a>
-            <a href="{{ route('reports.fabric-profit') }}"
-               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('reports.fabric-profit') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">
-                <span>📊</span> {{ __('Fabric Profit') }}
             </a>
 
             @if(auth()->user()->isAdmin())

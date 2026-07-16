@@ -5,6 +5,17 @@
 @section('content')
 <div class="space-y-5">
 
+    <div class="flex gap-2 mb-2">
+        <a href="{{ route('reports.export-csv', array_merge(['report' => 'pending-balances'], request()->all())) }}" 
+           class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm px-4 py-1.5 rounded-lg flex items-center gap-1 font-semibold">
+            📥 {{ __('Export Excel') }}
+        </a>
+        <button onclick="window.print()" type="button" 
+                class="bg-slate-600 hover:bg-slate-700 text-white text-sm px-4 py-1.5 rounded-lg flex items-center gap-1 font-semibold">
+            🖨️ {{ __('Print') }}
+        </button>
+    </div>
+
     {{-- Grand Total Banner --}}
     <div class="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center justify-between">
         <div>

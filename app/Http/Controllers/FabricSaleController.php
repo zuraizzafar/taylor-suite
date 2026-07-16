@@ -61,8 +61,9 @@ class FabricSaleController extends Controller
     public function invoice(FabricSale $fabricSale): Response
     {
         $fabricSale->load('fabric');
+        $settings = \App\Models\Setting::allKeyed();
 
-        $pdf = Pdf::loadView('fabric-sales.invoice-pdf', compact('fabricSale'))
+        $pdf = Pdf::loadView('fabric-sales.invoice-pdf', compact('fabricSale', 'settings'))
             ->setPaper('a5', 'portrait');
 
         $filename = "invoice-{$fabricSale->sale_code}.pdf";

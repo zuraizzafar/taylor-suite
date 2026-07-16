@@ -31,11 +31,21 @@
                 </a>
                 @endforeach
             </div>
-            <a href="{{ route('reports.salary-report-pdf', request()->all()) }}"
-               target="_blank"
-               class="ml-auto bg-red-600 hover:bg-red-700 text-white text-sm font-medium px-4 py-1.5 rounded-lg flex items-center gap-1.5">
-                🖨 {{ __('Print PDF') }}
-            </a>
+            <div class="ml-auto flex gap-2">
+                <a href="{{ route('reports.salary-report-pdf', request()->all()) }}"
+                   target="_blank"
+                   class="bg-red-600 hover:bg-red-700 text-white text-sm font-medium px-4 py-1.5 rounded-lg flex items-center gap-1.5 font-semibold">
+                    🖨 {{ __('Print PDF') }}
+                </a>
+                <a href="{{ route('reports.export-csv', array_merge(['report' => 'salary'], request()->all())) }}" 
+                   class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm px-4 py-1.5 rounded-lg flex items-center gap-1 font-semibold">
+                    📥 {{ __('Export Excel') }}
+                </a>
+                <button onclick="window.print()" type="button" 
+                        class="bg-slate-600 hover:bg-slate-700 text-white text-sm px-4 py-1.5 rounded-lg flex items-center gap-1 font-semibold">
+                    🖨️ {{ __('Print View') }}
+                </button>
+            </div>
         </form>
     </div>
 

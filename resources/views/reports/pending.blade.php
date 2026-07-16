@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="pt-2">
-    <form method="GET" action="{{ route('reports.pending') }}" class="flex gap-2 mb-5">
+    <form method="GET" action="{{ route('reports.pending') }}" class="flex flex-wrap gap-2 mb-5 items-center">
         <select name="status"
             class="text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
             <option value="">{{ __('All Statuses') }}</option>
@@ -12,7 +12,15 @@
             <option value="{{ $s }}" {{ $status === $s ? 'selected' : '' }}>{{ ucfirst($s) }}</option>
             @endforeach
         </select>
-        <button class="bg-slate-700 text-white text-sm px-4 py-2 rounded-lg">{{ __('Filter') }}</button>
+        <button class="bg-slate-700 text-white text-sm px-4 py-2 rounded-lg hover:bg-slate-800">{{ __('Filter') }}</button>
+        <a href="{{ route('reports.export-csv', array_merge(['report' => 'pending'], request()->all())) }}" 
+           class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm px-4 py-2 rounded-lg flex items-center gap-1 font-semibold">
+            📥 {{ __('Export Excel') }}
+        </a>
+        <button onclick="window.print()" type="button" 
+                class="bg-slate-600 hover:bg-slate-700 text-white text-sm px-4 py-2 rounded-lg flex items-center gap-1 font-semibold">
+            🖨️ {{ __('Print') }}
+        </button>
     </form>
 
     <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">

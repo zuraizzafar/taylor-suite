@@ -26,9 +26,17 @@
                 @endforeach
             </select>
         </div>
-        <div>
+        <div class="flex gap-2">
             <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-1.5 rounded-lg">
                 {{ __('Filter') }}
+            </button>
+            <a href="{{ route('reports.export-csv', array_merge(['report' => 'payments'], request()->all())) }}" 
+               class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm px-4 py-1.5 rounded-lg flex items-center gap-1 font-semibold">
+                📥 {{ __('Export Excel') }}
+            </a>
+            <button onclick="window.print()" type="button" 
+                    class="bg-slate-600 hover:bg-slate-700 text-white text-sm px-4 py-1.5 rounded-lg flex items-center gap-1 font-semibold">
+                🖨️ {{ __('Print') }}
             </button>
         </div>
     </form>

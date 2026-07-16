@@ -4,10 +4,18 @@
 
 @section('content')
 <div class="pt-2">
-    <form method="GET" action="{{ route('reports.daily') }}" class="flex gap-2 mb-5">
+    <form method="GET" action="{{ route('reports.daily') }}" class="flex flex-wrap gap-2 mb-5 items-center">
         <input type="date" name="date" value="{{ $date }}"
             class="text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
         <button class="bg-slate-700 text-white text-sm px-4 py-2 rounded-lg hover:bg-slate-800">Filter</button>
+        <a href="{{ route('reports.export-csv', array_merge(['report' => 'daily'], request()->all())) }}" 
+           class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm px-4 py-2 rounded-lg flex items-center gap-1 font-semibold">
+            📥 {{ __('Export Excel') }}
+        </a>
+        <button onclick="window.print()" type="button" 
+                class="bg-slate-600 hover:bg-slate-700 text-white text-sm px-4 py-2 rounded-lg flex items-center gap-1 font-semibold">
+            🖨️ {{ __('Print') }}
+        </button>
     </form>
 
     <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">

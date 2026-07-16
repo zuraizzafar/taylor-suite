@@ -17,8 +17,18 @@
             <input type="date" name="to" value="{{ $to }}"
                 class="border border-slate-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
         </div>
-        <button type="submit"
-            class="bg-blue-600 text-white text-sm px-4 py-1.5 rounded-lg hover:bg-blue-700">Filter</button>
+        <div class="flex gap-2">
+            <button type="submit"
+                class="bg-blue-600 text-white text-sm px-4 py-1.5 rounded-lg hover:bg-blue-700">Filter</button>
+            <a href="{{ route('reports.export-csv', array_merge(['report' => 'salary'], request()->all())) }}" 
+               class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm px-4 py-1.5 rounded-lg flex items-center gap-1 font-semibold">
+                📥 {{ __('Export Excel') }}
+            </a>
+            <button onclick="window.print()" type="button" 
+                    class="bg-slate-600 hover:bg-slate-700 text-white text-sm px-4 py-1.5 rounded-lg flex items-center gap-1 font-semibold">
+                🖨️ {{ __('Print') }}
+            </button>
+        </div>
     </form>
 
     {{-- Summary --}}

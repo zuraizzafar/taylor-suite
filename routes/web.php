@@ -107,6 +107,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/search', [SearchController::class, 'index'])->name('search');
 
         // Reports
+        Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
         Route::get('/reports/daily', [ReportController::class, 'daily'])->name('reports.daily');
         Route::get('/reports/pending', [ReportController::class, 'pending'])->name('reports.pending');
         Route::get('/reports/delivered', [ReportController::class, 'delivered'])->name('reports.delivered');
@@ -116,6 +117,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/reports/pending-balances', [ReportController::class, 'pendingBalances'])->name('reports.pending-balances');
         Route::get('/reports/payments', [ReportController::class, 'payments'])->name('reports.payments');
         Route::get('/reports/workers', [ReportController::class, 'workers'])->name('reports.workers');
+        Route::get('/reports/{report}/export-csv', [ReportController::class, 'exportCsv'])->name('reports.export-csv');
 
         // POS — quick order creation
         Route::get('/pos', [PosController::class, 'index'])->name('pos.index');
