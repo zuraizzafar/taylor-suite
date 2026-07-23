@@ -17,6 +17,10 @@
 /public/storage
 /storage/*.key
 /storage/pail
+/storage/fonts/*.json
+/storage/fonts/*.afm.json
+/storage/fonts/*.ufm.json
+/storage/fonts/*.php
 /vendor
 _ide_helper.php
 Homestead.json
