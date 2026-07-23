@@ -30,6 +30,8 @@
                        class="text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg">+ {{ __('Add Order') }}</a>
                     <a href="{{ route('measurements.create', $customer) }}"
                        class="text-xs bg-slate-700 hover:bg-slate-800 text-white px-3 py-1 rounded-lg">+ {{ __('Measurements') }}</a>
+                    <a href="{{ route('customers.statement-pdf', $customer) }}" target="_blank"
+                       class="text-xs bg-red-600 hover:bg-red-700 text-white font-medium px-3 py-1 rounded-lg flex items-center gap-1">📄 {{ __('Print Statement') }}</a>
                 </div>
             </div>
         </div>
@@ -116,9 +118,15 @@
     <div class="bg-white rounded-xl shadow-sm border border-slate-100">
         <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
             <h3 class="font-semibold text-slate-700">🧾 Orders ({{ $customer->orders->count() }})</h3>
-            <p class="text-sm font-semibold {{ $customer->outstandingBalance() > 0 ? 'text-red-600' : 'text-green-600' }}">
-                {{ __('Total Balance') }}: Rs {{ number_format($customer->outstandingBalance()) }}
-            </p>
+            <div class="flex items-center gap-3">
+                <p class="text-sm font-semibold {{ $customer->outstandingBalance() > 0 ? 'text-red-600' : 'text-green-600' }}">
+                    {{ __('Total Balance') }}: Rs {{ number_format($customer->outstandingBalance()) }}
+                </p>
+                <a href="{{ route('customers.statement-pdf', $customer) }}" target="_blank"
+                   class="text-xs bg-red-600 hover:bg-red-700 text-white font-medium px-3 py-1 rounded-lg flex items-center gap-1">
+                   📄 {{ __('Print Statement') }}
+                </a>
+            </div>
         </div>
         <div class="divide-y divide-slate-50">
             @forelse($customer->orders as $order)

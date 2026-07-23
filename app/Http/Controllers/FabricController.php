@@ -43,7 +43,7 @@ class FabricController extends Controller
             'low_stock_items'   => (clone $statsBase())->whereIn('status', ['low_stock', 'out_of_stock'])->count(),
             'today_sales'       => (float) $this->branchQuery(\App\Models\FabricSale::query())->whereDate('created_at', today())->sum('total_amount'),
             'total_stock_value' => (float) (clone $statsBase())->get()->sum(fn($f) => $f->available_meter * $f->cost_price),
-            'profit'            => (float) $this->branchQuery(\App\Models\FabricSale::query())->get()->sum(fn($s) => ($s->rate - ($s->fabric->cost_price ?? 0)) * $s->meter),
+            'profit'            => (float) $this->branchQuery(\App\Models\FabricSale::query())->get()->sum(fn($s) => ($s->rate - ($s->fabric?->cost_price ?? 0)) * $s->meter),
         ];
 
         return view('fabrics.index', compact('fabrics', 'stats', 'search'));

@@ -226,8 +226,8 @@
         <tbody>
             <tr>
                 <td>1</td>
-                <td>{{ $fabricSale->fabric->fabric_type }} ({{ $fabricSale->fabric->color }})</td>
-                <td>{{ $fabricSale->fabric->roll_number }}</td>
+                <td>{{ $fabricSale->fabric?->fabric_type ?? 'Fabric' }} ({{ $fabricSale->fabric?->color ?? '—' }})</td>
+                <td>{{ $fabricSale->fabric?->roll_number ?? '—' }}</td>
                 <td>{{ number_format($fabricSale->meter, 2) }}m</td>
                 <td>Rs {{ number_format($fabricSale->rate) }}</td>
                 <td>Rs {{ number_format($fabricSale->total_amount) }}</td>

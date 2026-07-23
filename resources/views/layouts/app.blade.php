@@ -319,7 +319,7 @@
     @stack('scripts')
     <script>
         function openPayModal(orderId, orderNum, balance) {
-            document.getElementById('qp-form').action = '/orders/' + orderId + '/payments';
+            document.getElementById('qp-form').action = '{{ url('/orders') }}/' + orderId + '/payments';
             document.getElementById('qp-title').textContent = '{{ __("Record Payment") }} — ' + orderNum;
             document.getElementById('qp-balance').textContent = 'Rs ' + Number(balance).toLocaleString();
             var amtInput = document.getElementById('qp-amount');

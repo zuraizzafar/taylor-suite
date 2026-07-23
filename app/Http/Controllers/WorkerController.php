@@ -133,6 +133,23 @@ class WorkerController extends Controller
         $totalSuits   = $stitchedSuits->count();
         $totalEarned  = $stitchedSuits->sum('worker_earning');
 
+        // Detailed breakdowns for Suits Stitched
+        $suitTypeBreakdown = $stitchedSuits->groupBy(fn($s) => $s->suit_type ?: 'Standard')->map(function ($suits, $type) {
+            return [
+                'type'   => $type,
+                'count'  => $suits->count(),
+                'earned' => (float) $suits->sum('worker_earning'),
+            ];
+        })->sortByDesc('count');
+
+        $stitchTypeBreakdown = $stitchedSuits->groupBy(fn($s) => $s->stitchType?->name ?? 'Standard')->map(function ($suits, $name) {
+            return [
+                'name'   => $name,
+                'count'  => $suits->count(),
+                'earned' => (float) $suits->sum('worker_earning'),
+            ];
+        })->sortByDesc('count');
+
         // Pending suits (assigned, not yet stitching)
         $pendingSuits = $worker->suits()
             ->with('customer', 'order', 'stitchType')
@@ -151,6 +168,7 @@ class WorkerController extends Controller
         return view('workers.report', compact(
             'worker', 'stitchedSuits', 'pendingSuits', 'salaryPayments',
             'totalSuits', 'totalEarned', 'totalPaid', 'balanceDue',
+            'suitTypeBreakdown', 'stitchTypeBreakdown',
             'from', 'to', 'preset'
         ));
     }

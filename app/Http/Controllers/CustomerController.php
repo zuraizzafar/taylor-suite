@@ -146,4 +146,29 @@ class CustomerController extends Controller
             ? $pdf->stream($filename)
             : $pdf->download($filename);
     }
+
+    public function statementPdf(Customer $customer): Response
+    {
+        $customer->load([
+            'orders' => function ($q) {
+                $q->with('suits')->latest('order_date');
+            },
+            'branch',
+        ]);
+
+        $settings = \App\Models\Setting::allKeyed();
+
+        $totalOrdersAmount  = (float) $customer->orders->sum('total_amount');
+        $totalBalanceAmount = (float) $customer->orders->sum('balance_amount');
+        $totalPaidAmount    = max(0, $totalOrdersAmount - $totalBalanceAmount);
+
+        $pdf = Pdf::loadView('customers.statement-pdf', compact('customer', 'settings', 'totalOrdersAmount', 'totalPaidAmount', 'totalBalanceAmount'))
+            ->setPaper('a5', 'portrait');
+
+        $filename = "statement-{$customer->file_number}.pdf";
+
+        return env('PDF_MODE', 'download') === 'stream'
+            ? $pdf->stream($filename)
+            : $pdf->download($filename);
+    }
 }

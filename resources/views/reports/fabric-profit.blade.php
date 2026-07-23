@@ -22,10 +22,10 @@
                class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm px-4 py-1.5 rounded-lg flex items-center gap-1 font-semibold">
                 📥 {{ __('Export Excel') }}
             </a>
-            <button onclick="window.print()" type="button" 
-                    class="bg-slate-600 hover:bg-slate-700 text-white text-sm px-4 py-1.5 rounded-lg flex items-center gap-1 font-semibold">
-                🖨️ {{ __('Print') }}
-            </button>
+            <a href="{{ route('reports.fabric-profit-pdf', request()->all()) }}" target="_blank"
+               class="bg-slate-700 hover:bg-slate-800 text-white text-sm px-4 py-1.5 rounded-lg flex items-center gap-1 font-semibold">
+                📄 {{ __('Print PDF') }}
+            </a>
             <div class="flex gap-1">
                 @foreach([
                     'Today' => 'today',
@@ -74,14 +74,14 @@
             <tbody class="divide-y divide-slate-50">
                 @forelse($sales as $s)
                 @php
-                    $lineCost = $s->meter * ($s->fabric->cost_price ?? 0);
+                    $lineCost = $s->meter * ($s->fabric?->cost_price ?? 0);
                     $lineProfit = $s->total_amount - $lineCost;
                 @endphp
                 <tr class="hover:bg-slate-50">
                     <td class="px-4 py-3 text-slate-600 text-xs">{{ $s->created_at->format('d M Y') }}</td>
                     <td class="px-4 py-3 font-mono text-blue-700 font-semibold">{{ $s->sale_code }}</td>
                     <td class="px-4 py-3 text-slate-700">{{ $s->customer_name }}</td>
-                    <td class="px-4 py-3 text-slate-600">{{ $s->fabric->roll_number }}</td>
+                    <td class="px-4 py-3 text-slate-600">{{ $s->fabric?->roll_number ?? '—' }}</td>
                     <td class="px-4 py-3">{{ number_format($s->meter, 2) }}m</td>
                     <td class="px-4 py-3">Rs {{ number_format($lineCost) }}</td>
                     <td class="px-4 py-3">Rs {{ number_format($s->total_amount) }}</td>

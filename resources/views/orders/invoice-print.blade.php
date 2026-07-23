@@ -229,6 +229,9 @@
         .content { margin-top: 0; padding: 0; }
         .page { box-shadow: none; border-radius: 0; margin: 0; padding: 10px 15px; page-break-after: always; max-width: 100%; }
         .page:last-child { page-break-after: auto; }
+        .info-row, .payment-wrap, .note-box, .legal-box, .meas-wrap, table.items {
+            page-break-inside: avoid !important;
+        }
     }
 </style>
 </head>

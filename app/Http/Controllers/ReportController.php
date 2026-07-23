@@ -274,7 +274,7 @@ class ReportController extends Controller
 
         $sales = $salesQuery->latest()->get();
 
-        $cost   = (float) $sales->sum(fn($s) => $s->meter * ($s->fabric->cost_price ?? 0));
+        $cost   = (float) $sales->sum(fn($s) => $s->meter * ($s->fabric?->cost_price ?? 0));
         $sale   = (float) $sales->sum('total_amount');
         $profit = $sale - $cost;
 
@@ -492,13 +492,13 @@ class ReportController extends Controller
                     fputcsv($file, ['Sale Code', 'Date', 'Fabric Type', 'Roll #', 'Meters Sold', 'Rate (Rs)', 'Total Amount (Rs)', 'Estimated Profit (Rs)']);
 
                     foreach ($sales as $s) {
-                        $cost = $s->meter * ($s->fabric->cost_price ?? 0);
+                        $cost = $s->meter * ($s->fabric?->cost_price ?? 0);
                         $profit = $s->total_amount - $cost;
                         fputcsv($file, [
                             $s->sale_code,
                             $s->created_at->toDateString(),
-                            $s->fabric->fabric_type,
-                            $s->fabric->roll_number,
+                            $s->fabric?->fabric_type ?? '—',
+                            $s->fabric?->roll_number ?? '—',
                             $s->meter,
                             $s->rate,
                             $s->total_amount,
@@ -531,6 +531,191 @@ class ReportController extends Controller
         }
 
         return [$from, $to, $preset];
+    }
+
+    public function dailyPdf(Request $request)
+    {
+        $date  = $request->input('date', today()->toDateString());
+        $query = Order::with(['customer', 'suits'])->whereDate('order_date', $date);
+        $this->branchQuery($query);
+        $orders = $query->latest()->get();
+        $settings = \App\Models\Setting::allKeyed();
+
+        $pdf = Pdf::loadView('reports.pdf.daily', compact('orders', 'date', 'settings'))
+            ->setPaper('a4', 'portrait');
+
+        $filename = "daily-orders-{$date}.pdf";
+        return env('PDF_MODE', 'download') === 'stream' ? $pdf->stream($filename) : $pdf->download($filename);
+    }
+
+    public function pendingPdf(Request $request)
+    {
+        $status = $request->input('status', '');
+        $query  = Suit::with(['customer', 'worker', 'order'])->whereNotIn('status', ['delivered']);
+        $this->branchQuery($query);
+
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        $suits = $query->oldest()->get();
+        $settings = \App\Models\Setting::allKeyed();
+
+        $pdf = Pdf::loadView('reports.pdf.pending', compact('suits', 'status', 'settings'))
+            ->setPaper('a4', 'portrait');
+
+        $filename = "pending-orders.pdf";
+        return env('PDF_MODE', 'download') === 'stream' ? $pdf->stream($filename) : $pdf->download($filename);
+    }
+
+    public function deliveredPdf(Request $request)
+    {
+        $from  = $request->input('from', today()->toDateString());
+        $to    = $request->input('to', today()->toDateString());
+        $query = Suit::with(['customer', 'worker', 'order'])
+            ->where('status', 'delivered')
+            ->whereBetween('delivered_at', [$from . ' 00:00:00', $to . ' 23:59:59']);
+        $this->branchQuery($query);
+
+        $suits = $query->latest('delivered_at')->get();
+        $settings = \App\Models\Setting::allKeyed();
+
+        $pdf = Pdf::loadView('reports.pdf.delivered', compact('suits', 'from', 'to', 'settings'))
+            ->setPaper('a4', 'portrait');
+
+        $filename = "delivered-suits-{$from}-{$to}.pdf";
+        return env('PDF_MODE', 'download') === 'stream' ? $pdf->stream($filename) : $pdf->download($filename);
+    }
+
+    public function salaryPdf(Request $request)
+    {
+        $from = $request->input('from', today()->startOfMonth()->toDateString());
+        $to   = $request->input('to', today()->toDateString());
+
+        $workerQuery = Worker::with(['suits' => function ($q) use ($from, $to) {
+            $q->whereNotNull('stitching_started_at')
+              ->whereBetween('stitching_started_at', [$from . ' 00:00:00', $to . ' 23:59:59'])
+              ->with('customer');
+        }])->where('is_active', true);
+
+        $this->branchQuery($workerQuery);
+
+        $workers     = $workerQuery->get()->filter(fn($w) => $w->suits->isNotEmpty());
+        $totalPayout = $workers->sum(fn($w) => $w->suits->sum('worker_earning'));
+        $settings    = \App\Models\Setting::allKeyed();
+
+        $pdf = Pdf::loadView('reports.pdf.salary', compact('workers', 'from', 'to', 'totalPayout', 'settings'))
+            ->setPaper('a4', 'portrait');
+
+        $filename = "salary-summary-{$from}-{$to}.pdf";
+        return env('PDF_MODE', 'download') === 'stream' ? $pdf->stream($filename) : $pdf->download($filename);
+    }
+
+    public function pendingBalancesPdf(Request $request)
+    {
+        $query = Customer::with(['orders' => fn($q) => $q->where('balance_amount', '>', 0)])
+            ->whereHas('orders', fn($q) => $q->where('balance_amount', '>', 0));
+        $this->branchQuery($query);
+
+        $customers = $query->get()
+            ->map(function ($c) {
+                $c->total_outstanding = $c->orders->sum('balance_amount');
+                return $c;
+            })
+            ->sortByDesc('total_outstanding');
+
+        $grandTotal = $customers->sum('total_outstanding');
+        $settings   = \App\Models\Setting::allKeyed();
+
+        $pdf = Pdf::loadView('reports.pdf.pending-balances', compact('customers', 'grandTotal', 'settings'))
+            ->setPaper('a4', 'portrait');
+
+        $filename = "pending-balances.pdf";
+        return env('PDF_MODE', 'download') === 'stream' ? $pdf->stream($filename) : $pdf->download($filename);
+    }
+
+    public function paymentsPdf(Request $request)
+    {
+        $from   = $request->input('from', today()->startOfMonth()->toDateString());
+        $to     = $request->input('to', today()->toDateString());
+        $method = $request->input('method', '');
+
+        $query = Payment::with(['order.customer', 'receivedBy'])
+            ->whereBetween('payment_date', [$from, $to]);
+
+        $this->branchQuery($query);
+
+        if ($method) {
+            $query->where('method', $method);
+        }
+
+        $payments     = $query->latest('payment_date')->get();
+        $totalAmount  = $payments->sum('amount');
+        $settings     = \App\Models\Setting::allKeyed();
+
+        $pdf = Pdf::loadView('reports.pdf.payments', compact('payments', 'from', 'to', 'method', 'totalAmount', 'settings'))
+            ->setPaper('a4', 'portrait');
+
+        $filename = "payments-{$from}-{$to}.pdf";
+        return env('PDF_MODE', 'download') === 'stream' ? $pdf->stream($filename) : $pdf->download($filename);
+    }
+
+    public function workersPdf(Request $request)
+    {
+        $from = $request->input('from', today()->startOfMonth()->toDateString());
+        $to   = $request->input('to', today()->toDateString());
+
+        $workerQuery = Worker::with([
+            'branch',
+            'suits' => function ($q) use ($from, $to) {
+                $q->whereNotNull('stitching_started_at')
+                  ->whereBetween('stitching_started_at', [$from . ' 00:00:00', $to . ' 23:59:59']);
+            },
+            'salaryPayments',
+        ])->where('is_active', true);
+
+        $this->branchQuery($workerQuery);
+
+        $workers = $workerQuery->get()->map(function ($w) {
+            $w->period_suits   = $w->suits->count();
+            $w->period_earned  = (float) $w->suits->sum('worker_earning');
+            $w->total_paid     = (float) $w->salaryPayments->sum('amount_paid');
+            $w->balance_due    = max(0, $w->period_earned - $w->total_paid);
+            return $w;
+        })->sortByDesc('period_suits');
+
+        $totalSuits  = $workers->sum('period_suits');
+        $totalEarned = $workers->sum('period_earned');
+        $totalPaid   = $workers->sum('total_paid');
+        $settings    = \App\Models\Setting::allKeyed();
+
+        $pdf = Pdf::loadView('reports.pdf.workers', compact('workers', 'from', 'to', 'totalSuits', 'totalEarned', 'totalPaid', 'settings'))
+            ->setPaper('a4', 'portrait');
+
+        $filename = "workers-summary-{$from}-{$to}.pdf";
+        return env('PDF_MODE', 'download') === 'stream' ? $pdf->stream($filename) : $pdf->download($filename);
+    }
+
+    public function fabricProfitPdf(Request $request)
+    {
+        [$from, $to, $preset] = $this->resolvePeriod($request);
+
+        $salesQuery = FabricSale::with('fabric')
+            ->whereBetween('created_at', [$from . ' 00:00:00', $to . ' 23:59:59']);
+        $this->branchQuery($salesQuery);
+
+        $sales = $salesQuery->latest()->get();
+
+        $cost   = (float) $sales->sum(fn($s) => $s->meter * ($s->fabric?->cost_price ?? 0));
+        $sale   = (float) $sales->sum('total_amount');
+        $profit = $sale - $cost;
+        $settings = \App\Models\Setting::allKeyed();
+
+        $pdf = Pdf::loadView('reports.pdf.fabric-profit', compact('sales', 'from', 'to', 'cost', 'sale', 'profit', 'settings'))
+            ->setPaper('a4', 'portrait');
+
+        $filename = "fabric-profit-{$from}-{$to}.pdf";
+        return env('PDF_MODE', 'download') === 'stream' ? $pdf->stream($filename) : $pdf->download($filename);
     }
 }
 

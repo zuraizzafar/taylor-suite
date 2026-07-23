@@ -67,6 +67,53 @@
         </div>
     </div>
 
+    {{-- ── Category & Design Breakdown ───────────────────────────── --}}
+    @if(($suitTypeBreakdown ?? collect())->isNotEmpty() || ($stitchTypeBreakdown ?? collect())->isNotEmpty())
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {{-- Garment Type Breakdown --}}
+        <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-4 space-y-3">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-600">👔 Garment / Suit Type Breakdown</h3>
+                <span class="text-xs font-semibold text-slate-400">{{ $totalSuits }} Total</span>
+            </div>
+            <div class="space-y-2">
+                @forelse($suitTypeBreakdown as $item)
+                <div class="flex items-center justify-between text-xs bg-slate-50 px-3 py-2 rounded-lg border border-slate-100">
+                    <span class="font-semibold text-slate-700">{{ $item['type'] }}</span>
+                    <div class="flex items-center gap-3">
+                        <span class="bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded-md">{{ $item['count'] }} suit{{ $item['count'] != 1 ? 's' : '' }}</span>
+                        <span class="font-bold text-slate-700">Rs {{ number_format($item['earned']) }}</span>
+                    </div>
+                </div>
+                @empty
+                <p class="text-xs text-slate-400 py-2">No garments stitched yet.</p>
+                @endforelse
+            </div>
+        </div>
+
+        {{-- Stitching Design / Pattern Breakdown --}}
+        <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-4 space-y-3">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-600">🧵 Stitching / Design Type Breakdown</h3>
+                <span class="text-xs font-semibold text-slate-400">{{ $totalSuits }} Total</span>
+            </div>
+            <div class="space-y-2">
+                @forelse($stitchTypeBreakdown as $item)
+                <div class="flex items-center justify-between text-xs bg-slate-50 px-3 py-2 rounded-lg border border-slate-100">
+                    <span class="font-semibold text-slate-700">{{ $item['name'] }}</span>
+                    <div class="flex items-center gap-3">
+                        <span class="bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded-md">{{ $item['count'] }} suit{{ $item['count'] != 1 ? 's' : '' }}</span>
+                        <span class="font-bold text-slate-700">Rs {{ number_format($item['earned']) }}</span>
+                    </div>
+                </div>
+                @empty
+                <p class="text-xs text-slate-400 py-2">No stitch types recorded.</p>
+                @endforelse
+            </div>
+        </div>
+    </div>
+    @endif
+
     {{-- ── Suits Stitched in Period ───────────────────────────────── --}}
     <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
         <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">

@@ -70,6 +70,7 @@ Route::middleware('auth')->group(function () {
         // Customers
         Route::resource('customers', CustomerController::class);
         Route::get('/customers/{customer}/tags/pending', [CustomerController::class, 'pendingTags'])->name('customers.tags.pending');
+        Route::get('/customers/{customer}/statement/pdf', [CustomerController::class, 'statementPdf'])->name('customers.statement-pdf');
 
         // Measurements (nested under customer)
         Route::get('/customers/{customer}/measurements/create', [MeasurementController::class, 'create'])
@@ -109,14 +110,21 @@ Route::middleware('auth')->group(function () {
         // Reports
         Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
         Route::get('/reports/daily', [ReportController::class, 'daily'])->name('reports.daily');
+        Route::get('/reports/daily/pdf', [ReportController::class, 'dailyPdf'])->name('reports.daily-pdf');
         Route::get('/reports/pending', [ReportController::class, 'pending'])->name('reports.pending');
+        Route::get('/reports/pending/pdf', [ReportController::class, 'pendingPdf'])->name('reports.pending-pdf');
         Route::get('/reports/delivered', [ReportController::class, 'delivered'])->name('reports.delivered');
+        Route::get('/reports/delivered/pdf', [ReportController::class, 'deliveredPdf'])->name('reports.delivered-pdf');
         Route::get('/reports/salary', [ReportController::class, 'salary'])->name('reports.salary');
+        Route::get('/reports/salary/pdf', [ReportController::class, 'salaryPdf'])->name('reports.salary-pdf');
         Route::get('/reports/salary-report', [ReportController::class, 'salaryReport'])->name('reports.salary-report');
         Route::get('/reports/salary-report/pdf', [ReportController::class, 'salaryReportPdf'])->name('reports.salary-report-pdf');
         Route::get('/reports/pending-balances', [ReportController::class, 'pendingBalances'])->name('reports.pending-balances');
+        Route::get('/reports/pending-balances/pdf', [ReportController::class, 'pendingBalancesPdf'])->name('reports.pending-balances-pdf');
         Route::get('/reports/payments', [ReportController::class, 'payments'])->name('reports.payments');
+        Route::get('/reports/payments/pdf', [ReportController::class, 'paymentsPdf'])->name('reports.payments-pdf');
         Route::get('/reports/workers', [ReportController::class, 'workers'])->name('reports.workers');
+        Route::get('/reports/workers/pdf', [ReportController::class, 'workersPdf'])->name('reports.workers-pdf');
         Route::get('/reports/{report}/export-csv', [ReportController::class, 'exportCsv'])->name('reports.export-csv');
 
         // POS — quick order creation
@@ -146,6 +154,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/fabric-sales/{fabricSale}/invoice', [FabricSaleController::class, 'invoice'])->name('fabric-sales.invoice');
 
         Route::get('/reports/fabric-profit', [ReportController::class, 'fabricProfit'])->name('reports.fabric-profit');
+        Route::get('/reports/fabric-profit/pdf', [ReportController::class, 'fabricProfitPdf'])->name('reports.fabric-profit-pdf');
     });
 
     // ── Admin-only routes ──────────────────────────────────────────────────────

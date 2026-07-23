@@ -10,10 +10,10 @@
            class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm px-4 py-1.5 rounded-lg flex items-center gap-1 font-semibold">
             📥 {{ __('Export Excel') }}
         </a>
-        <button onclick="window.print()" type="button" 
-                class="bg-slate-600 hover:bg-slate-700 text-white text-sm px-4 py-1.5 rounded-lg flex items-center gap-1 font-semibold">
-            🖨️ {{ __('Print') }}
-        </button>
+        <a href="{{ route('reports.pending-balances-pdf', request()->all()) }}" target="_blank"
+           class="bg-slate-700 hover:bg-slate-800 text-white text-sm px-4 py-1.5 rounded-lg flex items-center gap-1 font-semibold">
+            📄 {{ __('Print PDF') }}
+        </a>
     </div>
 
     {{-- Grand Total Banner --}}
@@ -53,9 +53,11 @@
                         Rs {{ number_format($customer->total_outstanding) }}
                     </td>
                     <td class="px-4 py-3 text-center">
-                        <div class="flex items-center justify-center gap-1">
+                        <div class="flex items-center justify-center gap-1.5">
                         <a href="{{ route('customers.show', $customer) }}"
-                            class="text-xs text-blue-600 hover:underline">{{ __('View') }}</a>
+                            class="text-xs text-blue-600 hover:underline font-medium">{{ __('View') }}</a>
+                        <a href="{{ route('customers.statement-pdf', $customer) }}" target="_blank"
+                            class="text-xs bg-red-600 hover:bg-red-700 text-white px-2 py-0.5 rounded flex items-center gap-1 font-medium">📄 {{ __('Statement') }}</a>
                         @foreach($customer->orders as $pendingOrder)
                         <button onclick="openPayModal({{ $pendingOrder->id }}, '{{ $pendingOrder->order_number }}', {{ $pendingOrder->balance_amount }})"
                             class="text-xs bg-green-600 hover:bg-green-700 text-white px-2 py-0.5 rounded">

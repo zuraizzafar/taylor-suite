@@ -12,10 +12,10 @@
            class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm px-4 py-2 rounded-lg flex items-center gap-1 font-semibold">
             📥 {{ __('Export Excel') }}
         </a>
-        <button onclick="window.print()" type="button" 
-                class="bg-slate-600 hover:bg-slate-700 text-white text-sm px-4 py-2 rounded-lg flex items-center gap-1 font-semibold">
-            🖨️ {{ __('Print') }}
-        </button>
+        <a href="{{ route('reports.daily-pdf', request()->all()) }}" target="_blank"
+           class="bg-slate-700 hover:bg-slate-800 text-white text-sm px-4 py-2 rounded-lg flex items-center gap-1 font-semibold">
+            📄 {{ __('Print PDF') }}
+        </a>
     </form>
 
     <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">

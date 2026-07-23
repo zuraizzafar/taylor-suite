@@ -27,7 +27,7 @@ class FabricSale extends Model
 
     public function fabric(): BelongsTo
     {
-        return $this->belongsTo(Fabric::class);
+        return $this->belongsTo(Fabric::class)->withTrashed();
     }
 
     public function branch(): BelongsTo
