@@ -21,66 +21,71 @@
     @endif
 
     /* Page */
-    .page { padding: 36px 40px 30px; page-break-after: always; font-family: DejaVu Sans, sans-serif; }
+    .page { padding: 22px 28px 18px; page-break-after: always; font-family: DejaVu Sans, sans-serif; }
     .page:last-child { page-break-after: auto; }
 
+    /* Page break preventions */
+    .info-row, .payment-wrap, .note-box, .legal-box, .copy-label-bar, table.items {
+        page-break-inside: avoid !important;
+    }
+
     /* Copy label pill */
-    .copy-label-bar { margin-bottom: 18px; }
+    .copy-label-bar { margin-bottom: 8px; }
     .copy-label-bar span {
         display: inline-block;
         background: #f1f5f9;
         border: 1px solid #cbd5e1;
-        font-size: 8.5px;
+        font-size: 8px;
         font-weight: 700;
         font-family: DejaVu Sans, sans-serif;
         text-transform: uppercase;
-        letter-spacing: 2px;
+        letter-spacing: 1.5px;
         color: #64748b;
-        padding: 3px 14px;
-        border-radius: 20px;
+        padding: 2px 10px;
+        border-radius: 12px;
     }
 
     /* Header */
     .header {
         display: table;
         width: 100%;
-        padding-bottom: 14px;
+        padding-bottom: 8px;
         border-bottom: 2px solid #1e293b;
-        margin-bottom: 16px;
+        margin-bottom: 10px;
         font-family: DejaVu Sans, sans-serif;
     }
     .header-left  { display: table-cell; vertical-align: top; width: 60%; font-family: DejaVu Sans, sans-serif; }
     .header-right { display: table-cell; vertical-align: top; text-align: right; font-family: DejaVu Sans, sans-serif; }
 
-    .logo-fallback { font-size: 22px; font-weight: 800; color: #0f172a; letter-spacing: -0.5px; font-family: DejaVu Sans, sans-serif; }
-    .logo-img      { height: 80px; width: auto; }
-    .company-meta  { font-size: 10px; color: #64748b; margin-top: 6px; line-height: 1.7; font-family: DejaVu Sans, sans-serif; }
+    .logo-fallback { font-size: 20px; font-weight: 800; color: #0f172a; letter-spacing: -0.5px; font-family: DejaVu Sans, sans-serif; }
+    .logo-img      { height: 60px; width: auto; }
+    .company-meta  { font-size: 9.5px; color: #64748b; margin-top: 3px; line-height: 1.4; font-family: DejaVu Sans, sans-serif; }
 
-    .invoice-title  { font-size: 26px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 2px; font-family: DejaVu Sans, sans-serif; }
-    .invoice-no     { display: inline-block; background: #1e293b; color: #fff; font-size: 10px; font-weight: 700; letter-spacing: 0.5px; padding: 3px 10px; border-radius: 4px; margin-top: 5px; font-family: DejaVu Sans, sans-serif; }
-    .invoice-dates  { font-size: 9.5px; color: #475569; margin-top: 6px; line-height: 1.8; font-family: DejaVu Sans, sans-serif; }
+    .invoice-title  { font-size: 22px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 1.5px; font-family: DejaVu Sans, sans-serif; }
+    .invoice-no     { display: inline-block; background: #1e293b; color: #fff; font-size: 9.5px; font-weight: 700; letter-spacing: 0.5px; padding: 2px 8px; border-radius: 4px; margin-top: 3px; font-family: DejaVu Sans, sans-serif; }
+    .invoice-dates  { font-size: 9px; color: #475569; margin-top: 3px; line-height: 1.5; font-family: DejaVu Sans, sans-serif; }
     .invoice-dates strong { color: #1e293b; font-family: DejaVu Sans, sans-serif; }
 
     /* Info boxes */
-    .info-row       { display: table; width: 100%; margin-bottom: 16px; border-spacing: 12px 0; font-family: DejaVu Sans, sans-serif; }
-    .info-cell      { display: table-cell; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px 12px; vertical-align: top; font-family: DejaVu Sans, sans-serif; }
-    .info-cell-title { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; margin-bottom: 5px; font-family: DejaVu Sans, sans-serif; }
-    .info-cell-name  { font-size: 12px; font-weight: 700; color: #0f172a; font-family: DejaVu Sans, sans-serif; }
-    .info-cell-sub   { font-size: 9.5px; color: #64748b; margin-top: 3px; line-height: 1.6; font-family: DejaVu Sans, sans-serif; }
+    .info-row       { display: table; width: 100%; margin-bottom: 10px; border-spacing: 10px 0; font-family: DejaVu Sans, sans-serif; }
+    .info-cell      { display: table-cell; border: 1px solid #e2e8f0; border-radius: 6px; padding: 6px 10px; vertical-align: top; font-family: DejaVu Sans, sans-serif; }
+    .info-cell-title { font-size: 7.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; margin-bottom: 3px; font-family: DejaVu Sans, sans-serif; }
+    .info-cell-name  { font-size: 11px; font-weight: 700; color: #0f172a; font-family: DejaVu Sans, sans-serif; }
+    .info-cell-sub   { font-size: 9px; color: #64748b; margin-top: 2px; line-height: 1.5; font-family: DejaVu Sans, sans-serif; }
 
     /* Items table */
-    table.items           { width: 100%; border-collapse: collapse; margin-bottom: 18px; font-size: 12px; font-family: DejaVu Sans, sans-serif; }
+    table.items           { width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 11px; font-family: DejaVu Sans, sans-serif; }
     table.items thead tr  { background: #1e293b; }
-    table.items thead th  { padding: 8px 10px; font-size: 14px; font-weight: 600; text-align: left; letter-spacing: 0.3px; font-family: DejaVu Sans, sans-serif; color: #ffffff; background: #1e293b; }
+    table.items thead th  { padding: 6px 8px; font-size: 12px; font-weight: 600; text-align: left; letter-spacing: 0.3px; font-family: DejaVu Sans, sans-serif; color: #ffffff; background: #1e293b; }
     table.items tbody tr:nth-child(even) { background: #f8fafc; }
-    table.items tbody td  { padding: 8px 10px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; font-size: 12px; font-family: DejaVu Sans, sans-serif; color: #1e293b; }
-    table.items tfoot td  { padding: 7px 10px; background: #f1f5f9; border-top: 1.5px solid #cbd5e1; font-weight: 600; font-size: 11px; font-family: DejaVu Sans, sans-serif; color: #1e293b; }
+    table.items tbody td  { padding: 5px 8px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; font-size: 11px; font-family: DejaVu Sans, sans-serif; color: #1e293b; }
+    table.items tfoot td  { padding: 5px 8px; background: #f1f5f9; border-top: 1.5px solid #cbd5e1; font-weight: 600; font-size: 10.5px; font-family: DejaVu Sans, sans-serif; color: #1e293b; }
 
     /* Payment summary */
-    .payment-wrap       { display: table; width: 100%; margin-bottom: 16px; }
+    .payment-wrap       { display: table; width: 100%; margin-bottom: 10px; }
     .payment-wrap-inner { display: table-cell; text-align: right; }
     .payment-table      { width: 230px; border: 1px solid #e2e8f0; border-radius: 6px; border-collapse: collapse; font-family: DejaVu Sans, sans-serif; }
-    .payment-table td   { padding: 4px 10px; font-size: 9.5px; font-family: DejaVu Sans, sans-serif; color: #1e293b; }
+    .payment-table td   { padding: 3px 8px; font-size: 9px; font-family: DejaVu Sans, sans-serif; color: #1e293b; }
     .payment-table tr   { border-bottom: 1px solid #f1f5f9; }
     .payment-table tr:last-child { border-bottom: none; }
     .lbl { color: #64748b; font-family: DejaVu Sans, sans-serif; }
@@ -91,12 +96,12 @@
     .row-grand      { background: #1e293b; }
 
     /* Legal notice */
-    .legal-box   { border: 1px solid #e2e8f0; border-left: 4px solid #1e293b; border-radius: 4px; padding: 9px 12px; margin-bottom: 20px; background: #f8fafc; }
-    .legal-title { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; margin-bottom: 4px; font-family: DejaVu Sans, sans-serif; }
-    .legal-text  { font-size: 9.5px; color: #475569; line-height: 1.6; font-family: DejaVu Sans, sans-serif; }
+    .legal-box   { border: 1px solid #e2e8f0; border-left: 4px solid #1e293b; border-radius: 4px; padding: 7px 10px; margin-bottom: 10px; background: #f8fafc; page-break-inside: avoid !important; }
+    .legal-title { font-size: 7.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; margin-bottom: 3px; font-family: DejaVu Sans, sans-serif; }
+    .legal-text  { font-size: 9px; color: #475569; line-height: 1.5; font-family: DejaVu Sans, sans-serif; }
 
     /* Footer */
-    .footer       { border-top: 1px solid #e2e8f0; padding-top: 8px; font-size: 9px; color: #94a3b8; display: table; width: 100%; font-family: DejaVu Sans, sans-serif; }
+    .footer       { border-top: 1px solid #e2e8f0; padding-top: 6px; font-size: 8.5px; color: #94a3b8; display: table; width: 100%; font-family: DejaVu Sans, sans-serif; page-break-inside: avoid !important; page-break-before: avoid !important; }
     .footer-left  { display: table-cell; font-family: DejaVu Sans, sans-serif; }
     .footer-right { display: table-cell; text-align: right; font-family: DejaVu Sans, sans-serif; }
 </style>

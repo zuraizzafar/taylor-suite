@@ -64,7 +64,7 @@ class FabricSaleController extends Controller
         $settings = \App\Models\Setting::allKeyed();
 
         $pdf = Pdf::loadView('fabric-sales.invoice-pdf', compact('fabricSale', 'settings'))
-            ->setPaper('a5', 'portrait');
+            ->setPaper('a4', 'portrait');
 
         $filename = "invoice-{$fabricSale->sale_code}.pdf";
 
