@@ -86,6 +86,10 @@
                class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('pos.*') ? 'bg-green-600 text-white' : 'text-green-400 hover:bg-slate-800' }}">
                 <span>🛒</span> {{ __('New Order (POS)') }}
             </a>
+            <a href="{{ route('quotations.index') }}"
+               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('quotations.*') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">
+                <span>📋</span> {{ __('Quotations') }}
+            </a>
             <a href="{{ route('orders.index') }}"
                class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('orders.*') && !request()->routeIs('pos.*') ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800' }}">
                 <span>🧾</span> {{ __('Orders') }}

@@ -14,6 +14,7 @@ use App\Http\Controllers\FabricSaleController;
 use App\Http\Controllers\MeasurementController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\QuotationController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ScanController;
 use App\Http\Controllers\SearchController;
@@ -84,6 +85,11 @@ Route::middleware('auth')->group(function () {
 
         // Workers
         Route::resource('workers', WorkerController::class)->except(['show']);
+
+        // Quotations (draft invoices — convertible into a real Order)
+        Route::resource('quotations', QuotationController::class);
+        Route::get('/quotations/{quotation}/pdf', [QuotationController::class, 'pdf'])->name('quotations.pdf');
+        Route::post('/quotations/{quotation}/convert', [QuotationController::class, 'convert'])->name('quotations.convert');
 
         // Orders
         Route::resource('orders', OrderController::class);
