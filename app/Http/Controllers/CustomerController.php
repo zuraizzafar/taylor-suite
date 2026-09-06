@@ -6,6 +6,7 @@ use App\Models\Branch;
 use App\Models\Customer;
 use App\Traits\HasBranchScope;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -64,6 +65,36 @@ class CustomerController extends Controller
 
         return redirect()->route('measurements.create', $customer)
             ->with('success', "Customer {$customer->file_number} created. Now add their measurements.");
+    }
+
+    /**
+     * AJAX: quick-create a customer from a modal (e.g. the Quotation/Order form)
+     * without leaving the page. Returns the new customer as JSON.
+     */
+    public function quickCreate(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'name'    => ['required', 'string', 'max:255'],
+            'mobile'  => ['required', 'string', 'max:20'],
+            'address' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        $fileData = Customer::nextFileNumber();
+        $data = array_merge($data, $fileData);
+
+        if ($branchId = $this->currentBranchId()) {
+            $data['branch_id'] = $branchId;
+        }
+
+        $customer = Customer::create($data);
+
+        return response()->json([
+            'id'          => $customer->id,
+            'name'        => $customer->name,
+            'mobile'      => $customer->mobile,
+            'file_number' => $customer->file_number,
+            'label'       => "{$customer->file_number} – {$customer->name} ({$customer->mobile})",
+        ]);
     }
 
     public function show(Customer $customer): View

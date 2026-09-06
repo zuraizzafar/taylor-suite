@@ -69,6 +69,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:admin,branch_manager')->group(function () {
 
         // Customers
+        Route::post('/customers/quick-create', [CustomerController::class, 'quickCreate'])->name('customers.quick-create');
         Route::resource('customers', CustomerController::class);
         Route::get('/customers/{customer}/tags/pending', [CustomerController::class, 'pendingTags'])->name('customers.tags.pending');
         Route::get('/customers/{customer}/statement/pdf', [CustomerController::class, 'statementPdf'])->name('customers.statement-pdf');

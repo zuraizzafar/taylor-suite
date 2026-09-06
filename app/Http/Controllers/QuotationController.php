@@ -220,8 +220,11 @@ class QuotationController extends Controller
             'converted_order_id' => $order->id,
         ]);
 
-        return redirect()->route('orders.show', $order)
-            ->with('success', "Quotation {$quotation->quotation_number} converted to Order {$order->order_number}. Add suits to complete the order.");
+        return redirect()->route('measurements.create', [
+                'customer'    => $quotation->customer_id,
+                'redirect_to' => route('orders.show', $order),
+            ])
+            ->with('success', "Quotation {$quotation->quotation_number} converted to Order {$order->order_number}. Add the customer's measurements to continue.");
     }
 
     private function syncItems(Quotation $quotation, Request $request): void
