@@ -488,6 +488,7 @@
                     <span style="font-size:7.5px;color:#94a3b8;font-family:DejaVu Sans,sans-serif">Scan to Track</span>
                 </div>
             </div>
+            
             <div class="payment-wrap-inner" style="display: table-cell; vertical-align: top; text-align: right; width: 50%;">
                 <table class="payment-table" style="display: inline-table; width: 230px; border-collapse: collapse;">
                     <tr>
