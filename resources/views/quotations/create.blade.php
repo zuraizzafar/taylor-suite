@@ -14,4 +14,5 @@
         </form>
     </div>
 </div>
+@include('quotations._quick-customer-modal')
 @endsection
