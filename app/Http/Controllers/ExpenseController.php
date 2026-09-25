@@ -48,12 +48,18 @@ class ExpenseController extends Controller
             'branch_id'   => ['nullable', 'exists:branches,id'],
             'category'    => ['required', 'string', 'max:100'],
             'amount'      => ['required', 'numeric', 'min:0.01'],
+            'tax_amount'  => ['nullable', 'numeric', 'min:0', 'lte:amount'],
+            'supplier_name'       => ['nullable', 'string', 'max:150'],
+            'supplier_ntn'        => ['nullable', 'string', 'max:50'],
+            'supplier_invoice_no' => ['nullable', 'string', 'max:50'],
             'description' => ['nullable', 'string', 'max:500'],
             'date'        => ['required', 'date'],
         ]);
 
+        $data['tax_amount'] = $data['tax_amount'] ?? 0;
+
         // Auto-assign branch for branch managers
-        if (! $data['branch_id'] && $this->currentBranchId()) {
+        if (empty($data['branch_id']) && $this->currentBranchId()) {
             $data['branch_id'] = $this->currentBranchId();
         }
 
@@ -74,10 +80,15 @@ class ExpenseController extends Controller
             'branch_id'   => ['nullable', 'exists:branches,id'],
             'category'    => ['required', 'string', 'max:100'],
             'amount'      => ['required', 'numeric', 'min:0.01'],
+            'tax_amount'  => ['nullable', 'numeric', 'min:0', 'lte:amount'],
+            'supplier_name'       => ['nullable', 'string', 'max:150'],
+            'supplier_ntn'        => ['nullable', 'string', 'max:50'],
+            'supplier_invoice_no' => ['nullable', 'string', 'max:50'],
             'description' => ['nullable', 'string', 'max:500'],
             'date'        => ['required', 'date'],
         ]);
 
+        $data['tax_amount'] = $data['tax_amount'] ?? 0;
         $expense->update($data);
         return redirect()->route('expenses.index')->with('success', 'Expense updated.');
     }

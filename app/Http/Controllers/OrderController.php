@@ -8,6 +8,7 @@ use App\Models\ExtraType;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\Setting;
+use App\Services\TaxService;
 use App\Traits\HasBranchScope;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
@@ -54,7 +55,9 @@ class OrderController extends Controller
         $branches   = Branch::where('is_active', true)->orderBy('name')->get();
         $extraTypes = ExtraType::where('is_active', true)->orderBy('name')->get();
 
-        return view('orders.create', compact('customers', 'selectedCustomer', 'branches', 'extraTypes'));
+        $taxInit = TaxService::formInit('order', $this->currentBranchId());
+
+        return view('orders.create', compact('customers', 'selectedCustomer', 'branches', 'extraTypes', 'taxInit'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -64,7 +67,11 @@ class OrderController extends Controller
             'branch_id'      => ['nullable', 'exists:branches,id'],
             'order_date'     => ['required', 'date'],
             'delivery_date'  => ['nullable', 'date', 'after_or_equal:order_date'],
-            'total_amount'   => ['required', 'numeric', 'min:0'],
+            'subtotal'       => ['required', 'numeric', 'min:0'],
+            'discount_type'  => ['nullable', 'in:percent,fixed'],
+            'discount_value' => ['nullable', 'numeric', 'min:0'],
+            'tax_mode'       => ['nullable', 'in:none,exclusive,inclusive'],
+            'tax_rate'       => ['nullable', 'numeric', 'min:0', 'max:100'],
             'advance_amount' => ['nullable', 'numeric', 'min:0'],
             'notes'          => ['nullable', 'string'],
         ]);
@@ -74,13 +81,17 @@ class OrderController extends Controller
         $advanceAmount = (float) ($data['advance_amount'] ?? 0);
         unset($data['advance_amount']); // managed via Payment record below
 
-        $data['order_number']   = Order::nextOrderNumber();
-        $data['advance_amount'] = 0;
-        $data['balance_amount'] = $data['total_amount'];
-
         if (empty($data['branch_id']) && $branchId = $this->currentBranchId()) {
             $data['branch_id'] = $branchId;
         }
+
+        $calc = TaxService::fromRequest($request, 'order', (float) $data['subtotal'], $data['branch_id'] ?? null);
+        unset($data['discount_type'], $data['discount_value'], $data['tax_mode'], $data['tax_rate']);
+        $data = array_merge($data, TaxService::documentColumns($calc));
+
+        $data['order_number']   = Order::nextOrderNumber();
+        $data['advance_amount'] = 0;
+        $data['balance_amount'] = $data['total_amount'];
 
         $order = Order::create($data);
 
@@ -106,7 +117,8 @@ class OrderController extends Controller
     public function show(Order $order): View
     {
         $order->load(['customer', 'branch', 'suits.worker', 'suits.measurement', 'payments.receivedBy']);
-        return view('orders.show', compact('order'));
+        $tax = TaxService::resolve('order', $order->branch_id);
+        return view('orders.show', compact('order', 'tax'));
     }
 
     public function edit(Order $order): View
@@ -115,7 +127,8 @@ class OrderController extends Controller
         $branches       = Branch::where('is_active', true)->orderBy('name')->get();
         $extraTypes     = ExtraType::where('is_active', true)->orderBy('name')->get();
         $initialAdvance = (float) $order->payments()->where('reference', 'INITIAL_ADVANCE')->sum('amount');
-        return view('orders.edit', compact('order', 'customers', 'branches', 'initialAdvance', 'extraTypes'));
+        $taxInit        = TaxService::formInit('order', $order->branch_id, $order);
+        return view('orders.edit', compact('order', 'customers', 'branches', 'initialAdvance', 'extraTypes', 'taxInit'));
     }
 
     public function update(Request $request, Order $order): RedirectResponse
@@ -124,7 +137,11 @@ class OrderController extends Controller
             'branch_id'      => ['nullable', 'exists:branches,id'],
             'order_date'     => ['required', 'date'],
             'delivery_date'  => ['nullable', 'date', 'after_or_equal:order_date'],
-            'total_amount'   => ['required', 'numeric', 'min:0'],
+            'subtotal'       => ['required', 'numeric', 'min:0'],
+            'discount_type'  => ['nullable', 'in:percent,fixed'],
+            'discount_value' => ['nullable', 'numeric', 'min:0'],
+            'tax_mode'       => ['nullable', 'in:none,exclusive,inclusive'],
+            'tax_rate'       => ['nullable', 'numeric', 'min:0', 'max:100'],
             'advance_amount' => ['nullable', 'numeric', 'min:0'],
             'notes'          => ['nullable', 'string'],
         ]);
@@ -133,6 +150,10 @@ class OrderController extends Controller
 
         $newAdvance = (float) ($data['advance_amount'] ?? 0);
         unset($data['advance_amount'], $data['balance_amount']); // computed by recalculateBalance
+
+        $calc = TaxService::fromRequest($request, 'order', (float) $data['subtotal'], $data['branch_id'] ?? $order->branch_id);
+        unset($data['discount_type'], $data['discount_value'], $data['tax_mode'], $data['tax_rate']);
+        $data = array_merge($data, TaxService::documentColumns($calc));
 
         $order->update($data);
 
@@ -174,11 +195,12 @@ class OrderController extends Controller
         $order->load(['customer.measurements', 'suits.worker', 'suits.measurement']);
         $settings        = Setting::allKeyed();
         $previousBalance = $order->customer->outstandingBalance($order->id);
+        $tax             = TaxService::resolve('order', $order->branch_id);
 
         // Urdu locale: DomPDF cannot shape Arabic script — use browser print page instead
         if (app()->getLocale() === 'ur') {
             return response(
-                view('orders.invoice-print', compact('order', 'settings', 'previousBalance'))
+                view('orders.invoice-print', compact('order', 'settings', 'previousBalance', 'tax'))
             );
         }
 
@@ -188,7 +210,7 @@ class OrderController extends Controller
             mkdir($fontCacheDir, 0775, true);
         }
 
-        $pdf = Pdf::loadView('orders.invoice-pdf', compact('order', 'settings', 'previousBalance'))
+        $pdf = Pdf::loadView('orders.invoice-pdf', compact('order', 'settings', 'previousBalance', 'tax'))
             ->setPaper('a4', 'portrait');
 
         $filename = "invoice-{$order->order_number}.pdf";

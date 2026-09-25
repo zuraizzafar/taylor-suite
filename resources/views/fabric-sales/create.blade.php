@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="max-w-xl pt-4">
-    <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6" x-data="fabricSale({{ $fabric ? $fabric->toJson() : 'null' }})">
+    <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6" x-data="fabricSale({{ $fabric ? $fabric->toJson() : 'null' }}, @js($taxInit))">
         @if(session('error'))
             <div class="mb-4 bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3">❌ {{ session('error') }}</div>
         @endif
@@ -52,9 +52,12 @@
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">{{ __('Total (Rs)') }}</label>
-                    <input type="text" :value="total.toFixed(2)" disabled
+                    <input type="text" :value="taxFmt(total)" disabled
                         class="w-full border border-slate-200 bg-slate-50 rounded-lg px-3 py-2 text-sm font-semibold">
                 </div>
+            </div>
+            <div class="mb-4">
+                @include('tax._fields', ['taxEnabled' => $taxInit['enabled'], 'taxLabel' => $taxInit['label'], 'discount' => false])
             </div>
             <p class="text-xs text-slate-400 mb-4" x-show="fabricId">{{ __('Available') }}: <span x-text="availableMeter"></span>m</p>
 
@@ -81,8 +84,8 @@ if (!window.Alpine) {
     document.head.appendChild(s);
 }
 
-function fabricSale(initial) {
-    return {
+function fabricSale(initial, taxInit) {
+    return withTax({
         fabricId: initial ? initial.id : null,
         rollInput: initial ? initial.roll_number : '',
         fabricLabel: initial ? (initial.fabric_type + ' — ' + initial.color + ' (' + initial.roll_number + ')') : '',
@@ -90,9 +93,10 @@ function fabricSale(initial) {
         rate: initial ? parseFloat(initial.sale_price) : 0,
         meter: 0,
         notFound: false,
-        get total() {
+        get subtotal() {
             return (this.meter || 0) * (this.rate || 0);
         },
+        get total() { return this.grandTotal; },
         lookup() {
             this.notFound = false;
             fetch(`{{ route('fabrics.lookup') }}?q=${encodeURIComponent(this.rollInput)}`)
@@ -105,7 +109,7 @@ function fabricSale(initial) {
                     this.fabricLabel = data.fabric_type + ' — ' + data.color + ' (' + data.roll_number + ')';
                 });
         }
-    }
+    }, taxInit);
 }
 </script>
 @endpush

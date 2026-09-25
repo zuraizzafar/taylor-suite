@@ -64,7 +64,15 @@
             </div>
             <div>
                 <p class="text-xs text-slate-500">{{ __('Total Quotation Amount') }}</p>
-                <p class="text-sm font-semibold text-slate-700">Rs {{ number_format($quotation->total_amount) }}</p>
+                <p class="text-sm font-semibold text-slate-700">Rs {{ \App\Services\TaxService::fmt($quotation->total_amount) }}</p>
+                @if((float) $quotation->discount_amount > 0 || $quotation->tax_mode !== 'none')
+                <p class="text-xs text-slate-400 mt-0.5">
+                    {{ __('Subtotal') }} Rs {{ \App\Services\TaxService::fmt($quotation->subtotal) }}
+                    @if((float) $quotation->discount_amount > 0) · <span class="text-rose-500">{{ __('Discount') }} −Rs {{ \App\Services\TaxService::fmt($quotation->discount_amount) }}</span>@endif
+                    @if($quotation->tax_mode !== 'none') · {{ $tax['label'] }} {{ \App\Services\TaxService::rateLabel($quotation->tax_rate) }} Rs {{ \App\Services\TaxService::fmt($quotation->tax_amount) }}
+                        <span class="{{ $quotation->tax_mode === 'inclusive' ? 'text-green-600' : 'text-amber-600' }}">({{ $quotation->tax_mode === 'inclusive' ? __('charged') : __('not charged') }})</span>@endif
+                </p>
+                @endif
             </div>
             <div>
                 <p class="text-xs text-slate-500">{{ __('Advance Required') }} / {{ __('Remaining Balance') }}</p>

@@ -57,11 +57,11 @@
     .header-left  { display: table-cell; vertical-align: top; width: 60%; font-family: DejaVu Sans, sans-serif; }
     .header-right { display: table-cell; vertical-align: top; text-align: right; font-family: DejaVu Sans, sans-serif; }
 
-    .logo-fallback { font-size: 20px; font-weight: 800; color: #0f172a; letter-spacing: -0.5px; font-family: DejaVu Sans, sans-serif; }
+    .logo-fallback { font-size: 20px; font-weight: 700; color: #0f172a; letter-spacing: -0.5px; font-family: DejaVu Sans, sans-serif; }
     .logo-img      { height: 60px; width: auto; }
     .company-meta  { font-size: 9.5px; color: #64748b; margin-top: 3px; line-height: 1.4; font-family: DejaVu Sans, sans-serif; }
 
-    .invoice-title  { font-size: 22px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 1.5px; font-family: DejaVu Sans, sans-serif; }
+    .invoice-title  { font-size: 22px; font-weight: 700; color: #0f172a; text-transform: uppercase; letter-spacing: 1.5px; font-family: DejaVu Sans, sans-serif; }
     .invoice-no     { display: inline-block; background: #1e293b; color: #fff; font-size: 9.5px; font-weight: 700; letter-spacing: 0.5px; padding: 2px 8px; border-radius: 4px; margin-top: 3px; font-family: DejaVu Sans, sans-serif; }
     .invoice-dates  { font-size: 9px; color: #475569; margin-top: 3px; line-height: 1.5; font-family: DejaVu Sans, sans-serif; }
     .invoice-dates strong { color: #1e293b; font-family: DejaVu Sans, sans-serif; }
@@ -76,10 +76,10 @@
     /* Suits table */
     table.items           { width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 11px; font-family: DejaVu Sans, sans-serif; }
     table.items thead tr  { background: #1e293b; }
-    table.items thead th  { padding: 6px 8px; font-size: 12px; font-weight: 600; text-align: left; letter-spacing: 0.3px; font-family: DejaVu Sans, sans-serif; color: #ffffff; background: #1e293b; }
+    table.items thead th  { padding: 6px 8px; font-size: 12px; font-weight: 700; text-align: left; letter-spacing: 0.3px; font-family: DejaVu Sans, sans-serif; color: #ffffff; background: #1e293b; }
     table.items tbody tr:nth-child(even) { background: #f8fafc; }
     table.items tbody td  { padding: 5px 8px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; font-size: 11px; font-family: DejaVu Sans, sans-serif; color: #1e293b; }
-    table.items tfoot td  { padding: 5px 8px; background: #f1f5f9; border-top: 1.5px solid #cbd5e1; font-weight: 600; font-size: 10.5px; font-family: DejaVu Sans, sans-serif; color: #1e293b; }
+    table.items tfoot td  { padding: 5px 8px; background: #f1f5f9; border-top: 1.5px solid #cbd5e1; font-weight: 700; font-size: 10.5px; font-family: DejaVu Sans, sans-serif; color: #1e293b; }
 
     /* Status badges */
     .st-pending   { color: #6b7280; font-family: DejaVu Sans, sans-serif; }
@@ -96,7 +96,7 @@
     .payment-table tr   { border-bottom: 1px solid #f1f5f9; }
     .payment-table tr:last-child { border-bottom: none; }
     .lbl { color: #64748b; font-family: DejaVu Sans, sans-serif; }
-    .val { text-align: right; font-weight: 600; font-family: DejaVu Sans, sans-serif; }
+    .val { text-align: right; font-weight: 700; font-family: DejaVu Sans, sans-serif; }
     .row-advance    { background: #f0fdf4; }
     .row-balance    { }
     .row-prev       { }
@@ -246,8 +246,11 @@
                 @if($companyPhone) &nbsp;|&nbsp; Tel: {{ $companyPhone }}@endif
                 @if($companyEmail) &nbsp;|&nbsp; {{ $companyEmail }}@endif
             </div>
-            @if($taxNumber)
-            <div class="company-meta" style="color:#1e293b;font-weight:700;">{{ $isUrdu ? __('Tax Registration No.') : 'Tax Registration No.' }}: {{ $taxNumber }}</div>
+            @if($taxNumber || !empty($tax['registration_no']))
+            <div class="company-meta" style="color:#1e293b;font-weight:700;">
+                @if($taxNumber)NTN: {{ $taxNumber }}@endif
+                @if(!empty($tax['registration_no']))@if($taxNumber) &nbsp;|&nbsp; @endif{{ $tax['label'] }} Reg. No.: {{ $tax['registration_no'] }}@endif
+            </div>
             @endif
         </div>
         <div class="header-right">
@@ -267,6 +270,8 @@
             <div class="info-cell-title">{{ $isUrdu ? __('Billed To') : 'Billed To' }}</div>
             <div class="info-cell-name">{{ $order->customer->name }}</div>
             <div class="info-cell-sub">
+                @if($order->customer->company_name)Company: <strong>{{ $order->customer->company_name }}</strong><br>@endif
+                @if($order->customer->ntn)NTN: <strong>{{ $order->customer->ntn }}</strong><br>@endif
                 File No: <strong>{{ $order->customer->file_number }}</strong><br>
                 Mobile: {{ $order->customer->mobile }}
                 @if($order->customer->address)<br>{{ $order->customer->address }}@endif
@@ -460,6 +465,7 @@
             </div>
             <div class="payment-wrap-inner" style="display: table-cell; vertical-align: top; text-align: left; width: 50%;">
                 <table class="payment-table" style="display: inline-table; width: 230px; text-align: right; border-collapse: collapse;">
+                    @include('tax._rows', ['doc' => $order, 'taxLabel' => $tax['label']])
                     <tr>
                         <td class="lbl" style="font-family:DejaVu Sans,sans-serif;color:#64748b">{{ $isUrdu ? __('Total Amount') : 'Total Amount' }}</td>
                         <td class="val" style="font-family:DejaVu Sans,sans-serif;color:#1e293b">Rs {{ number_format($order->total_amount) }}</td>
@@ -480,7 +486,7 @@
                     @endif
                     <tr class="row-grand">
                         <td class="lbl" style="font-family:DejaVu Sans,sans-serif;color:#e2e8f0;font-weight:700">{{ $isUrdu ? __('Grand Total Owed') : 'Grand Total Owed' }}</td>
-                        <td class="val" style="font-family:DejaVu Sans,sans-serif;color:#fbbf24;font-weight:800;font-size:11.5px">Rs {{ number_format($grandTotal) }}</td>
+                        <td class="val" style="font-family:DejaVu Sans,sans-serif;color:#fbbf24;font-weight: 700;font-size:11.5px">Rs {{ number_format($grandTotal) }}</td>
                     </tr>
                 </table>
             </div>
@@ -495,6 +501,7 @@
             
             <div class="payment-wrap-inner" style="display: table-cell; vertical-align: top; text-align: right; width: 50%;">
                 <table class="payment-table" style="display: inline-table; width: 230px; border-collapse: collapse;">
+                    @include('tax._rows', ['doc' => $order, 'taxLabel' => $tax['label']])
                     <tr>
                         <td class="lbl" style="font-family:DejaVu Sans,sans-serif;color:#64748b">{{ $isUrdu ? __('Total Amount') : 'Total Amount' }}</td>
                         <td class="val" style="font-family:DejaVu Sans,sans-serif;color:#1e293b">Rs {{ number_format($order->total_amount) }}</td>
@@ -515,7 +522,7 @@
                     @endif
                     <tr class="row-grand">
                         <td class="lbl" style="font-family:DejaVu Sans,sans-serif;color:#e2e8f0;font-weight:700">{{ $isUrdu ? __('Grand Total Owed') : 'Grand Total Owed' }}</td>
-                        <td class="val" style="font-family:DejaVu Sans,sans-serif;color:#fbbf24;font-weight:800;font-size:11.5px">Rs {{ number_format($grandTotal) }}</td>
+                        <td class="val" style="font-family:DejaVu Sans,sans-serif;color:#fbbf24;font-weight: 700;font-size:11.5px">Rs {{ number_format($grandTotal) }}</td>
                     </tr>
                 </table>
             </div>

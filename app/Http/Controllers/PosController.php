@@ -12,6 +12,7 @@ use App\Models\Setting;
 use App\Models\StitchType;
 use App\Models\Suit;
 use App\Models\SuitType;
+use App\Services\TaxService;
 use App\Models\Worker;
 use App\Traits\HasBranchScope;
 use Illuminate\Http\JsonResponse;
@@ -43,7 +44,9 @@ class PosController extends Controller
             ? Customer::with('measurements')->find($request->input('customer_id'))
             : null;
 
-        return view('pos.index', compact('workers', 'stitchTypes', 'suitTypes', 'extraTypes', 'branches', 'preCustomer'));
+        $taxInit = TaxService::formInit('order', $this->currentBranchId());
+
+        return view('pos.index', compact('workers', 'stitchTypes', 'suitTypes', 'extraTypes', 'branches', 'preCustomer', 'taxInit'));
     }
 
     /**
@@ -95,7 +98,11 @@ class PosController extends Controller
             // Order
             'order_date'         => ['required', 'date'],
             'delivery_date'      => ['nullable', 'date', 'after_or_equal:order_date'],
-            'total_amount'       => ['required', 'numeric', 'min:0'],
+            'subtotal'           => ['required', 'numeric', 'min:0'],
+            'discount_type'      => ['nullable', 'in:percent,fixed'],
+            'discount_value'     => ['nullable', 'numeric', 'min:0'],
+            'tax_mode'           => ['nullable', 'in:none,exclusive,inclusive'],
+            'tax_rate'           => ['nullable', 'numeric', 'min:0', 'max:100'],
             'advance_amount'     => ['nullable', 'numeric', 'min:0'],
             'order_notes'        => ['nullable', 'string'],
             // Suits — array
@@ -107,7 +114,11 @@ class PosController extends Controller
             'suits.*.notes'      => ['nullable', 'string'],
         ]);
 
-        $total   = (float) $request->input('total_amount');
+        $calc    = TaxService::fromRequest(
+            $request, 'order', (float) $request->input('subtotal'),
+            $request->input('branch_id') ?: $this->currentBranchId()
+        );
+        $total   = $calc['total_amount'];
         $advance = (float) ($request->input('advance_amount') ?? 0);
 
         if ($advance > $total) {
@@ -116,7 +127,7 @@ class PosController extends Controller
                 ->withInput();
         }
 
-        DB::transaction(function () use ($request) {
+        DB::transaction(function () use ($request, $calc) {
             $branchId = $request->input('branch_id') ?? $this->currentBranchId();
 
             // ── 1. Customer ────────────────────────────────────────────────────
@@ -146,7 +157,7 @@ class PosController extends Controller
             }
 
             // ── 3. Order ───────────────────────────────────────────────────────
-            $total   = (float) $request->input('total_amount');
+            $total   = $calc['total_amount'];
             $advance = (float) $request->input('advance_amount');
 
             $order = Order::create([
@@ -155,12 +166,11 @@ class PosController extends Controller
                 'order_number'   => Order::nextOrderNumber(),
                 'order_date'     => $request->input('order_date'),
                 'delivery_date'  => $request->input('delivery_date'),
-                'total_amount'   => $total,
                 'advance_amount' => 0,
                 'balance_amount' => $total,
                 'notes'          => $request->input('order_notes'),
                 'extras'         => $this->parsePosExtras($request),
-            ]);
+            ] + TaxService::documentColumns($calc));
 
             if ($advance > 0) {
                 Payment::create([

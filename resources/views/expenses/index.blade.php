@@ -39,6 +39,7 @@
                     <th class="px-4 py-3 text-left font-medium">{{ __('Description') }}</th>
                     <th class="px-4 py-3 text-left font-medium">{{ __('Branch') }}</th>
                     <th class="px-4 py-3 text-left font-medium">{{ __('Amount') }}</th>
+                    <th class="px-4 py-3 text-left font-medium">{{ __('Input Tax') }}</th>
                     <th class="px-4 py-3 text-left font-medium">{{ __('Actions') }}</th>
                 </tr>
             </thead>
@@ -52,6 +53,7 @@
                     <td class="px-4 py-3 text-slate-600">{{ $expense->description ?? '—' }}</td>
                     <td class="px-4 py-3 text-slate-600">{{ $expense->branch?->name ?? 'Main' }}</td>
                     <td class="px-4 py-3 font-semibold text-red-600">Rs {{ number_format($expense->amount) }}</td>
+                    <td class="px-4 py-3 text-slate-500">{{ (float) $expense->tax_amount > 0 ? 'Rs ' . \App\Services\TaxService::fmt($expense->tax_amount) : '—' }}</td>
                     <td class="px-4 py-3">
                         <div class="flex gap-2">
                             <a href="{{ route('expenses.edit', $expense) }}"
@@ -65,7 +67,7 @@
                     </td>
                 </tr>
                 @empty
-                <tr><td colspan="6" class="px-4 py-8 text-center text-slate-400">No expenses found.</td></tr>
+                <tr><td colspan="7" class="px-4 py-8 text-center text-slate-400">No expenses found.</td></tr>
                 @endforelse
             </tbody>
         </table>

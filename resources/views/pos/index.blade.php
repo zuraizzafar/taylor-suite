@@ -9,10 +9,10 @@
 
 @push('scripts')
 <script>
-function posApp() {
+function posApp(taxInit) {
     const customerSearchUrl = @json(route('pos.customers.search'));
 
-    return {
+    return withTax({
         // ── Customer panel ─────────────────────────────────────────────────
         customerMode: 'search',   // 'search' | 'new' | 'selected'
         searchQuery:  '',
@@ -56,9 +56,11 @@ function posApp() {
             return this.extras.reduce((s, e) => s + (parseFloat(e.price) || 0), 0);
         },
 
-        get totalAmount() {
+        get subtotal() {
             return Math.max(0, (parseFloat(this.baseAmount) || 0) + this.extrasTotal);
         },
+
+        get totalAmount() { return this.grandTotal; },
 
         get balance() {
             return Math.max(0, this.totalAmount - (parseFloat(this.advanceAmount) || 0));
@@ -218,6 +220,7 @@ function posApp() {
 
         // ── Init ──────────────────────────────────────────────────────────
         init() {
+            this.watchBranchSelect(this.$el);
             this.addSuit();
             // Delivery date default: 10 days from today
             const d = new Date();
@@ -235,13 +238,13 @@ function posApp() {
             });
             @endif
         },
-    };
+    }, taxInit);
 }
 </script>
 @endpush
 
 @section('content')
-<div x-data="posApp()" class="pt-1">
+<div x-data="posApp(@js($taxInit))" class="pt-1">
 <form method="POST" action="{{ route('pos.store') }}" @submit.prevent="submitForm($event)">
 @csrf
 
@@ -657,7 +660,7 @@ function posApp() {
                     <input type="number" x-model="baseAmount" min="0" step="50"
                         class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="0">
-                    <input type="hidden" name="total_amount" :value="totalAmount">
+                    <input type="hidden" name="subtotal" :value="subtotal">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">{{ __('Advance') }} (Rs)</label>
@@ -708,6 +711,8 @@ function posApp() {
                     &nbsp;·&nbsp; Order total: Rs <span x-text="totalAmount.toLocaleString()" class="font-semibold text-slate-800"></span>
                 </div>
             </div>
+
+            @include('tax._fields', ['taxEnabled' => $taxInit['enabled'], 'taxLabel' => $taxInit['label'], 'discount' => true])
 
             <div class="grid grid-cols-2 gap-3">
                 <div>

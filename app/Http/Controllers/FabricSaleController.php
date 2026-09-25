@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Fabric;
 use App\Models\FabricSale;
+use App\Services\TaxService;
 use App\Traits\HasBranchScope;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
@@ -23,7 +24,9 @@ class FabricSaleController extends Controller
             $fabric = Fabric::where('roll_number', $roll)->first();
         }
 
-        return view('fabric-sales.create', compact('fabric'));
+        $taxInit = TaxService::formInit('fabric_sale', $this->currentBranchId());
+
+        return view('fabric-sales.create', compact('fabric', 'taxInit'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -33,10 +36,17 @@ class FabricSaleController extends Controller
             'customer_name'   => ['required', 'string', 'max:150'],
             'customer_mobile' => ['nullable', 'string', 'max:30'],
             'meter'           => ['required', 'numeric', 'min:0.1'],
+            'tax_mode'        => ['nullable', 'in:none,exclusive,inclusive'],
+            'tax_rate'        => ['nullable', 'numeric', 'min:0', 'max:100'],
         ]);
 
-        $sale = DB::transaction(function () use ($data) {
+        $sale = DB::transaction(function () use ($data, $request) {
             $fabric = Fabric::lockForUpdate()->findOrFail($data['fabric_id']);
+
+            $branchId = $fabric->branch_id ?? $this->currentBranchId();
+            $calc = TaxService::fromRequest(
+                $request, 'fabric_sale', round($data['meter'] * $fabric->sale_price, 2), $branchId, false
+            );
 
             $sale = FabricSale::create([
                 'fabric_id'       => $fabric->id,
@@ -45,7 +55,11 @@ class FabricSaleController extends Controller
                 'customer_mobile' => $data['customer_mobile'] ?? null,
                 'meter'           => $data['meter'],
                 'rate'            => $fabric->sale_price,
-                'total_amount'    => $data['meter'] * $fabric->sale_price,
+                'subtotal'        => $calc['subtotal'],
+                'tax_mode'        => $calc['tax_mode'],
+                'tax_rate'        => $calc['tax_rate'],
+                'tax_amount'      => $calc['tax_amount'],
+                'total_amount'    => $calc['total_amount'],
                 'sale_code'       => 'FS-' . str_pad((string) (FabricSale::max('id') + 1), 6, '0', STR_PAD_LEFT),
                 'sold_by'         => auth()->id(),
             ]);
@@ -62,8 +76,9 @@ class FabricSaleController extends Controller
     {
         $fabricSale->load('fabric');
         $settings = \App\Models\Setting::allKeyed();
+        $tax      = TaxService::resolve('fabric_sale', $fabricSale->branch_id);
 
-        $pdf = Pdf::loadView('fabric-sales.invoice-pdf', compact('fabricSale', 'settings'))
+        $pdf = Pdf::loadView('fabric-sales.invoice-pdf', compact('fabricSale', 'settings', 'tax'))
             ->setPaper('a4', 'portrait');
 
         $filename = "invoice-{$fabricSale->sale_code}.pdf";

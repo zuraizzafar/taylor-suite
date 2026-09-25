@@ -198,6 +198,7 @@
                 if ($companyEmail) $second[] = e($companyEmail);
                 if ($companyWebsite) $second[] = e($companyWebsite);
                 if ($taxNumber) $second[] = '<strong>NTN: ' . e($taxNumber) . '</strong>';
+                if (! empty($tax['registration_no'])) $second[] = '<strong>' . e($tax['label']) . ' Reg. No.: ' . e($tax['registration_no']) . '</strong>';
                 if ($bankAccount) $second[] = '<strong>' . ($isUrdu ? __('Account Number') : 'Account Number') . ': ' . e($bankAccount) . '</strong>';
             @endphp
             {!! implode(' &nbsp;|&nbsp; ', $second) !!}
@@ -254,6 +255,7 @@
     <div class="totals-wrap">
         <div class="totals-wrap-inner">
             <table class="totals-table">
+@include('tax._rows', ['doc' => $quotation, 'taxLabel' => $tax['label']])
                 <tr>
                     <td class="lbl">{{ $isUrdu ? __('Total Quotation Amount') : 'Total Quotation Amount' }}</td>
                     <td class="val">Rs {{ number_format($quotation->total_amount) }}</td>

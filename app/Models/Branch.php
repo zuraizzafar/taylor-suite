@@ -10,7 +10,7 @@ class Branch extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'address', 'phone', 'is_active'];
+    protected $fillable = ['name', 'address', 'phone', 'is_active', 'tax_mode', 'tax_rate', 'tax_registration_no'];
 
     protected $casts = ['is_active' => 'boolean'];
 

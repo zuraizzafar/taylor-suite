@@ -1,4 +1,4 @@
-<div class="space-y-4" x-data="orderForm()">
+<div class="space-y-4" x-data="orderForm(@js($taxInit))" x-init="watchBranchSelect($el)">
     @if(isset($customers))
     <div>
         <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Customer') }} *</label>
@@ -106,6 +106,8 @@
             </template>
         </div>
 
+        @include('tax._fields', ['taxEnabled' => $taxInit['enabled'], 'taxLabel' => $taxInit['label'], 'discount' => true])
+
         {{-- Totals summary --}}
         <div class="bg-slate-50 rounded-lg px-4 py-3 grid grid-cols-3 gap-4 text-sm">
             <div>
@@ -113,10 +115,10 @@
                 <span class="font-semibold text-slate-700">Rs <span x-text="extrasTotal.toLocaleString()"></span></span>
             </div>
             <div>
-                <span class="text-slate-500 text-xs block">Total Amount</span>
+                <span class="text-slate-500 text-xs block">{{ __('Total Payable') }}</span>
                 <span class="font-bold text-slate-900">Rs <span x-text="totalAmount.toLocaleString()"></span></span>
-                <input type="hidden" name="total_amount" :value="totalAmount">
-                @error('total_amount')<p class="text-xs text-red-600 mt-1">{{ $message }}</p>@enderror
+                <input type="hidden" name="subtotal" :value="subtotal">
+                @error('subtotal')<p class="text-xs text-red-600 mt-1">{{ $message }}</p>@enderror
             </div>
             <div>
                 <span class="text-slate-500 text-xs block">Balance</span>
@@ -150,21 +152,22 @@
 
 @once
 <script>
-function orderForm() {
+function orderForm(taxInit) {
     const existingExtras = @json(isset($order) ? ($order->extras ?? []) : []);
-    const existingTotal  = {{ (float) old('total_amount', isset($order) ? $order->total_amount : 0) }};
+    const existingTotal  = {{ (float) old('subtotal', isset($order) ? $order->subtotal : 0) }};
     const existingAdv    = {{ (float) old('advance_amount', isset($initialAdvance) ? $initialAdvance : (isset($order) ? $order->advance_amount : 0)) }};
     const extrasSum      = existingExtras.reduce((s, e) => s + (parseFloat(e.price) || 0), 0);
-    return {
+    return withTax({
         extras:        existingExtras.map(e => ({ name: e.name, price: parseFloat(e.price) || 0 })),
         baseAmount:    existingTotal - extrasSum,
         advanceAmount: existingAdv,
         get extrasTotal() { return this.extras.reduce((s, e) => s + (parseFloat(e.price) || 0), 0); },
-        get totalAmount()  { return Math.max(0, (parseFloat(this.baseAmount) || 0) + this.extrasTotal); },
+        get subtotal()     { return Math.max(0, (parseFloat(this.baseAmount) || 0) + this.extrasTotal); },
+        get totalAmount()  { return this.grandTotal; },
         get balance()      { return Math.max(0, this.totalAmount - (parseFloat(this.advanceAmount) || 0)); },
         addExtra()    { this.extras.push({ name: '', price: 0 }); },
         removeExtra(i){ this.extras.splice(i, 1); },
-    };
+    }, taxInit);
 }
 function orderFormAddPreset(select) {
     if (!select.value) return;

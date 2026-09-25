@@ -102,6 +102,24 @@
                     'color' => 'from-violet-500 to-fuchsia-600',
                     'badge' => __('Inventory Profit')
                 ],
+                [
+                    'title' => __('Sales Tax Report'),
+                    'desc' => __('Output tax on invoices and fabric sales, input tax on purchases, breakdown by rate, and the net tax payable for the period.'),
+                    'icon' => '🧾',
+                    'route' => 'reports.tax',
+                    'csv_route' => 'reports.tax-csv',
+                    'color' => 'from-amber-500 to-yellow-600',
+                    'badge' => __('Tax Return')
+                ],
+                [
+                    'title' => __('Discounts Report'),
+                    'desc' => __('Every discount given on invoices and quoted on quotations, with totals and the share of sales it represents.'),
+                    'icon' => '🏷️',
+                    'route' => 'reports.discounts',
+                    'csv_route' => 'reports.discounts-csv',
+                    'color' => 'from-rose-500 to-pink-600',
+                    'badge' => __('Pricing')
+                ],
             ];
         @endphp
 
@@ -125,7 +143,7 @@
                    class="flex-1 text-center bg-slate-50 hover:bg-blue-50 text-slate-700 hover:text-blue-700 font-semibold text-xs py-2 px-3 rounded-lg border border-slate-200/60 hover:border-blue-200 transition-all duration-250">
                     👁️ {{ __('View') }}
                 </a>
-                <a href="{{ route('reports.export-csv', ['report' => $item['report_key']]) }}" 
+                <a href="{{ isset($item['csv_route']) ? route($item['csv_route']) : route('reports.export-csv', ['report' => $item['report_key']]) }}" 
                    class="flex-1 text-center bg-emerald-50 hover:bg-emerald-600 text-emerald-700 hover:text-white font-semibold text-xs py-2 px-3 rounded-lg border border-emerald-100 hover:border-emerald-600 transition-all duration-250">
                     📥 {{ __('Excel') }}
                 </a>

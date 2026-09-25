@@ -21,6 +21,7 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\StitchTypeController;
 use App\Http\Controllers\SuitController;
+use App\Http\Controllers\TaxReportController;
 use App\Http\Controllers\SuitTypeController;
 use App\Http\Controllers\TranslationController;
 use App\Http\Controllers\WorkerController;
@@ -132,6 +133,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/reports/payments/pdf', [ReportController::class, 'paymentsPdf'])->name('reports.payments-pdf');
         Route::get('/reports/workers', [ReportController::class, 'workers'])->name('reports.workers');
         Route::get('/reports/workers/pdf', [ReportController::class, 'workersPdf'])->name('reports.workers-pdf');
+        Route::get('/reports/tax', [TaxReportController::class, 'tax'])->name('reports.tax');
+        Route::get('/reports/tax/pdf', [TaxReportController::class, 'taxPdf'])->name('reports.tax-pdf');
+        Route::get('/reports/tax/csv', [TaxReportController::class, 'taxCsv'])->name('reports.tax-csv');
+        Route::get('/reports/discounts', [TaxReportController::class, 'discounts'])->name('reports.discounts');
+        Route::get('/reports/discounts/pdf', [TaxReportController::class, 'discountsPdf'])->name('reports.discounts-pdf');
+        Route::get('/reports/discounts/csv', [TaxReportController::class, 'discountsCsv'])->name('reports.discounts-csv');
         Route::get('/reports/{report}/export-csv', [ReportController::class, 'exportCsv'])->name('reports.export-csv');
 
         // POS — quick order creation

@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\Payment;
 use App\Models\Quotation;
 use App\Models\Setting;
+use App\Services\TaxService;
 use App\Traits\HasBranchScope;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
@@ -52,8 +53,9 @@ class QuotationController extends Controller
             : null;
 
         $branches = Branch::where('is_active', true)->orderBy('name')->get();
+        $taxInit  = TaxService::formInit('quotation', $this->currentBranchId());
 
-        return view('quotations.create', compact('customers', 'selectedCustomer', 'branches'));
+        return view('quotations.create', compact('customers', 'selectedCustomer', 'branches', 'taxInit'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -66,6 +68,10 @@ class QuotationController extends Controller
             'advance_percentage'  => ['nullable', 'numeric', 'min:0', 'max:100'],
             'design_reference'    => ['nullable', 'string'],
             'delivery_note'       => ['nullable', 'string', 'max:500'],
+            'discount_type'       => ['nullable', 'in:percent,fixed'],
+            'discount_value'      => ['nullable', 'numeric', 'min:0'],
+            'tax_mode'            => ['nullable', 'in:none,exclusive,inclusive'],
+            'tax_rate'            => ['nullable', 'numeric', 'min:0', 'max:100'],
             'sample_image_1'      => ['nullable', 'image', 'mimes:png,jpg,jpeg,webp', 'max:4096'],
             'sample_image_2'      => ['nullable', 'image', 'mimes:png,jpg,jpeg,webp', 'max:4096'],
             'notes'               => ['nullable', 'string'],
@@ -92,7 +98,7 @@ class QuotationController extends Controller
             'delivery_note'      => $data['delivery_note'] ?? null,
             'notes'              => $data['notes'] ?? null,
             'status'             => 'draft',
-        ]);
+        ] + $this->taxFields($request, $data['branch_id'] ?? null));
 
         $this->syncItems($quotation, $request);
         $this->syncSampleImages($quotation, $request);
@@ -105,7 +111,8 @@ class QuotationController extends Controller
     public function show(Quotation $quotation): View
     {
         $quotation->load(['customer', 'branch', 'items', 'convertedOrder']);
-        return view('quotations.show', compact('quotation'));
+        $tax = TaxService::resolve('quotation', $quotation->branch_id);
+        return view('quotations.show', compact('quotation', 'tax'));
     }
 
     public function edit(Quotation $quotation): View
@@ -114,7 +121,9 @@ class QuotationController extends Controller
         $customers = Customer::orderBy('name')->get();
         $branches  = Branch::where('is_active', true)->orderBy('name')->get();
 
-        return view('quotations.edit', compact('quotation', 'customers', 'branches'));
+        $taxInit = TaxService::formInit('quotation', $quotation->branch_id, $quotation);
+
+        return view('quotations.edit', compact('quotation', 'customers', 'branches', 'taxInit'));
     }
 
     public function update(Request $request, Quotation $quotation): RedirectResponse
@@ -126,6 +135,10 @@ class QuotationController extends Controller
             'advance_percentage'  => ['nullable', 'numeric', 'min:0', 'max:100'],
             'design_reference'    => ['nullable', 'string'],
             'delivery_note'       => ['nullable', 'string', 'max:500'],
+            'discount_type'       => ['nullable', 'in:percent,fixed'],
+            'discount_value'      => ['nullable', 'numeric', 'min:0'],
+            'tax_mode'            => ['nullable', 'in:none,exclusive,inclusive'],
+            'tax_rate'            => ['nullable', 'numeric', 'min:0', 'max:100'],
             'sample_image_1'      => ['nullable', 'image', 'mimes:png,jpg,jpeg,webp', 'max:4096'],
             'sample_image_2'      => ['nullable', 'image', 'mimes:png,jpg,jpeg,webp', 'max:4096'],
             'notes'               => ['nullable', 'string'],
@@ -137,8 +150,10 @@ class QuotationController extends Controller
             'rate.*'              => ['nullable', 'numeric', 'min:0'],
         ]);
 
-        $quotation->update([
-            'branch_id'          => $data['branch_id'] ?? null,
+        $branchId = array_key_exists('branch_id', $data) ? $data['branch_id'] : $quotation->branch_id;
+
+        $quotation->update($this->taxFields($request, $branchId) + [
+            'branch_id'          => $branchId,
             'quotation_date'     => $data['quotation_date'],
             'validity_days'      => $data['validity_days'],
             'advance_percentage' => $data['advance_percentage'] ?? 50,
@@ -170,11 +185,12 @@ class QuotationController extends Controller
     {
         $quotation->load(['customer', 'branch', 'items']);
         $settings = Setting::allKeyed();
+        $tax = TaxService::resolve('quotation', $quotation->branch_id);
 
         // Urdu locale: DomPDF cannot shape Arabic script — use browser print page instead
         if (app()->getLocale() === 'ur') {
             return response(
-                view('quotations.quotation-print', compact('quotation', 'settings'))
+                view('quotations.quotation-print', compact('quotation', 'settings', 'tax'))
             );
         }
 
@@ -183,7 +199,7 @@ class QuotationController extends Controller
             mkdir($fontCacheDir, 0775, true);
         }
 
-        $pdf = Pdf::loadView('quotations.quotation-pdf', compact('quotation', 'settings'))
+        $pdf = Pdf::loadView('quotations.quotation-pdf', compact('quotation', 'settings', 'tax'))
             ->setPaper('a4', 'portrait');
 
         $filename = "quotation-{$quotation->quotation_number}.pdf";
@@ -210,6 +226,13 @@ class QuotationController extends Controller
             'order_number'   => Order::nextOrderNumber(),
             'order_date'     => now()->toDateString(),
             'delivery_date'  => null,
+            'subtotal'        => $quotation->subtotal,
+            'discount_type'   => $quotation->discount_type,
+            'discount_value'  => $quotation->discount_value,
+            'discount_amount' => $quotation->discount_amount,
+            'tax_mode'        => $quotation->tax_mode,
+            'tax_rate'        => $quotation->tax_rate,
+            'tax_amount'      => $quotation->tax_amount,
             'total_amount'   => $quotation->total_amount,
             'advance_amount' => 0,
             'balance_amount' => $quotation->total_amount,
@@ -241,6 +264,20 @@ class QuotationController extends Controller
                 'redirect_to' => route('orders.show', $order),
             ])
             ->with('success', "Quotation {$quotation->quotation_number} converted to Order {$order->order_number}. Add the customer's measurements to continue.");
+    }
+
+    /** Sanitised discount + tax inputs; totals are derived later by Quotation::recalculateTotals(). */
+    private function taxFields(Request $request, ?int $branchId): array
+    {
+        $branchId = $branchId ?: $this->currentBranchId();
+        $calc = TaxService::fromRequest($request, 'quotation', 0, $branchId);
+
+        return [
+            'discount_type'  => $calc['discount_type'],
+            'discount_value' => $calc['discount_value'],
+            'tax_mode'       => $calc['tax_mode'],
+            'tax_rate'       => $calc['tax_rate'],
+        ];
     }
 
     private function syncSampleImages(Quotation $quotation, Request $request): void

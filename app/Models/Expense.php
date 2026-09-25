@@ -14,6 +14,10 @@ class Expense extends Model
         'branch_id',
         'category',
         'amount',
+        'tax_amount',
+        'supplier_name',
+        'supplier_ntn',
+        'supplier_invoice_no',
         'description',
         'date',
     ];

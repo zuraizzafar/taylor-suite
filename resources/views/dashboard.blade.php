@@ -98,9 +98,29 @@
                     Rs {{ number_format(abs($finance['netProfit'])) }}
                     <span class="text-sm font-normal">{{ $finance['netProfit'] >= 0 ? '▲' : '▼' }}</span>
                 </p>
-                <p class="text-xs {{ $finance['netProfit'] >= 0 ? 'text-emerald-400' : 'text-rose-400' }} mt-1">{{ __('Collected − Salaries − Expenses') }}</p>
+                <p class="text-xs {{ $finance['netProfit'] >= 0 ? 'text-emerald-400' : 'text-rose-400' }} mt-1">{{ __('Collected − Salaries − Expenses') }}@if($finance['showTax']) {{ __('− Tax') }}@endif</p>
             </div>
         </div>
+
+        @if($finance['showTax'])
+        <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+            <div class="bg-sky-50 border border-sky-100 rounded-xl p-4">
+                <p class="text-xs text-sky-600 font-medium mb-1">{{ __('Output Tax') }}</p>
+                <p class="text-xl font-bold text-sky-800">Rs {{ \App\Services\TaxService::fmt($finance['outputTax']) }}</p>
+                <a href="{{ route('reports.tax') }}" class="text-xs text-sky-400 mt-1 hover:underline block">{{ __('Sales tax report →') }}</a>
+            </div>
+            <div class="bg-violet-50 border border-violet-100 rounded-xl p-4">
+                <p class="text-xs text-violet-600 font-medium mb-1">{{ __('Input Tax') }}</p>
+                <p class="text-xl font-bold text-violet-800">Rs {{ \App\Services\TaxService::fmt($finance['inputTax']) }}</p>
+                <p class="text-xs text-violet-400 mt-1">{{ __('Tax paid on purchases') }}</p>
+            </div>
+            <div class="{{ $finance['netTaxPayable'] >= 0 ? 'bg-amber-50 border-amber-100' : 'bg-emerald-50 border-emerald-100' }} border rounded-xl p-4">
+                <p class="text-xs {{ $finance['netTaxPayable'] >= 0 ? 'text-amber-600' : 'text-emerald-600' }} font-medium mb-1">{{ $finance['netTaxPayable'] >= 0 ? __('Net Tax Payable') : __('Net Tax Refundable / Carry Forward') }}</p>
+                <p class="text-xl font-bold {{ $finance['netTaxPayable'] >= 0 ? 'text-amber-800' : 'text-emerald-800' }}">Rs {{ \App\Services\TaxService::fmt(abs($finance['netTaxPayable'])) }}</p>
+                <p class="text-xs text-slate-400 mt-1">{{ __('Output tax − input tax (all time)') }}</p>
+            </div>
+        </div>
+        @endif
     </div>
     @endif
 

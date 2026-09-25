@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\TaxService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -18,6 +19,13 @@ class Quotation extends Model
         'quotation_number',
         'quotation_date',
         'validity_days',
+        'subtotal',
+        'discount_type',
+        'discount_value',
+        'discount_amount',
+        'tax_mode',
+        'tax_rate',
+        'tax_amount',
         'total_amount',
         'advance_percentage',
         'advance_amount',
@@ -72,12 +80,20 @@ class Quotation extends Model
      */
     public function recalculateTotals(): void
     {
-        $total = $this->items()->get()->sum(fn (QuotationItem $item) => $item->qty * $item->rate);
-        $advance = round($total * ($this->advance_percentage / 100), 2);
+        $subtotal = (float) $this->items()->get()->sum(fn (QuotationItem $item) => $item->qty * $item->rate);
 
-        $this->total_amount   = $total;
+        $calc = TaxService::calculate(
+            $subtotal,
+            $this->discount_type,
+            (float) $this->discount_value,
+            $this->tax_mode ?: TaxService::MODE_NONE,
+            (float) $this->tax_rate
+        );
+        $advance = round($calc['total_amount'] * ($this->advance_percentage / 100), 2);
+
+        $this->fill(TaxService::documentColumns($calc));
         $this->advance_amount = $advance;
-        $this->balance_amount = max(0, $total - $advance);
+        $this->balance_amount = max(0, $calc['total_amount'] - $advance);
         $this->save();
     }
 

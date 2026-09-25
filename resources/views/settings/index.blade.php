@@ -63,6 +63,77 @@
             </div>
         </div>
 
+        {{-- Tax --}}
+        <div class="bg-white border border-slate-200 rounded-xl p-6 space-y-4">
+            <h3 class="text-sm font-semibold text-slate-700 border-b border-slate-100 pb-2">🧾 {{ __('Tax (GST / Sales Tax)') }}</h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Tax Name on Documents') }}</label>
+                    <input type="text" name="tax_label" value="{{ old('tax_label', $settings['tax_label'] ?? 'GST') }}"
+                        class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="GST / Sales Tax">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Sales Tax Registration No. (STRN)') }}</label>
+                    <input type="text" name="tax_registration_no" value="{{ old('tax_registration_no', $settings['tax_registration_no'] ?? '') }}"
+                        class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <p class="text-xs text-slate-400 mt-1">{{ __('Printed beside the NTN. A branch can have its own.') }}</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Default Tax Mode') }}</label>
+                    @php $dm = old('tax_default_mode', $settings['tax_default_mode'] ?? 'none'); @endphp
+                    <select name="tax_default_mode"
+                        class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        @foreach(\App\Services\TaxService::modeLabels() as $key => $label)
+                        <option value="{{ $key }}" {{ $dm === $key ? 'selected' : '' }}>{{ $label }}</option>
+                        @endforeach
+                    </select>
+                    <p class="text-xs text-slate-400 mt-1">{{ __('Can be changed on each quotation, order and fabric sale.') }}</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Default Tax Rate (%)') }}</label>
+                    <input type="number" name="tax_default_rate" step="0.01" min="0" max="100"
+                        value="{{ old('tax_default_rate', $settings['tax_default_rate'] ?? '') }}"
+                        class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="e.g. 18">
+                </div>
+            </div>
+
+            <div class="rounded-lg bg-slate-50 border border-slate-200 p-3 text-xs text-slate-600 space-y-1">
+                <p><strong>{{ __('Exclusive') }}:</strong> {{ __('tax is calculated and printed, but the client pays only the price (you bear the tax).') }}</p>
+                <p><strong>{{ __('Inclusive') }}:</strong> {{ __('tax is calculated, printed and added to what the client pays.') }}</p>
+                <p>{{ __('Discount is taken off first; tax is calculated on the discounted amount.') }}</p>
+            </div>
+
+            <div>
+                <p class="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2">{{ __('Apply tax to') }}</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    @foreach([
+                        ['quotation', __('Quotations')],
+                        ['order', __('Invoices (Orders)')],
+                        ['fabric_sale', __('Fabric Sales')],
+                    ] as [$m, $mLabel])
+                    <div class="border border-slate-200 rounded-lg p-3 space-y-2">
+                        <input type="hidden" name="tax_{{ $m }}_enabled" value="0">
+                        <label class="flex items-center gap-2 text-sm font-medium text-slate-700">
+                            <input type="checkbox" name="tax_{{ $m }}_enabled" value="1"
+                                {{ old("tax_{$m}_enabled", $settings["tax_{$m}_enabled"] ?? '1') !== '0' ? 'checked' : '' }}>
+                            {{ $mLabel }}
+                        </label>
+                        <div>
+                            <label class="block text-xs text-slate-500 mb-1">{{ __('Rate (%) — blank uses default') }}</label>
+                            <input type="number" name="tax_rate_{{ $m }}" step="0.01" min="0" max="100"
+                                value="{{ old("tax_rate_{$m}", $settings["tax_rate_{$m}"] ?? '') }}"
+                                class="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+                <p class="text-xs text-slate-400 mt-2">{{ __('Untick a module to stop tax on it entirely. Branches can override the mode, rate and registration number from the Branches page.') }}</p>
+            </div>
+        </div>
+
         {{-- Bank / Payment --}}
         <div class="bg-white border border-slate-200 rounded-xl p-6 space-y-4">
             <h3 class="text-sm font-semibold text-slate-700 border-b border-slate-100 pb-2">🏦 {{ __('Bank & Payment Details') }}</h3>

@@ -271,8 +271,11 @@
                 @if($companyPhone) | {{ $companyPhone }}@endif
                 @if($companyEmail) | {{ $companyEmail }}@endif
             </div>
-            @if($taxNumber)
-            <div class="company-meta" style="color:#1e293b;font-weight:700;">ٹیکس رجسٹریشن نمبر: {{ $taxNumber }}</div>
+            @if($taxNumber || !empty($tax['registration_no']))
+            <div class="company-meta" style="color:#1e293b;font-weight:700;">
+                @if($taxNumber)NTN: {{ $taxNumber }}@endif
+                @if(!empty($tax['registration_no']))@if($taxNumber) | @endif{{ $tax['label'] }} Reg. No.: {{ $tax['registration_no'] }}@endif
+            </div>
             @endif
         </div>
         <div class="header-right">
@@ -292,6 +295,8 @@
             <div class="info-cell-title">BILLED TO</div>
             <div class="info-cell-name">{{ $order->customer->name }}</div>
             <div class="info-cell-sub">
+                @if($order->customer->company_name)کمپنی: <strong>{{ $order->customer->company_name }}</strong><br>@endif
+                @if($order->customer->ntn)NTN: <strong>{{ $order->customer->ntn }}</strong><br>@endif
                 فائل نمبر: <strong>{{ $order->customer->file_number }}</strong><br>
                 موبائل: {{ $order->customer->mobile }}
                 @if($order->customer->address)<br>{{ $order->customer->address }}@endif
@@ -482,6 +487,7 @@
             </div>
         </div>
         <table class="payment-table" style="margin: 0;">
+            @include('tax._rows', ['doc' => $order, 'taxLabel' => $tax['label']])
             <tr>
                 <td class="lbl">کل رقم</td>
                 <td class="val">Rs {{ number_format($order->total_amount) }}</td>

@@ -46,7 +46,15 @@
             </div>
             <div>
                 <p class="text-xs text-slate-500">{{ __('Total Amount') }}</p>
-                <p class="text-sm font-semibold text-slate-700">Rs {{ number_format($order->total_amount) }}</p>
+                <p class="text-sm font-semibold text-slate-700">Rs {{ \App\Services\TaxService::fmt($order->total_amount) }}</p>
+                @if((float) $order->discount_amount > 0 || $order->tax_mode !== 'none')
+                <p class="text-xs text-slate-400 mt-0.5">
+                    {{ __('Subtotal') }} Rs {{ \App\Services\TaxService::fmt($order->subtotal) }}
+                    @if((float) $order->discount_amount > 0) · <span class="text-rose-500">{{ __('Discount') }} −Rs {{ \App\Services\TaxService::fmt($order->discount_amount) }}</span>@endif
+                    @if($order->tax_mode !== 'none') · {{ $tax['label'] }} {{ \App\Services\TaxService::rateLabel($order->tax_rate) }} Rs {{ \App\Services\TaxService::fmt($order->tax_amount) }}
+                        <span class="{{ $order->tax_mode === 'inclusive' ? 'text-green-600' : 'text-amber-600' }}">({{ $order->tax_mode === 'inclusive' ? __('charged') : __('not charged') }})</span>@endif
+                </p>
+                @endif
             </div>
             <div>
                 <p class="text-xs text-slate-500">{{ __('Advance') }} / {{ __('Balance') }}</p>

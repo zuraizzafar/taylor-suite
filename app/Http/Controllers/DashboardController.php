@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Branch;
 use App\Models\Customer;
 use App\Models\Expense;
+use App\Models\FabricSale;
 use App\Models\Order;
 use App\Models\Suit;
 use App\Traits\HasBranchScope;
@@ -51,11 +52,22 @@ class DashboardController extends Controller
         $totalOutstanding = (float) (clone $orderQ)->where('balance_amount', '>', 0)->sum('balance_amount');
         $workerSalaries   = (float) (clone $suitQ)->whereNotNull('worker_earning')->sum('worker_earning');
         $totalExpenses    = (float) (clone $expenseQ)->sum('amount');
-        $netProfit        = $totalCollected - $workerSalaries - $totalExpenses;
+
+        // Tax: output tax is owed to FBR whether or not it was charged to the client;
+        // input tax on purchases is recoverable, so it reduces the real cost of expenses.
+        $orderOutputTax = (float) (clone $orderQ)->sum('tax_amount');
+        $fabricOutputTax = (float) ($bid ? FabricSale::where('branch_id', $bid) : FabricSale::query())->sum('tax_amount');
+        $outputTax      = $orderOutputTax + $fabricOutputTax;
+        $inputTax       = (float) (clone $expenseQ)->sum('tax_amount');
+        $netTaxPayable  = $outputTax - $inputTax;
+        $showTax        = $outputTax > 0 || $inputTax > 0;
+
+        $netProfit        = $totalCollected - $workerSalaries - ($totalExpenses - $inputTax) - $orderOutputTax;
 
         $finance = compact(
             'totalRevenue', 'totalCollected', 'totalOutstanding',
-            'workerSalaries', 'totalExpenses', 'netProfit'
+            'workerSalaries', 'totalExpenses', 'netProfit',
+            'outputTax', 'inputTax', 'netTaxPayable', 'showTax'
         );
 
         $recent_orders = (clone $orderQ)->with('customer')->latest()->take(5)->get();

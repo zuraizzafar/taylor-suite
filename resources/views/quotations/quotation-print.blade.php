@@ -219,6 +219,7 @@
                 if ($companyPhone) $second[] = '<span dir="ltr">' . e($companyPhone) . '</span>';
                 if ($companyEmail) $second[] = '<span dir="ltr">' . e($companyEmail) . '</span>';
                 if ($taxNumber) $second[] = '<strong>NTN: ' . e($taxNumber) . '</strong>';
+                if (! empty($tax['registration_no'])) $second[] = '<strong>' . e($tax['label']) . ' Reg. No.: ' . e($tax['registration_no']) . '</strong>';
                 if ($bankAccount) $second[] = '<strong>اکاؤنٹ نمبر: <span dir="ltr">' . e($bankAccount) . '</span></strong>';
             @endphp
             {!! implode(' | ', $second) !!}
@@ -271,6 +272,7 @@
 
     <div class="totals-wrap">
         <table class="totals-table">
+@include('tax._rows', ['doc' => $quotation, 'taxLabel' => $tax['label']])
             <tr>
                 <td class="lbl">کل رقم</td>
                 <td class="val">Rs {{ number_format($quotation->total_amount) }}</td>

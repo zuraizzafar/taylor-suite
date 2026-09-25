@@ -144,6 +144,7 @@ class SyncController extends Controller
             'order_number'   => $orderNumber,
             'order_date'     => $p['order_date'] ?? today()->toDateString(),
             'delivery_date'  => $p['delivery_date'] ?? null,
+            'subtotal'       => $total,
             'total_amount'   => $total,
             'advance_amount' => $advance,
             'balance_amount' => max(0, $total - $advance),

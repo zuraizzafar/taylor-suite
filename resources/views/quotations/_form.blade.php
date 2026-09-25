@@ -1,4 +1,4 @@
-<div class="space-y-4" x-data="quotationForm()">
+<div class="space-y-4" x-data="quotationForm(@js($taxInit))" x-init="watchBranchSelect($el)">
     @if(isset($customers))
     <div>
         <div class="flex items-center justify-between mb-1">
@@ -96,6 +96,8 @@
         </template>
         @error('description')<p class="text-xs text-red-600 mt-1">{{ $message }}</p>@enderror
 
+        @include('tax._fields', ['taxEnabled' => $taxInit['enabled'], 'taxLabel' => $taxInit['label'], 'discount' => true])
+
         <div class="grid grid-cols-2 gap-4 pt-2">
             <div>
                 <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Advance Required') }} (%)</label>
@@ -157,21 +159,22 @@
 
 @once
 <script>
-function quotationForm() {
+function quotationForm(taxInit) {
     const existingItems = @json(isset($quotation) ? $quotation->items->map(fn ($i) => ['description' => $i->description, 'qty' => (float) $i->qty, 'rate' => (float) $i->rate])->values() : []);
-    return {
+    return withTax({
         items: existingItems.length ? existingItems : [{ description: '', qty: 1, rate: 0 }],
         advancePct: {{ (float) old('advance_percentage', $quotation->advance_percentage ?? 50) }},
-        get totalAmount() {
+        get subtotal() {
             return this.items.reduce((s, i) => s + ((parseFloat(i.qty) || 0) * (parseFloat(i.rate) || 0)), 0);
         },
+        get totalAmount() { return this.grandTotal; },
         get advanceAmount() {
             return Math.round(this.totalAmount * ((parseFloat(this.advancePct) || 0) / 100));
         },
         get balance() { return Math.max(0, this.totalAmount - this.advanceAmount); },
         addItem()    { this.items.push({ description: '', qty: 1, rate: 0 }); },
         removeItem(i){ if (this.items.length > 1) this.items.splice(i, 1); },
-    };
+    }, taxInit);
 }
 </script>
 @endonce
