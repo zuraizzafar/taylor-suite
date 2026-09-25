@@ -15,6 +15,28 @@
         @error('mobile')<p class="text-xs text-red-600 mt-1">{{ $message }}</p>@enderror
     </div>
 
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Company Name') }}</label>
+            <input type="text" name="company_name" value="{{ old('company_name', $customer->company_name ?? '') }}"
+                class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            @error('company_name')<p class="text-xs text-red-600 mt-1">{{ $message }}</p>@enderror
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('NTN') }}</label>
+            <input type="text" name="ntn" value="{{ old('ntn', $customer->ntn ?? '') }}"
+                class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            @error('ntn')<p class="text-xs text-red-600 mt-1">{{ $message }}</p>@enderror
+        </div>
+    </div>
+
+    <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Email') }}</label>
+        <input type="email" name="email" value="{{ old('email', $customer->email ?? '') }}"
+            class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        @error('email')<p class="text-xs text-red-600 mt-1">{{ $message }}</p>@enderror
+    </div>
+
     <div>
         <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Address') }}</label>
         <input type="text" name="address" value="{{ old('address', $customer->address ?? '') }}"

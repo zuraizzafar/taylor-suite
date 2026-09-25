@@ -21,6 +21,23 @@
                 <input type="text" name="mobile" required
                     style="width:100%;border:1px solid #cbd5e1;border-radius:8px;padding:7px 10px;font-size:13px;outline:none;">
             </div>
+            <div style="display:flex;gap:10px;margin-bottom:12px;">
+                <div style="flex:1;">
+                    <label style="display:block;font-size:11px;font-weight:600;color:#475569;margin-bottom:4px;">{{ __('Company Name') }}</label>
+                    <input type="text" name="company_name"
+                        style="width:100%;border:1px solid #cbd5e1;border-radius:8px;padding:7px 10px;font-size:13px;outline:none;">
+                </div>
+                <div style="flex:1;">
+                    <label style="display:block;font-size:11px;font-weight:600;color:#475569;margin-bottom:4px;">{{ __('NTN') }}</label>
+                    <input type="text" name="ntn"
+                        style="width:100%;border:1px solid #cbd5e1;border-radius:8px;padding:7px 10px;font-size:13px;outline:none;">
+                </div>
+            </div>
+            <div style="margin-bottom:12px;">
+                <label style="display:block;font-size:11px;font-weight:600;color:#475569;margin-bottom:4px;">{{ __('Email') }}</label>
+                <input type="email" name="email"
+                    style="width:100%;border:1px solid #cbd5e1;border-radius:8px;padding:7px 10px;font-size:13px;outline:none;">
+            </div>
             <div style="margin-bottom:16px;">
                 <label style="display:block;font-size:11px;font-weight:600;color:#475569;margin-bottom:4px;">{{ __('Address') }}</label>
                 <input type="text" name="address"

@@ -7,6 +7,9 @@
     $companyWebsite = $settings['company_website']     ?? '';
     $logoPath       = $settings['logo_path']           ?? null;
     $taxNumber      = $settings['company_tax_number']  ?? '';
+    $bankName       = $settings['bank_name']           ?? '';
+    $bankTitle      = $settings['bank_account_title']  ?? '';
+    $bankAccount    = $settings['bank_account_number'] ?? '';
     $ceoName        = $settings['ceo_name']            ?? '';
     $managerName    = $settings['manager_name']        ?? '';
     $embed = function (?string $path) {
@@ -193,7 +196,14 @@
                 @if($companyEmail) | {{ $companyEmail }}@endif
             </div>
             @if($taxNumber)
-            <div class="company-tax">ٹیکس رجسٹریشن نمبر: {{ $taxNumber }}</div>
+            <div class="company-tax">NTN: {{ $taxNumber }}</div>
+            @endif
+            @if($bankAccount)
+            <div class="company-meta">
+                @if($bankName){{ $bankName }} | @endif
+                @if($bankTitle)اکاؤنٹ ٹائٹل: {{ $bankTitle }} | @endif
+                <strong>اکاؤنٹ نمبر: <span dir="ltr">{{ $bankAccount }}</span></strong>
+            </div>
             @endif
         </div>
         <div class="header-right">
@@ -213,10 +223,14 @@
     <div class="info-row">
         <div class="info-cell" style="flex: 1;">
             <div class="info-cell-title">QUOTATION FOR</div>
-            <div class="info-cell-name">{{ $quotation->customer->name }}</div>
+            @php $c = $quotation->customer; @endphp
+            <div class="info-cell-name">{{ $c->company_name ?: $c->name }}</div>
             <div class="info-cell-sub">
-                فون: {{ $quotation->customer->mobile }}
-                @if($quotation->customer->address)<br>{{ $quotation->customer->address }}@endif
+                @if($c->company_name)رابطہ شخص: <strong>{{ $c->name }}</strong><br>@endif
+                @if($c->ntn)NTN: <strong>{{ $c->ntn }}</strong><br>@endif
+                فون: {{ $c->mobile }}
+                @if($c->email)<br>ای میل: {{ $c->email }}@endif
+                @if($c->address)<br>پتہ: {{ $c->address }}@endif
             </div>
         </div>
     </div>

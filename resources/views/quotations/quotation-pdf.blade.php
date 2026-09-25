@@ -119,6 +119,9 @@
     $companyEmail   = $settings['company_email']       ?? '';
     $companyWebsite = $settings['company_website']     ?? '';
     $taxNumber      = $settings['company_tax_number']  ?? '';
+    $bankName       = $settings['bank_name']           ?? '';
+    $bankTitle      = $settings['bank_account_title']  ?? '';
+    $bankAccount    = $settings['bank_account_number'] ?? '';
     $ceoName        = $settings['ceo_name']            ?? '';
     $managerName    = $settings['manager_name']        ?? '';
     $logoPath       = $settings['logo_path']           ?? null;
@@ -169,7 +172,14 @@
                 @if($companyWebsite) &nbsp;|&nbsp; {{ $companyWebsite }}@endif
             </div>
             @if($taxNumber)
-            <div class="company-tax">{{ $isUrdu ? __('Tax Registration No.') : 'Tax Registration No.' }}: {{ $taxNumber }}</div>
+            <div class="company-tax">NTN: {{ $taxNumber }}</div>
+            @endif
+            @if($bankAccount)
+            <div class="company-meta">
+                @if($bankName){{ $bankName }} &nbsp;|&nbsp; @endif
+                @if($bankTitle){{ $isUrdu ? __('Account Title') : 'Account Title' }}: {{ $bankTitle }} &nbsp;|&nbsp; @endif
+                <strong>{{ $isUrdu ? __('Account Number') : 'Account Number' }}: {{ $bankAccount }}</strong>
+            </div>
             @endif
         </div>
         <div class="header-right">
@@ -190,10 +200,14 @@
     <div class="info-row">
         <div class="info-cell" style="width:96%">
             <div class="info-cell-title">{{ $isUrdu ? __('Quotation For') : 'Quotation For' }}</div>
-            <div class="info-cell-name">{{ $quotation->customer->name }}</div>
+            @php $c = $quotation->customer; @endphp
+            <div class="info-cell-name">{{ $c->company_name ?: $c->name }}</div>
             <div class="info-cell-sub">
-                {{ $isUrdu ? __('Phone') : 'Phone' }}: {{ $quotation->customer->mobile }}
-                @if($quotation->customer->address)<br>{{ $quotation->customer->address }}@endif
+                @if($c->company_name){{ $isUrdu ? __('Contact Person') : 'Contact Person' }}: <strong>{{ $c->name }}</strong><br>@endif
+                @if($c->ntn)NTN: <strong>{{ $c->ntn }}</strong><br>@endif
+                {{ $isUrdu ? __('Phone') : 'Phone' }}: {{ $c->mobile }}
+                @if($c->email)<br>{{ $isUrdu ? __('Email') : 'Email' }}: {{ $c->email }}@endif
+                @if($c->address)<br>{{ $isUrdu ? __('Address') : 'Address' }}: {{ $c->address }}@endif
             </div>
         </div>
     </div>

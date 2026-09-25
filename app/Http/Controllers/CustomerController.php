@@ -48,6 +48,9 @@ class CustomerController extends Controller
         $data = $request->validate([
             'name'      => ['required', 'string', 'max:255'],
             'mobile'    => ['required', 'string', 'max:20'],
+            'company_name' => ['nullable', 'string', 'max:255'],
+            'ntn'          => ['nullable', 'string', 'max:50'],
+            'email'        => ['nullable', 'email', 'max:255'],
             'address'   => ['nullable', 'string', 'max:500'],
             'notes'     => ['nullable', 'string'],
             'branch_id' => ['nullable', 'exists:branches,id'],
@@ -76,6 +79,9 @@ class CustomerController extends Controller
         $data = $request->validate([
             'name'    => ['required', 'string', 'max:255'],
             'mobile'  => ['required', 'string', 'max:20'],
+            'company_name' => ['nullable', 'string', 'max:255'],
+            'ntn'          => ['nullable', 'string', 'max:50'],
+            'email'        => ['nullable', 'email', 'max:255'],
             'address' => ['nullable', 'string', 'max:500'],
         ]);
 
@@ -121,6 +127,9 @@ class CustomerController extends Controller
         $data = $request->validate([
             'name'      => ['required', 'string', 'max:255'],
             'mobile'    => ['required', 'string', 'max:20'],
+            'company_name' => ['nullable', 'string', 'max:255'],
+            'ntn'          => ['nullable', 'string', 'max:50'],
+            'email'        => ['nullable', 'email', 'max:255'],
             'address'   => ['nullable', 'string', 'max:500'],
             'notes'     => ['nullable', 'string'],
             'branch_id' => ['nullable', 'exists:branches,id'],
