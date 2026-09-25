@@ -8,7 +8,7 @@
             <span class="font-mono text-blue-700 font-semibold">{{ $quotation->quotation_number }}</span>
             <span class="text-slate-500 text-sm ml-2">– {{ $quotation->customer->name }}</span>
         </div>
-        <form method="POST" action="{{ route('quotations.update', $quotation) }}">
+        <form method="POST" enctype="multipart/form-data" action="{{ route('quotations.update', $quotation) }}">
             @csrf @method('PUT')
             @include('quotations._form')
             <div class="flex gap-3 mt-6">

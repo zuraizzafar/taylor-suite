@@ -50,6 +50,12 @@
     .header-left  { display: table-cell; vertical-align: top; width: 60%; }
     .header-right { display: table-cell; vertical-align: top; text-align: right; }
 
+    .header { border-bottom: none; padding-bottom: 0; margin-bottom: 6px; }
+    .company-lines { border-bottom: 2px solid #1e293b; padding-bottom: 8px; margin-bottom: 10px; font-size: 8.5px; color: #64748b; line-height: 1.7; }
+    .company-lines strong { color: #1e293b; }
+    .samples-wrap  { display: table; width: 100%; margin: 6px 0 8px; page-break-inside: avoid !important; }
+    .sample-cell   { display: table-cell; width: 50%; text-align: center; vertical-align: middle; padding: 0 6px; }
+    .sample-img    { max-height: 150px; max-width: 100%; border: 1px solid #e2e8f0; }
     .company-name  { font-size: 15px; font-weight: 700; color: #0f172a; margin-top: 4px; letter-spacing: 0.3px; }
     .company-tax   { font-size: 9px; color: #1e293b; margin-top: 2px; font-weight: 700; }
     .delivery-box  { margin-bottom: 10px; padding: 6px 10px; background: #fffbeb; border: 1px solid #fcd34d; border-left: 4px solid #f59e0b; border-radius: 4px; font-size: 10px; color: #78350f; page-break-inside: avoid !important; }
@@ -74,6 +80,12 @@
     .info-cell      { display: table-cell; border: 1px solid #e2e8f0; border-radius: 6px; padding: 6px 10px; vertical-align: top; }
     .info-cell-title { font-size: 7.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; margin-bottom: 3px; }
     .info-cell-name  { font-size: 11px; font-weight: 700; color: #0f172a; }
+    .client-box   { border: 1px solid #e2e8f0; border-left: 4px solid #1e293b; border-radius: 4px; background: #f8fafc; padding: 7px 10px; margin-bottom: 10px; page-break-inside: avoid !important; }
+    .client-label { font-size: 7.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; margin-bottom: 3px; }
+    .client-name  { font-size: 12px; font-weight: 700; color: #0f172a; }
+    .client-attn  { font-size: 9px; font-weight: 400; color: #64748b; }
+    .client-line  { font-size: 9px; color: #475569; margin-top: 3px; line-height: 1.5; }
+    .client-line strong { color: #1e293b; }
     .info-cell-sub   { font-size: 9px; color: #64748b; margin-top: 2px; line-height: 1.5; }
 
     table.items           { width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 11px; }
@@ -141,6 +153,7 @@
     $ceoSig     = $embed($settings['ceo_signature_path'] ?? null);
     $managerSig = $embed($settings['manager_signature_path'] ?? null);
     $stampImg   = $embed($settings['company_stamp_path'] ?? null);
+    $sampleImgs = array_values(array_filter([$embed($quotation->sample_image_1), $embed($quotation->sample_image_2)]));
 
     $logoB64  = null;
     $logoMime = 'image/png';
@@ -163,24 +176,6 @@
             @if($logoB64)
             <img class="logo-img" src="data:{{ $logoMime }};base64,{{ $logoB64 }}" alt="{{ $companyName }}">
             @endif
-            <div class="company-name">{{ $companyName }}</div>
-            <div class="company-meta">
-                {{ $companyTagline }}
-                @if($companyAddress)<br>{{ $companyAddress }}@endif
-                @if($companyPhone) &nbsp;|&nbsp; Tel: {{ $companyPhone }}@endif
-                @if($companyEmail) &nbsp;|&nbsp; {{ $companyEmail }}@endif
-                @if($companyWebsite) &nbsp;|&nbsp; {{ $companyWebsite }}@endif
-            </div>
-            @if($taxNumber)
-            <div class="company-tax">NTN: {{ $taxNumber }}</div>
-            @endif
-            @if($bankAccount)
-            <div class="company-meta">
-                @if($bankName){{ $bankName }} &nbsp;|&nbsp; @endif
-                @if($bankTitle){{ $isUrdu ? __('Account Title') : 'Account Title' }}: {{ $bankTitle }} &nbsp;|&nbsp; @endif
-                <strong>{{ $isUrdu ? __('Account Number') : 'Account Number' }}: {{ $bankAccount }}</strong>
-            </div>
-            @endif
         </div>
         <div class="header-right">
             <div class="doc-title">{{ $isUrdu ? __('Quotation') : 'Quotation' }}</div>
@@ -192,24 +187,43 @@
         </div>
     </div>
 
+    <div class="company-lines">
+        <div>
+            {{ $companyTagline }}@if($companyAddress) &nbsp;|&nbsp; {{ $companyAddress }}@endif
+        </div>
+        <div>
+            @php
+                $second = [];
+                if ($companyPhone) $second[] = 'Tel: ' . e($companyPhone);
+                if ($companyEmail) $second[] = e($companyEmail);
+                if ($companyWebsite) $second[] = e($companyWebsite);
+                if ($taxNumber) $second[] = '<strong>NTN: ' . e($taxNumber) . '</strong>';
+                if ($bankAccount) $second[] = '<strong>' . ($isUrdu ? __('Account Number') : 'Account Number') . ': ' . e($bankAccount) . '</strong>';
+            @endphp
+            {!! implode(' &nbsp;|&nbsp; ', $second) !!}
+        </div>
+    </div>
+
     @if($quotation->delivery_note)
     <div class="delivery-box"><strong>{{ $isUrdu ? __('Delivery Note') : 'Delivery Note' }}:</strong> {{ $quotation->delivery_note }}</div>
     @endif
 
     {{-- CUSTOMER --}}
-    <div class="info-row">
-        <div class="info-cell" style="width:96%">
-            <div class="info-cell-title">{{ $isUrdu ? __('Quotation For') : 'Quotation For' }}</div>
-            @php $c = $quotation->customer; @endphp
-            <div class="info-cell-name">{{ $c->company_name ?: $c->name }}</div>
-            <div class="info-cell-sub">
-                @if($c->company_name){{ $isUrdu ? __('Contact Person') : 'Contact Person' }}: <strong>{{ $c->name }}</strong><br>@endif
-                @if($c->ntn)NTN: <strong>{{ $c->ntn }}</strong><br>@endif
-                {{ $isUrdu ? __('Phone') : 'Phone' }}: {{ $c->mobile }}
-                @if($c->email)<br>{{ $isUrdu ? __('Email') : 'Email' }}: {{ $c->email }}@endif
-                @if($c->address)<br>{{ $isUrdu ? __('Address') : 'Address' }}: {{ $c->address }}@endif
-            </div>
+    @php
+        $c = $quotation->customer;
+        $contact = [];
+        if ($c->mobile) $contact[] = ($isUrdu ? __('Phone') : 'Phone') . ': <strong>' . e($c->mobile) . '</strong>';
+        if ($c->email) $contact[] = ($isUrdu ? __('Email') : 'Email') . ': <strong>' . e($c->email) . '</strong>';
+        if ($c->ntn) $contact[] = 'NTN: <strong>' . e($c->ntn) . '</strong>';
+    @endphp
+    <div class="client-box">
+        <div class="client-label">{{ $isUrdu ? __('Quotation For') : 'Quotation For' }}</div>
+        <div class="client-name">
+            {{ $c->company_name ?: $c->name }}
+            @if($c->company_name)<span class="client-attn">&nbsp; {{ $isUrdu ? __('Contact Person') : 'Attn' }}: {{ $c->name }}</span>@endif
         </div>
+        @if(count($contact))<div class="client-line">{!! implode(' &nbsp;|&nbsp; ', $contact) !!}</div>@endif
+        @if($c->address)<div class="client-line">{{ $isUrdu ? __('Address') : 'Address' }}: <strong>{{ $c->address }}</strong></div>@endif
     </div>
 
     {{-- ITEMS TABLE --}}
@@ -272,6 +286,14 @@
         <div class="legal-title">{{ $isUrdu ? __('Quotation Notice') : 'Quotation Notice' }}</div>
         <div class="legal-text">{{ $validityNote }}</div>
     </div>
+
+    @if(count($sampleImgs))
+    <div class="samples-wrap">
+        @foreach($sampleImgs as $img)
+        <div class="sample-cell"><img class="sample-img" src="{{ $img }}" alt=""></div>
+        @endforeach
+    </div>
+    @endif
 
     {{-- SIGNATURES & STAMP --}}
     @if($ceoName || $managerName || $ceoSig || $managerSig || $stampImg)

@@ -4,7 +4,7 @@
 @section('content')
 <div class="max-w-2xl pt-4">
     <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
-        <form method="POST" action="{{ route('quotations.store') }}">
+        <form method="POST" enctype="multipart/form-data" action="{{ route('quotations.store') }}">
             @csrf
             @include('quotations._form')
             <div class="flex gap-3 mt-6">

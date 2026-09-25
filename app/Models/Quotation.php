@@ -24,6 +24,8 @@ class Quotation extends Model
         'balance_amount',
         'design_reference',
         'delivery_note',
+        'sample_image_1',
+        'sample_image_2',
         'notes',
         'status',
         'converted_order_id',

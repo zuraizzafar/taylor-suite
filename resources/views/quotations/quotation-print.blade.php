@@ -22,6 +22,7 @@
     $ceoSig     = $embed($settings['ceo_signature_path'] ?? null);
     $managerSig = $embed($settings['manager_signature_path'] ?? null);
     $stampImg   = $embed($settings['company_stamp_path'] ?? null);
+    $sampleImgs = array_values(array_filter([$embed($quotation->sample_image_1), $embed($quotation->sample_image_2)]));
 
     $validityNote = $settings['quotation_validity_note_ur']
         ?? 'یہ کوٹیشن مذکورہ بالا تاریخ سے صرف بتائی گئی مدت کے لیے کارآمد ہے۔ حتمی قیمت پیمائش اور حتمی ڈیزائن کی تصدیق کے بعد تبدیل ہو سکتی ہے۔';
@@ -111,6 +112,11 @@
     .sign-space { height: 42px; }
     .sign-line { border-top: 1px solid #1e293b; margin-top: 2px; padding-top: 3px; font-size: 10px; }
     .stamp-img { height: 85px; width: auto; margin-right: auto; }
+    .header { border-bottom: none; padding-bottom: 0; margin-bottom: 4px; }
+    .company-lines { border-bottom: 2px solid #1e293b; padding-bottom: 8px; margin-bottom: 10px; font-size: 9.5px; color: #64748b; line-height: 1.6; }
+    .company-lines strong { color: #1e293b; }
+    .samples-wrap { display: flex; justify-content: center; gap: 12px; margin: 8px 0; page-break-inside: avoid; }
+    .samples-wrap img { max-height: 160px; max-width: 48%; border: 1px solid #e2e8f0; }
     .header-right { text-align: left; }
     .doc-title { font-size: 20px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 1px; font-family: sans-serif; }
     .doc-no {
@@ -120,6 +126,12 @@
     .doc-dates { font-size: 10px; color: #475569; margin-top: 4px; line-height: 1.3; }
     .doc-dates strong { color: #1e293b; }
 
+    .client-box { border: 1px solid #e2e8f0; border-right: 4px solid #1e293b; border-radius: 4px; background: #f8fafc; padding: 7px 10px; margin-bottom: 10px; page-break-inside: avoid; }
+    .client-label { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #94a3b8; margin-bottom: 3px; font-family: sans-serif; }
+    .client-name { font-size: 12.5px; font-weight: 700; color: #0f172a; }
+    .client-attn { font-size: 10px; font-weight: 400; color: #64748b; }
+    .client-line { font-size: 10px; color: #475569; margin-top: 3px; line-height: 1.6; }
+    .client-line strong { color: #1e293b; }
     .info-row { display: flex; gap: 10px; margin-bottom: 10px; }
     .info-cell { flex: 1; border: 1px solid #e2e8f0; border-radius: 6px; padding: 6px 10px; }
     .info-cell-title { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #94a3b8; margin-bottom: 3px; font-family: sans-serif; }
@@ -188,23 +200,6 @@
             @if($logoB64)
             <img class="logo-img" src="data:{{ $logoMime }};base64,{{ $logoB64 }}" alt="{{ $companyName }}">
             @endif
-            <div class="company-name">{{ $companyName }}</div>
-            <div class="company-meta">
-                {{ $companyTagline }}
-                @if($companyAddress)<br>{{ $companyAddress }}@endif
-                @if($companyPhone) | {{ $companyPhone }}@endif
-                @if($companyEmail) | {{ $companyEmail }}@endif
-            </div>
-            @if($taxNumber)
-            <div class="company-tax">NTN: {{ $taxNumber }}</div>
-            @endif
-            @if($bankAccount)
-            <div class="company-meta">
-                @if($bankName){{ $bankName }} | @endif
-                @if($bankTitle)اکاؤنٹ ٹائٹل: {{ $bankTitle }} | @endif
-                <strong>اکاؤنٹ نمبر: <span dir="ltr">{{ $bankAccount }}</span></strong>
-            </div>
-            @endif
         </div>
         <div class="header-right">
             <div class="doc-title">QUOTATION</div>
@@ -216,23 +211,39 @@
         </div>
     </div>
 
+    <div class="company-lines">
+        <div>{{ $companyTagline }}@if($companyAddress) | {{ $companyAddress }}@endif</div>
+        <div>
+            @php
+                $second = [];
+                if ($companyPhone) $second[] = '<span dir="ltr">' . e($companyPhone) . '</span>';
+                if ($companyEmail) $second[] = '<span dir="ltr">' . e($companyEmail) . '</span>';
+                if ($taxNumber) $second[] = '<strong>NTN: ' . e($taxNumber) . '</strong>';
+                if ($bankAccount) $second[] = '<strong>اکاؤنٹ نمبر: <span dir="ltr">' . e($bankAccount) . '</span></strong>';
+            @endphp
+            {!! implode(' | ', $second) !!}
+        </div>
+    </div>
+
     @if($quotation->delivery_note)
     <div class="delivery-box"><strong>ڈیلیوری نوٹ:</strong> {{ $quotation->delivery_note }}</div>
     @endif
 
-    <div class="info-row">
-        <div class="info-cell" style="flex: 1;">
-            <div class="info-cell-title">QUOTATION FOR</div>
-            @php $c = $quotation->customer; @endphp
-            <div class="info-cell-name">{{ $c->company_name ?: $c->name }}</div>
-            <div class="info-cell-sub">
-                @if($c->company_name)رابطہ شخص: <strong>{{ $c->name }}</strong><br>@endif
-                @if($c->ntn)NTN: <strong>{{ $c->ntn }}</strong><br>@endif
-                فون: {{ $c->mobile }}
-                @if($c->email)<br>ای میل: {{ $c->email }}@endif
-                @if($c->address)<br>پتہ: {{ $c->address }}@endif
-            </div>
+    @php
+        $c = $quotation->customer;
+        $contact = [];
+        if ($c->mobile) $contact[] = 'فون: <strong dir="ltr">' . e($c->mobile) . '</strong>';
+        if ($c->email) $contact[] = 'ای میل: <strong dir="ltr">' . e($c->email) . '</strong>';
+        if ($c->ntn) $contact[] = 'NTN: <strong dir="ltr">' . e($c->ntn) . '</strong>';
+    @endphp
+    <div class="client-box">
+        <div class="client-label">QUOTATION FOR</div>
+        <div class="client-name">
+            {{ $c->company_name ?: $c->name }}
+            @if($c->company_name)<span class="client-attn">&nbsp; رابطہ شخص: {{ $c->name }}</span>@endif
         </div>
+        @if(count($contact))<div class="client-line">{!! implode(' &nbsp;|&nbsp; ', $contact) !!}</div>@endif
+        @if($c->address)<div class="client-line">پتہ: <strong>{{ $c->address }}</strong></div>@endif
     </div>
 
     <table class="items">
@@ -290,6 +301,12 @@
         <div class="legal-title">QUOTATION NOTICE</div>
         <div class="legal-text">{{ $validityNote }}</div>
     </div>
+
+    @if(count($sampleImgs))
+    <div class="samples-wrap">
+        @foreach($sampleImgs as $img)<img src="{{ $img }}" alt="">@endforeach
+    </div>
+    @endif
 
     @if($ceoName || $managerName || $ceoSig || $managerSig || $stampImg)
     <div class="sign-wrap">

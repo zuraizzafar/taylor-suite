@@ -13,6 +13,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class QuotationController extends Controller
@@ -65,6 +66,8 @@ class QuotationController extends Controller
             'advance_percentage'  => ['nullable', 'numeric', 'min:0', 'max:100'],
             'design_reference'    => ['nullable', 'string'],
             'delivery_note'       => ['nullable', 'string', 'max:500'],
+            'sample_image_1'      => ['nullable', 'image', 'mimes:png,jpg,jpeg,webp', 'max:4096'],
+            'sample_image_2'      => ['nullable', 'image', 'mimes:png,jpg,jpeg,webp', 'max:4096'],
             'notes'               => ['nullable', 'string'],
             'description'         => ['required', 'array', 'min:1'],
             'description.*'       => ['nullable', 'string'],
@@ -92,6 +95,7 @@ class QuotationController extends Controller
         ]);
 
         $this->syncItems($quotation, $request);
+        $this->syncSampleImages($quotation, $request);
         $quotation->recalculateTotals();
 
         return redirect()->route('quotations.show', $quotation)
@@ -122,6 +126,8 @@ class QuotationController extends Controller
             'advance_percentage'  => ['nullable', 'numeric', 'min:0', 'max:100'],
             'design_reference'    => ['nullable', 'string'],
             'delivery_note'       => ['nullable', 'string', 'max:500'],
+            'sample_image_1'      => ['nullable', 'image', 'mimes:png,jpg,jpeg,webp', 'max:4096'],
+            'sample_image_2'      => ['nullable', 'image', 'mimes:png,jpg,jpeg,webp', 'max:4096'],
             'notes'               => ['nullable', 'string'],
             'description'         => ['required', 'array', 'min:1'],
             'description.*'       => ['nullable', 'string'],
@@ -142,6 +148,7 @@ class QuotationController extends Controller
         ]);
 
         $this->syncItems($quotation, $request);
+        $this->syncSampleImages($quotation, $request);
         $quotation->recalculateTotals();
 
         return redirect()->route('quotations.show', $quotation)
@@ -150,6 +157,11 @@ class QuotationController extends Controller
 
     public function destroy(Quotation $quotation): RedirectResponse
     {
+        foreach (['sample_image_1', 'sample_image_2'] as $field) {
+            if ($quotation->$field) {
+                Storage::disk('public')->delete($quotation->$field);
+            }
+        }
         $quotation->delete();
         return redirect()->route('quotations.index')->with('success', 'Quotation deleted.');
     }
@@ -229,6 +241,23 @@ class QuotationController extends Controller
                 'redirect_to' => route('orders.show', $order),
             ])
             ->with('success', "Quotation {$quotation->quotation_number} converted to Order {$order->order_number}. Add the customer's measurements to continue.");
+    }
+
+    private function syncSampleImages(Quotation $quotation, Request $request): void
+    {
+        foreach (['sample_image_1', 'sample_image_2'] as $field) {
+            $replace = $request->hasFile($field);
+            $remove  = $request->boolean('remove_' . $field);
+
+            if (($replace || $remove) && $quotation->$field) {
+                Storage::disk('public')->delete($quotation->$field);
+                $quotation->$field = null;
+            }
+            if ($replace) {
+                $quotation->$field = $request->file($field)->store('quotation-samples', 'public');
+            }
+        }
+        $quotation->save();
     }
 
     private function syncItems(Quotation $quotation, Request $request): void

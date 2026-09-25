@@ -128,6 +128,26 @@
             class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">{{ old('design_reference', $quotation->design_reference ?? '') }}</textarea>
     </div>
 
+    <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Sample Images') }} <span class="text-xs text-slate-400 font-normal">({{ __('optional, up to 2 — printed above the signatures') }})</span></label>
+        <div class="grid grid-cols-2 gap-4">
+            @foreach([1, 2] as $n)
+            @php $field = 'sample_image_' . $n; @endphp
+            <div class="border border-slate-200 rounded-lg p-3 space-y-2">
+                @if(isset($quotation) && $quotation->$field)
+                <img src="{{ asset('storage/' . $quotation->$field) }}" alt="Sample {{ $n }}" class="h-24 object-contain border border-slate-100 rounded bg-slate-50 w-full">
+                <label class="flex items-center gap-2 text-xs text-red-600">
+                    <input type="checkbox" name="remove_{{ $field }}" value="1"> {{ __('Remove this image') }}
+                </label>
+                @endif
+                <input type="file" name="{{ $field }}" accept="image/png,image/jpeg,image/webp"
+                    class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-xs file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                @error($field)<p class="text-xs text-red-600">{{ $message }}</p>@enderror
+            </div>
+            @endforeach
+        </div>
+    </div>
+
     <div class="notes-container">
         <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Notes') }}</label>
         <textarea name="notes" rows="2"
