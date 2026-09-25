@@ -261,9 +261,9 @@ class QuotationController extends Controller
 
         return redirect()->route('measurements.create', [
                 'customer'    => $quotation->customer_id,
-                'redirect_to' => route('orders.show', $order),
+                'redirect_to' => route('orders.suits-prompt', $order),
             ])
-            ->with('success', "Quotation {$quotation->quotation_number} converted to Order {$order->order_number}. Add the customer's measurements to continue.");
+            ->with('success', "Quotation {$quotation->quotation_number} converted to Order {$order->order_number}. Add the customer's measurements, then add suits.");
     }
 
     /** Sanitised discount + tax inputs; totals are derived later by Quotation::recalculateTotals(). */

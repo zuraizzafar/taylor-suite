@@ -95,6 +95,7 @@ Route::middleware('auth')->group(function () {
 
         // Orders
         Route::resource('orders', OrderController::class);
+        Route::get('/orders/{order}/suits-prompt', [OrderController::class, 'suitsPrompt'])->name('orders.suits-prompt');
         Route::get('/orders/{order}/invoice', [OrderController::class, 'invoice'])->name('orders.invoice');
         Route::get('/orders/{order}/tags', [OrderController::class, 'tags'])->name('orders.tags');
 

@@ -16,34 +16,34 @@
 <div class="space-y-3">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         @if($discount)
-        <div>
+        <div class="min-w-0">
             <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Discount') }}</label>
             <div class="flex gap-2">
                 <select name="discount_type" x-model="discountType"
-                    class="w-32 border border-slate-300 rounded-lg px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    class="w-32 shrink-0 border border-slate-300 rounded-lg px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option value="">{{ __('No discount') }}</option>
                     <option value="percent">{{ __('Percent (%)') }}</option>
                     <option value="fixed">{{ __('Fixed (Rs)') }}</option>
                 </select>
                 <input type="number" name="discount_value" x-model.number="discountValue" x-show="discountType" min="0" step="0.01"
                     :max="discountType === 'percent' ? 100 : null"
-                    class="flex-1 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    class="flex-1 min-w-0 w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="0">
             </div>
         </div>
         @endif
 
         @if($taxEnabled)
-        <div>
+        <div class="min-w-0">
             <label class="block text-sm font-medium text-slate-700 mb-1">{{ $taxLabel }}</label>
             <div class="flex gap-2">
                 <select name="tax_mode" x-model="taxMode" @change="onTaxModeChange()"
-                    class="flex-1 border border-slate-300 rounded-lg px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    class="flex-1 min-w-0 border border-slate-300 rounded-lg px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option value="none">{{ __('No tax') }}</option>
                     <option value="exclusive">{{ __('Exclusive (not charged)') }}</option>
                     <option value="inclusive">{{ __('Inclusive (charged)') }}</option>
                 </select>
-                <div class="relative w-24" x-show="taxMode !== 'none'">
+                <div class="relative w-24 shrink-0" x-show="taxMode !== 'none'">
                     <input type="number" name="tax_rate" x-model.number="taxRate" min="0" max="100" step="0.01"
                         class="w-full border border-slate-300 rounded-lg pl-3 pr-6 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <span class="absolute right-2 top-2 text-sm text-slate-400">%</span>

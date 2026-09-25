@@ -71,6 +71,12 @@
     .info-cell      { display: table-cell; border: 1px solid #e2e8f0; border-radius: 6px; padding: 6px 10px; vertical-align: top; font-family: DejaVu Sans, sans-serif; }
     .info-cell-title { font-size: 7.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; margin-bottom: 3px; font-family: DejaVu Sans, sans-serif; }
     .info-cell-name  { font-size: 11px; font-weight: 700; color: #0f172a; font-family: DejaVu Sans, sans-serif; }
+    .client-box   { border: 1px solid #e2e8f0; border-left: 4px solid #1e293b; border-radius: 4px; background: #f8fafc; padding: 7px 10px; margin-bottom: 8px; font-family: DejaVu Sans, sans-serif; page-break-inside: avoid !important; }
+    .client-label { font-size: 7.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; margin-bottom: 3px; font-family: DejaVu Sans, sans-serif; }
+    .client-name  { font-size: 12px; font-weight: 700; color: #0f172a; font-family: DejaVu Sans, sans-serif; }
+    .client-attn  { font-size: 9px; font-weight: 400; color: #64748b; font-family: DejaVu Sans, sans-serif; }
+    .client-line  { font-size: 9px; color: #475569; margin-top: 3px; line-height: 1.5; font-family: DejaVu Sans, sans-serif; }
+    .client-line strong { color: #1e293b; font-family: DejaVu Sans, sans-serif; }
     .info-cell-sub   { font-size: 9px; color: #64748b; margin-top: 2px; line-height: 1.5; font-family: DejaVu Sans, sans-serif; }
 
     /* Suits table */
@@ -264,42 +270,45 @@
         </div>
     </div>
 
-    {{-- CUSTOMER + BANK --}}
-    <div class="info-row">
-        <div class="info-cell" style="width:{{ ($bankName || $bankAccount) ? '44%' : '96%' }}">
-            <div class="info-cell-title">{{ $isUrdu ? __('Billed To') : 'Billed To' }}</div>
-            <div class="info-cell-name">{{ $order->customer->name }}</div>
-            <div class="info-cell-sub">
-                @if($order->customer->company_name)Company: <strong>{{ $order->customer->company_name }}</strong><br>@endif
-                @if($order->customer->ntn)NTN: <strong>{{ $order->customer->ntn }}</strong><br>@endif
-                File No: <strong>{{ $order->customer->file_number }}</strong><br>
-                Mobile: {{ $order->customer->mobile }}
-                @if($order->customer->address)<br>{{ $order->customer->address }}@endif
-            </div>
+    {{-- BILLED TO --}}
+    @php
+        $c = $order->customer;
+        $contact = [];
+        if ($c->mobile) $contact[] = ($isUrdu ? __('Mobile') : 'Mobile') . ': <strong>' . e($c->mobile) . '</strong>';
+        if ($c->email) $contact[] = ($isUrdu ? __('Email') : 'Email') . ': <strong>' . e($c->email) . '</strong>';
+        if ($c->ntn) $contact[] = 'NTN: <strong>' . e($c->ntn) . '</strong>';
+        $contact[] = ($isUrdu ? __('File Number') : 'File No') . ': <strong>' . e($c->file_number) . '</strong>';
+    @endphp
+    <div class="client-box">
+        <div class="client-label">{{ $isUrdu ? __('Billed To') : 'Billed To' }}</div>
+        <div class="client-name">
+            {{ $c->company_name ?: $c->name }}
+            @if($c->company_name)<span class="client-attn">&nbsp; {{ $isUrdu ? __('Contact Person') : 'Attn' }}: {{ $c->name }}</span>@endif
         </div>
-        @if($bankName || $bankAccount)
-        <div class="info-cell" style="width:52%">
-            <table style="width:100%; border-collapse:collapse; border:none; margin:0; padding:0;" dir="{{ app()->getLocale() === 'ur' ? 'rtl' : 'ltr' }}">
-                <tr>
-                    <td style="border:none; padding:0; vertical-align:top; text-align:{{ app()->getLocale() === 'ur' ? 'right' : 'left' }};">
-                        <div class="info-cell-title">{{ $isUrdu ? __('Bank Payment Details') : 'Bank Payment Details' }}</div>
-                        @if($bankName)<div class="info-cell-name" style="font-size:11px; margin-bottom:4px;">{{ $bankName }}</div>@endif
-                        <div class="info-cell-sub">
-                            @if($bankTitle)Title: <strong>{{ $bankTitle }}</strong><br>@endif
-                            @if($bankAccount)Account: <strong>{{ $bankAccount }}</strong>@endif
-                        </div>
-                    </td>
-                    @if($payQrB64)
-                    <td style="border:none; padding:{{ app()->getLocale() === 'ur' ? '0 10px 0 0' : '0 0 0 10px' }}; vertical-align:middle; text-align:{{ app()->getLocale() === 'ur' ? 'left' : 'right' }}; width:75px;">
-                        <img src="data:{{ $payQrMime }};base64,{{ $payQrB64 }}" alt="Payment QR" style="width:65px;height:65px;display:block;margin:0 auto 2px;">
-                        <div style="font-size:7px;color:#94a3b8;text-align:center;">{{ $isUrdu ? __('Scan to pay') : 'Scan to pay' }}</div>
-                    </td>
-                    @endif
-                </tr>
-            </table>
-        </div>
-        @endif
+        <div class="client-line">{!! implode(' &nbsp;|&nbsp; ', $contact) !!}</div>
+        @if($c->address)<div class="client-line">{{ $isUrdu ? __('Address') : 'Address' }}: <strong>{{ $c->address }}</strong></div>@endif
     </div>
+
+    @if($bankName || $bankAccount)
+    <div class="client-box" style="margin-bottom:10px;">
+        <table style="width:100%; border-collapse:collapse; border:none; margin:0; padding:0;" dir="{{ $isUrdu ? 'rtl' : 'ltr' }}">
+            <tr>
+                <td style="border:none; padding:0; vertical-align:top; text-align:{{ $isUrdu ? 'right' : 'left' }};">
+                    <div class="client-label">{{ $isUrdu ? __('Bank Payment Details') : 'Bank Payment Details' }}</div>
+                    @if($bankName)<div class="client-name" style="font-size:11px;">{{ $bankName }}</div>@endif
+                    @if($bankTitle)<div class="client-line">{{ $isUrdu ? __('Account Title') : 'Title' }}: <strong>{{ $bankTitle }}</strong></div>@endif
+                    @if($bankAccount)<div class="client-line">{{ $isUrdu ? __('Account Number') : 'Account' }}: <strong>{{ $bankAccount }}</strong></div>@endif
+                </td>
+                @if($payQrB64)
+                <td style="border:none; padding:{{ $isUrdu ? '0 10px 0 0' : '0 0 0 10px' }}; vertical-align:middle; text-align:center; width:75px;">
+                    <img src="data:{{ $payQrMime }};base64,{{ $payQrB64 }}" alt="Payment QR" style="width:65px;height:65px;display:block;margin:0 auto 2px;">
+                    <div style="font-size:7px;color:#94a3b8;text-align:center;">{{ $isUrdu ? __('Scan to pay') : 'Scan to pay' }}</div>
+                </td>
+                @endif
+            </tr>
+        </table>
+    </div>
+    @endif
 
     {{-- SUITS TABLE --}}
     <table class="items">

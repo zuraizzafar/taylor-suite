@@ -116,9 +116,12 @@ class TaxAndDiscountTest extends TestCase
         $this->post(route('quotations.store'), $this->quotationPayload());
         $q = Quotation::firstOrFail();
 
-        $this->post(route('quotations.convert', $q))->assertRedirect();
-
+        $resp = $this->post(route('quotations.convert', $q));
         $o = Order::firstOrFail();
+        $resp->assertRedirect(route('measurements.create', [
+            'customer' => $this->customer->id, 'redirect_to' => route('orders.suits-prompt', $o),
+        ]));
+
         $this->assertEquals(10000, $o->subtotal);
         $this->assertEquals(1000, $o->discount_amount);
         $this->assertEquals('inclusive', $o->tax_mode);
@@ -357,5 +360,24 @@ class TaxAndDiscountTest extends TestCase
         $c = Customer::where('name', 'Ali')->firstOrFail();
         $this->assertSame('Acme', $c->company_name);
         $this->assertSame('123-4', $c->ntn);
+    }
+
+    public function test_suits_prompt_offers_add_or_skip_and_skips_when_suits_exist(): void
+    {
+        $this->post(route('orders.store'), [
+            'customer_id' => $this->customer->id, 'order_date' => '2026-10-01', 'subtotal' => 1000, 'tax_mode' => 'none',
+        ]);
+        $o = Order::firstOrFail();
+
+        $this->get(route('orders.suits-prompt', $o))->assertOk()
+            ->assertSee(route('suits.create', ['order_id' => $o->id, 'customer_id' => $this->customer->id]))
+            ->assertSee(route('orders.show', $o))
+            ->assertSee('Skip');
+
+        \App\Models\Suit::create([
+            'customer_id' => $this->customer->id, 'order_id' => $o->id, 'suit_number' => 1, 'suit_code' => 'S00001',
+            'suit_type' => 'Shalwar Kameez', 'fabric_meter' => 4, 'status' => 'pending',
+        ]);
+        $this->get(route('orders.suits-prompt', $o))->assertRedirect(route('orders.show', $o));
     }
 }

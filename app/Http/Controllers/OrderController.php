@@ -121,6 +121,17 @@ class OrderController extends Controller
         return view('orders.show', compact('order', 'tax'));
     }
 
+    /** Shown after measurements when a quotation was converted: offer to add suits or skip. */
+    public function suitsPrompt(Order $order): View|RedirectResponse
+    {
+        if ($order->suits()->exists()) {
+            return redirect()->route('orders.show', $order);
+        }
+
+        $order->load('customer');
+        return view('orders.suits-prompt', compact('order'));
+    }
+
     public function edit(Order $order): View
     {
         $customers      = Customer::orderBy('name')->get();
