@@ -23,6 +23,7 @@ class Quotation extends Model
         'advance_amount',
         'balance_amount',
         'design_reference',
+        'delivery_note',
         'notes',
         'status',
         'converted_order_id',

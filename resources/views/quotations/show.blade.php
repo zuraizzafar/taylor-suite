@@ -74,6 +74,10 @@
             </div>
         </div>
 
+        @if($quotation->delivery_note)
+        <p class="mt-3 text-sm text-slate-600">🚚 <span class="font-medium">{{ __('Delivery Note') }}:</span> {{ $quotation->delivery_note }}</p>
+        @endif
+
         @if($quotation->notes)
         <p class="mt-3 text-sm text-slate-500">📝 {{ $quotation->notes }}</p>
         @endif

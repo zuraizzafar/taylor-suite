@@ -36,6 +36,7 @@
     $bankTitle      = $settings['bank_account_title']  ?? '';
     $bankAccount    = $settings['bank_account_number'] ?? '';
     $logoPath       = $settings['logo_path']           ?? null;
+    $taxNumber      = $settings['company_tax_number']  ?? '';
     $paymentQrPath  = $settings['payment_qr_path']     ?? null;
     $legalNote      = $settings['invoice_legal_note_ur']
                         ?? ($settings['invoice_legal_note'] ?? 'ادائیگی صرف اس انوائس پر درج مجاز بینک اکاؤنٹ کے ذریعے قبول کی جاتی ہے۔ کسی اور اکاؤنٹ پر کی گئی ادائیگی کی ذمہ داری دکان یا کمپنی پر نہیں ہوگی۔');
@@ -270,6 +271,9 @@
                 @if($companyPhone) | {{ $companyPhone }}@endif
                 @if($companyEmail) | {{ $companyEmail }}@endif
             </div>
+            @if($taxNumber)
+            <div class="company-meta" style="color:#1e293b;font-weight:700;">ٹیکس رجسٹریشن نمبر: {{ $taxNumber }}</div>
+            @endif
         </div>
         <div class="header-right">
             <div class="invoice-title">INVOICE</div>

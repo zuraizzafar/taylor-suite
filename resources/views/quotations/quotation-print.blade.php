@@ -6,6 +6,19 @@
     $companyEmail   = $settings['company_email']       ?? '';
     $companyWebsite = $settings['company_website']     ?? '';
     $logoPath       = $settings['logo_path']           ?? null;
+    $taxNumber      = $settings['company_tax_number']  ?? '';
+    $ceoName        = $settings['ceo_name']            ?? '';
+    $managerName    = $settings['manager_name']        ?? '';
+    $embed = function (?string $path) {
+        if (! $path) return null;
+        $full = storage_path('app/public/' . $path);
+        return file_exists($full)
+            ? 'data:' . mime_content_type($full) . ';base64,' . base64_encode(file_get_contents($full))
+            : null;
+    };
+    $ceoSig     = $embed($settings['ceo_signature_path'] ?? null);
+    $managerSig = $embed($settings['manager_signature_path'] ?? null);
+    $stampImg   = $embed($settings['company_stamp_path'] ?? null);
 
     $validityNote = $settings['quotation_validity_note_ur']
         ?? 'یہ کوٹیشن مذکورہ بالا تاریخ سے صرف بتائی گئی مدت کے لیے کارآمد ہے۔ حتمی قیمت پیمائش اور حتمی ڈیزائن کی تصدیق کے بعد تبدیل ہو سکتی ہے۔';
@@ -85,6 +98,16 @@
     .header-brand .logo-img { height: 48px; width: auto; }
     .header-brand .logo-fallback { font-size: 18px; font-weight: 800; color: #0f172a; }
     .header-brand .company-meta { font-size: 9.5px; color: #64748b; margin-top: 3px; line-height: 1.3; }
+    .header-brand .company-name { font-size: 17px; font-weight: 700; color: #0f172a; margin-top: 4px; }
+    .header-brand .company-tax { font-size: 10px; font-weight: 700; color: #1e293b; margin-top: 2px; font-family: sans-serif; }
+    .delivery-box { margin-bottom: 10px; padding: 6px 10px; background: #fffbeb; border: 1px solid #fcd34d; border-right: 4px solid #f59e0b; border-radius: 4px; font-size: 10.5px; color: #78350f; }
+    .sign-wrap { display: flex; align-items: flex-end; gap: 24px; margin: 16px 0 10px; }
+    .sign-cell { width: 180px; }
+    .sign-title { font-size: 9px; font-weight: 700; color: #64748b; margin-bottom: 4px; }
+    .sign-img { height: 42px; width: auto; display: block; }
+    .sign-space { height: 42px; }
+    .sign-line { border-top: 1px solid #1e293b; margin-top: 2px; padding-top: 3px; font-size: 10px; }
+    .stamp-img { height: 85px; width: auto; margin-right: auto; }
     .header-right { text-align: left; }
     .doc-title { font-size: 20px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 1px; font-family: sans-serif; }
     .doc-no {
@@ -161,15 +184,17 @@
         <div class="header-brand">
             @if($logoB64)
             <img class="logo-img" src="data:{{ $logoMime }};base64,{{ $logoB64 }}" alt="{{ $companyName }}">
-            @else
-            <div class="logo-fallback">{{ $companyName }}</div>
             @endif
+            <div class="company-name">{{ $companyName }}</div>
             <div class="company-meta">
                 {{ $companyTagline }}
-                @if($companyAddress) | {{ $companyAddress }}@endif
+                @if($companyAddress)<br>{{ $companyAddress }}@endif
                 @if($companyPhone) | {{ $companyPhone }}@endif
                 @if($companyEmail) | {{ $companyEmail }}@endif
             </div>
+            @if($taxNumber)
+            <div class="company-tax">ٹیکس رجسٹریشن نمبر: {{ $taxNumber }}</div>
+            @endif
         </div>
         <div class="header-right">
             <div class="doc-title">QUOTATION</div>
@@ -180,6 +205,10 @@
             </div>
         </div>
     </div>
+
+    @if($quotation->delivery_note)
+    <div class="delivery-box"><strong>ڈیلیوری نوٹ:</strong> {{ $quotation->delivery_note }}</div>
+    @endif
 
     <div class="info-row">
         <div class="info-cell" style="flex: 1;">
@@ -197,7 +226,8 @@
             <tr>
                 <th style="width:28px">#</th>
                 <th>تفصیل</th>
-                <th style="width:70px">تعداد</th>
+                <th style="width:60px">تعداد</th>
+                <th style="width:90px">فی عدد قیمت</th>
                 <th style="width:100px">رقم</th>
             </tr>
         </thead>
@@ -207,6 +237,7 @@
                 <td>{{ $i + 1 }}</td>
                 <td>{{ $item->description }}</td>
                 <td>{{ rtrim(rtrim(number_format((float) $item->qty, 2), '0'), '.') }}</td>
+                <td>Rs {{ number_format($item->rate) }}</td>
                 <td>Rs {{ number_format($item->line_total) }}</td>
             </tr>
             @endforeach
@@ -245,6 +276,22 @@
         <div class="legal-title">QUOTATION NOTICE</div>
         <div class="legal-text">{{ $validityNote }}</div>
     </div>
+
+    @if($ceoName || $managerName || $ceoSig || $managerSig || $stampImg)
+    <div class="sign-wrap">
+        <div class="sign-cell">
+            <div class="sign-title">سی ای او</div>
+            @if($ceoSig)<img class="sign-img" src="{{ $ceoSig }}" alt="">@else<div class="sign-space"></div>@endif
+            <div class="sign-line">{{ $ceoName }}</div>
+        </div>
+        <div class="sign-cell">
+            <div class="sign-title">مینیجر</div>
+            @if($managerSig)<img class="sign-img" src="{{ $managerSig }}" alt="">@else<div class="sign-space"></div>@endif
+            <div class="sign-line">{{ $managerName }}</div>
+        </div>
+        @if($stampImg)<img class="stamp-img" src="{{ $stampImg }}" alt="">@endif
+    </div>
+    @endif
 
     <div class="footer">
         <div>{{ $companyName }} — {{ $companyTagline }}</div>

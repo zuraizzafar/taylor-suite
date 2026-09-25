@@ -460,5 +460,19 @@
     "Converted": "تبدیل شدہ",
     "Expired": "میعاد ختم",
     "View Order": "آرڈر دیکھیں",
-    "Quotation Notice": "کوٹیشن نوٹس"
+    "Quotation Notice": "کوٹیشن نوٹس",
+
+    "Delivery Note": "ڈیلیوری نوٹ",
+    "e.g. Delivery within 10 working days after measurements": "مثلاً پیمائش کے بعد 10 کام کے دنوں میں ڈیلیوری",
+    "Unit Price": "فی عدد قیمت",
+    "Tax Registration No.": "ٹیکس رجسٹریشن نمبر",
+    "Tax Registration No. (NTN)": "ٹیکس رجسٹریشن نمبر (این ٹی این)",
+    "Prints on invoices and quotations.": "انوائس اور کوٹیشن پر پرنٹ ہوگا۔",
+    "Signatures & Company Stamp": "دستخط اور کمپنی کی مہر",
+    "CEO": "سی ای او",
+    "Manager": "مینیجر",
+    "Full name": "پورا نام",
+    "Signature image (PNG with transparent background works best).": "دستخط کی تصویر (شفاف پس منظر والی PNG بہتر ہے)۔",
+    "Company Stamp": "کمپنی کی مہر",
+    "Printed beside the signatures on quotations.": "کوٹیشن پر دستخطوں کے ساتھ پرنٹ ہوگی۔"
 }

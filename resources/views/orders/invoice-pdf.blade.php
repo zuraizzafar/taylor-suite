@@ -170,6 +170,7 @@
     $bankTitle      = $settings['bank_account_title']  ?? '';
     $bankAccount    = $settings['bank_account_number'] ?? '';
     $logoPath       = $settings['logo_path']           ?? null;
+    $taxNumber      = $settings['company_tax_number']  ?? '';
     $paymentQrPath  = $settings['payment_qr_path']     ?? null;
     $isUrdu = app()->getLocale() === 'ur';
     $legalNote      = $isUrdu
@@ -245,6 +246,9 @@
                 @if($companyPhone) &nbsp;|&nbsp; Tel: {{ $companyPhone }}@endif
                 @if($companyEmail) &nbsp;|&nbsp; {{ $companyEmail }}@endif
             </div>
+            @if($taxNumber)
+            <div class="company-meta" style="color:#1e293b;font-weight:700;">{{ $isUrdu ? __('Tax Registration No.') : 'Tax Registration No.' }}: {{ $taxNumber }}</div>
+            @endif
         </div>
         <div class="header-right">
             <div class="invoice-title">{{ $isUrdu ? __('Invoice') : 'Invoice' }}</div>

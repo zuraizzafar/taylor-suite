@@ -64,6 +64,7 @@ class QuotationController extends Controller
             'validity_days'       => ['required', 'integer', 'min:1'],
             'advance_percentage'  => ['nullable', 'numeric', 'min:0', 'max:100'],
             'design_reference'    => ['nullable', 'string'],
+            'delivery_note'       => ['nullable', 'string', 'max:500'],
             'notes'               => ['nullable', 'string'],
             'description'         => ['required', 'array', 'min:1'],
             'description.*'       => ['nullable', 'string'],
@@ -85,6 +86,7 @@ class QuotationController extends Controller
             'validity_days'      => $data['validity_days'],
             'advance_percentage' => $data['advance_percentage'] ?? 50,
             'design_reference'   => $data['design_reference'] ?? null,
+            'delivery_note'      => $data['delivery_note'] ?? null,
             'notes'              => $data['notes'] ?? null,
             'status'             => 'draft',
         ]);
@@ -119,6 +121,7 @@ class QuotationController extends Controller
             'validity_days'       => ['required', 'integer', 'min:1'],
             'advance_percentage'  => ['nullable', 'numeric', 'min:0', 'max:100'],
             'design_reference'    => ['nullable', 'string'],
+            'delivery_note'       => ['nullable', 'string', 'max:500'],
             'notes'               => ['nullable', 'string'],
             'description'         => ['required', 'array', 'min:1'],
             'description.*'       => ['nullable', 'string'],
@@ -134,6 +137,7 @@ class QuotationController extends Controller
             'validity_days'      => $data['validity_days'],
             'advance_percentage' => $data['advance_percentage'] ?? 50,
             'design_reference'   => $data['design_reference'] ?? null,
+            'delivery_note'      => $data['delivery_note'] ?? null,
             'notes'              => $data['notes'] ?? null,
         ]);
 

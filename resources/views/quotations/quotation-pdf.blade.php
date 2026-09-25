@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: DejaVu Sans, sans-serif; }
     body { font-family: DejaVu Sans, sans-serif; font-size: 12px; color: #1e293b; background: #fff; }
     @if(app()->getLocale() === 'ur')
     @@font-face {
@@ -50,11 +50,22 @@
     .header-left  { display: table-cell; vertical-align: top; width: 60%; }
     .header-right { display: table-cell; vertical-align: top; text-align: right; }
 
-    .logo-fallback { font-size: 20px; font-weight: 800; color: #0f172a; letter-spacing: -0.5px; }
+    .company-name  { font-size: 15px; font-weight: 700; color: #0f172a; margin-top: 4px; letter-spacing: 0.3px; }
+    .company-tax   { font-size: 9px; color: #1e293b; margin-top: 2px; font-weight: 700; }
+    .delivery-box  { margin-bottom: 10px; padding: 6px 10px; background: #fffbeb; border: 1px solid #fcd34d; border-left: 4px solid #f59e0b; border-radius: 4px; font-size: 10px; color: #78350f; page-break-inside: avoid !important; }
+    .sign-wrap     { display: table; width: 100%; margin: 14px 0 10px; page-break-inside: avoid !important; }
+    .sign-cell     { display: table-cell; vertical-align: bottom; width: 30%; padding-right: 14px; }
+    .sign-title    { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #64748b; margin-bottom: 4px; }
+    .sign-img      { height: 38px; width: auto; display: block; }
+    .sign-line     { border-top: 1px solid #1e293b; margin-top: 2px; padding-top: 3px; font-size: 9px; color: #1e293b; }
+    .sign-role     { font-size: 8px; color: #64748b; }
+    .stamp-cell    { display: table-cell; vertical-align: bottom; text-align: right; }
+    .stamp-img     { height: 80px; width: auto; }
+    .logo-fallback { font-size: 20px; font-weight: 700; color: #0f172a; letter-spacing: -0.5px; }
     .logo-img      { height: 60px; width: auto; }
     .company-meta  { font-size: 9.5px; color: #64748b; margin-top: 3px; line-height: 1.4; }
 
-    .doc-title  { font-size: 22px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 1.5px; }
+    .doc-title  { font-size: 22px; font-weight: 700; color: #0f172a; text-transform: uppercase; letter-spacing: 1.5px; }
     .doc-no     { display: inline-block; background: #1e293b; color: #fff; font-size: 9.5px; font-weight: 700; letter-spacing: 0.5px; padding: 2px 8px; border-radius: 4px; margin-top: 3px; }
     .doc-dates  { font-size: 9px; color: #475569; margin-top: 3px; line-height: 1.5; }
     .doc-dates strong { color: #1e293b; }
@@ -67,7 +78,7 @@
 
     table.items           { width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 11px; }
     table.items thead tr  { background: #1e293b; }
-    table.items thead th  { padding: 6px 8px; font-size: 12px; font-weight: 600; text-align: left; letter-spacing: 0.3px; color: #ffffff; background: #1e293b; }
+    table.items thead th  { padding: 6px 8px; font-size: 12px; font-weight: 700; text-align: left; letter-spacing: 0.3px; color: #ffffff; background: #1e293b; }
     table.items tbody tr:nth-child(even) { background: #f8fafc; }
     table.items tbody td  { padding: 6px 8px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; font-size: 11px; color: #1e293b; }
 
@@ -78,7 +89,7 @@
     .totals-table tr   { border-bottom: 1px solid #f1f5f9; }
     .totals-table tr:last-child { border-bottom: none; }
     .lbl { color: #64748b; }
-    .val { text-align: right; font-weight: 600; }
+    .val { text-align: right; font-weight: 700; }
     .row-advance { background: #f0fdf4; }
     .row-balance { background: #1e293b; }
 
@@ -107,12 +118,26 @@
     $companyPhone   = $settings['company_phone']       ?? '';
     $companyEmail   = $settings['company_email']       ?? '';
     $companyWebsite = $settings['company_website']     ?? '';
+    $taxNumber      = $settings['company_tax_number']  ?? '';
+    $ceoName        = $settings['ceo_name']            ?? '';
+    $managerName    = $settings['manager_name']        ?? '';
     $logoPath       = $settings['logo_path']           ?? null;
     $isUrdu         = app()->getLocale() === 'ur';
 
     $validityNote = $isUrdu
         ? ($settings['quotation_validity_note_ur'] ?? 'یہ کوٹیشن مذکورہ بالا تاریخ سے صرف بتائی گئی مدت کے لیے کارآمد ہے۔ حتمی قیمت پیمائش اور حتمی ڈیزائن کی تصدیق کے بعد تبدیل ہو سکتی ہے۔')
         : ($settings['quotation_validity_note_en'] ?? 'This quotation is valid only for the period stated above from the quotation date. Final pricing may vary after measurements and design confirmation.');
+
+    $embed = function (?string $path) {
+        if (! $path) return null;
+        $full = storage_path('app/public/' . $path);
+        return file_exists($full)
+            ? 'data:' . mime_content_type($full) . ';base64,' . base64_encode(file_get_contents($full))
+            : null;
+    };
+    $ceoSig     = $embed($settings['ceo_signature_path'] ?? null);
+    $managerSig = $embed($settings['manager_signature_path'] ?? null);
+    $stampImg   = $embed($settings['company_stamp_path'] ?? null);
 
     $logoB64  = null;
     $logoMime = 'image/png';
@@ -134,16 +159,18 @@
         <div class="header-left">
             @if($logoB64)
             <img class="logo-img" src="data:{{ $logoMime }};base64,{{ $logoB64 }}" alt="{{ $companyName }}">
-            @else
-            <div class="logo-fallback">{{ $companyName }}</div>
             @endif
+            <div class="company-name">{{ $companyName }}</div>
             <div class="company-meta">
                 {{ $companyTagline }}
-                @if($companyAddress) &nbsp;|&nbsp; {{ $companyAddress }}@endif
+                @if($companyAddress)<br>{{ $companyAddress }}@endif
                 @if($companyPhone) &nbsp;|&nbsp; Tel: {{ $companyPhone }}@endif
                 @if($companyEmail) &nbsp;|&nbsp; {{ $companyEmail }}@endif
                 @if($companyWebsite) &nbsp;|&nbsp; {{ $companyWebsite }}@endif
             </div>
+            @if($taxNumber)
+            <div class="company-tax">{{ $isUrdu ? __('Tax Registration No.') : 'Tax Registration No.' }}: {{ $taxNumber }}</div>
+            @endif
         </div>
         <div class="header-right">
             <div class="doc-title">{{ $isUrdu ? __('Quotation') : 'Quotation' }}</div>
@@ -154,6 +181,10 @@
             </div>
         </div>
     </div>
+
+    @if($quotation->delivery_note)
+    <div class="delivery-box"><strong>{{ $isUrdu ? __('Delivery Note') : 'Delivery Note' }}:</strong> {{ $quotation->delivery_note }}</div>
+    @endif
 
     {{-- CUSTOMER --}}
     <div class="info-row">
@@ -173,8 +204,9 @@
             <tr>
                 <th style="width:24px">#</th>
                 <th>{{ $isUrdu ? __('Description') : 'Description' }}</th>
-                <th style="width:60px;text-align:right">{{ $isUrdu ? __('Qty') : 'Qty' }}</th>
-                <th style="width:100px;text-align:right">{{ $isUrdu ? __('Amount') : 'Amount' }}</th>
+                <th style="width:50px;text-align:right">{{ $isUrdu ? __('Qty') : 'Qty' }}</th>
+                <th style="width:90px;text-align:right">{{ $isUrdu ? __('Unit Price') : 'Unit Price' }}</th>
+                <th style="width:95px;text-align:right">{{ $isUrdu ? __('Amount') : 'Amount' }}</th>
             </tr>
         </thead>
         <tbody>
@@ -183,6 +215,7 @@
                 <td>{{ $i + 1 }}</td>
                 <td>{{ $item->description }}</td>
                 <td style="text-align:right">{{ rtrim(rtrim(number_format((float) $item->qty, 2), '0'), '.') }}</td>
+                <td style="text-align:right">Rs {{ number_format($item->rate) }}</td>
                 <td style="text-align:right">Rs {{ number_format($item->line_total) }}</td>
             </tr>
             @endforeach
@@ -203,7 +236,7 @@
                 </tr>
                 <tr class="row-balance">
                     <td class="lbl" style="color:#e2e8f0;font-weight:700">{{ $isUrdu ? __('Remaining Balance') : 'Remaining Balance' }}</td>
-                    <td class="val" style="color:#fbbf24;font-weight:800;font-size:11.5px">Rs {{ number_format($quotation->balance_amount) }}</td>
+                    <td class="val" style="color:#fbbf24;font-weight:700;font-size:11.5px">Rs {{ number_format($quotation->balance_amount) }}</td>
                 </tr>
             </table>
         </div>
@@ -225,6 +258,25 @@
         <div class="legal-title">{{ $isUrdu ? __('Quotation Notice') : 'Quotation Notice' }}</div>
         <div class="legal-text">{{ $validityNote }}</div>
     </div>
+
+    {{-- SIGNATURES & STAMP --}}
+    @if($ceoName || $managerName || $ceoSig || $managerSig || $stampImg)
+    <div class="sign-wrap">
+        <div class="sign-cell">
+            <div class="sign-title">{{ $isUrdu ? __('CEO') : 'CEO' }}</div>
+            @if($ceoSig)<img class="sign-img" src="{{ $ceoSig }}" alt="CEO signature">@else<div style="height:38px"></div>@endif
+            <div class="sign-line">{{ $ceoName }}</div>
+        </div>
+        <div class="sign-cell">
+            <div class="sign-title">{{ $isUrdu ? __('Manager') : 'Manager' }}</div>
+            @if($managerSig)<img class="sign-img" src="{{ $managerSig }}" alt="Manager signature">@else<div style="height:38px"></div>@endif
+            <div class="sign-line">{{ $managerName }}</div>
+        </div>
+        <div class="stamp-cell">
+            @if($stampImg)<img class="stamp-img" src="{{ $stampImg }}" alt="Company stamp">@endif
+        </div>
+    </div>
+    @endif
 
     {{-- FOOTER --}}
     <div class="footer">

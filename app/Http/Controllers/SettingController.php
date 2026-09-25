@@ -17,6 +17,12 @@ class SettingController extends Controller
         'company_address',
         'company_phone',
         'company_email',
+        'company_tax_number',
+        'ceo_name',
+        'manager_name',
+        'ceo_signature_path',
+        'manager_signature_path',
+        'company_stamp_path',
         'bank_name',
         'bank_account_title',
         'bank_account_number',
@@ -62,6 +68,12 @@ class SettingController extends Controller
             'company_address'     => ['nullable', 'string', 'max:300'],
             'company_phone'       => ['nullable', 'string', 'max:50'],
             'company_email'       => ['nullable', 'email', 'max:150'],
+            'company_tax_number'  => ['nullable', 'string', 'max:50'],
+            'ceo_name'            => ['nullable', 'string', 'max:150'],
+            'manager_name'        => ['nullable', 'string', 'max:150'],
+            'ceo_signature'       => ['nullable', 'image', 'max:2048', 'mimes:png,jpg,jpeg,webp'],
+            'manager_signature'   => ['nullable', 'image', 'max:2048', 'mimes:png,jpg,jpeg,webp'],
+            'company_stamp'       => ['nullable', 'image', 'max:2048', 'mimes:png,jpg,jpeg,webp'],
             'bank_name'           => ['nullable', 'string', 'max:150'],
             'bank_account_title'  => ['nullable', 'string', 'max:150'],
             'bank_account_number' => ['nullable', 'string', 'max:50'],
@@ -92,8 +104,23 @@ class SettingController extends Controller
             Setting::set('payment_qr_path', $request->file('payment_qr')->store('logo', 'public'));
         }
 
+        // Signature / stamp uploads
+        foreach ([
+            'ceo_signature'     => 'ceo_signature_path',
+            'manager_signature' => 'manager_signature_path',
+            'company_stamp'     => 'company_stamp_path',
+        ] as $field => $settingKey) {
+            if ($request->hasFile($field)) {
+                $oldPath = Setting::get($settingKey);
+                if ($oldPath && Storage::disk('public')->exists($oldPath)) {
+                    Storage::disk('public')->delete($oldPath);
+                }
+                Setting::set($settingKey, $request->file($field)->store('logo', 'public'));
+            }
+        }
+
         // Save all text settings
-        foreach (Arr::except($data, ['logo', 'payment_qr']) as $key => $value) {
+        foreach (Arr::except($data, ['logo', 'payment_qr', 'ceo_signature', 'manager_signature', 'company_stamp']) as $key => $value) {
             if ($request->has($key)) {
                 Setting::set($key, $value ?? '');
             }

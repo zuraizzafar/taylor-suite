@@ -58,6 +58,15 @@
         </div>
     </div>
 
+    <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">{{ __('Delivery Note') }}</label>
+        <input type="text" name="delivery_note" maxlength="500"
+            value="{{ old('delivery_note', $quotation->delivery_note ?? '') }}"
+            placeholder="{{ __('e.g. Delivery within 10 working days after measurements') }}"
+            class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        @error('delivery_note')<p class="text-xs text-red-600 mt-1">{{ $message }}</p>@enderror
+    </div>
+
     <div class="border border-slate-200 rounded-xl p-4 space-y-3">
         <div class="flex items-center justify-between mb-1">
             <label class="text-sm font-medium text-slate-700">{{ __('Items') }}</label>
