@@ -87,10 +87,9 @@ class QuotationController extends Controller
             $data['branch_id'] = $branchId;
         }
 
-        $quotation = Quotation::create([
+        $quotation = Quotation::createWithUniqueNumber('quotation_number', fn (int $offset) => Quotation::nextQuotationNumber($offset), [
             'customer_id'        => $data['customer_id'],
             'branch_id'          => $data['branch_id'] ?? null,
-            'quotation_number'   => Quotation::nextQuotationNumber(),
             'quotation_date'     => $data['quotation_date'],
             'validity_days'      => $data['validity_days'],
             'advance_percentage' => $data['advance_percentage'] ?? 50,
@@ -220,10 +219,9 @@ class QuotationController extends Controller
                 ->with('error', 'This quotation was already converted.');
         }
 
-        $order = Order::create([
+        $order = Order::createWithUniqueNumber('order_number', fn (int $offset) => Order::nextOrderNumber($offset), [
             'customer_id'    => $quotation->customer_id,
             'branch_id'      => $quotation->branch_id,
-            'order_number'   => Order::nextOrderNumber(),
             'order_date'     => now()->toDateString(),
             'delivery_date'  => null,
             'subtotal'        => $quotation->subtotal,

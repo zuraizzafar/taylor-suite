@@ -160,10 +160,9 @@ class PosController extends Controller
             $total   = $calc['total_amount'];
             $advance = (float) $request->input('advance_amount');
 
-            $order = Order::create([
+            $order = Order::createWithUniqueNumber('order_number', fn (int $offset) => Order::nextOrderNumber($offset), [
                 'customer_id'    => $customer->id,
                 'branch_id'      => $branchId,
-                'order_number'   => Order::nextOrderNumber(),
                 'order_date'     => $request->input('order_date'),
                 'delivery_date'  => $request->input('delivery_date'),
                 'advance_amount' => 0,

@@ -134,14 +134,12 @@ class SyncController extends Controller
         $advance  = (float) ($p['advance_amount'] ?? 0);
         $total    = (float) ($p['total_amount']   ?? 0);
 
-        // Generate order number
-        $last = Order::max('id') ?? 0;
-        $orderNumber = 'ORD-' . str_pad($last + 1, 5, '0', STR_PAD_LEFT);
-
-        $order = Order::create([
+        $order = Order::createWithUniqueNumber('order_number', function (int $offset) {
+            $last = Order::max('id') ?? 0;
+            return 'ORD-' . str_pad($last + 1 + $offset, 5, '0', STR_PAD_LEFT);
+        }, [
             'customer_id'    => $customer->id,
             'branch_id'      => $p['branch_id'] ?? $customer->branch_id ?? $this->currentBranchId(),
-            'order_number'   => $orderNumber,
             'order_date'     => $p['order_date'] ?? today()->toDateString(),
             'delivery_date'  => $p['delivery_date'] ?? null,
             'subtotal'       => $total,

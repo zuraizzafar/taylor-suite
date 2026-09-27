@@ -96,11 +96,10 @@ class OrderController extends Controller
         unset($data['discount_type'], $data['discount_value'], $data['tax_mode'], $data['tax_rate']);
         $data = array_merge($data, TaxService::documentColumns($calc));
 
-        $data['order_number']   = Order::nextOrderNumber();
         $data['advance_amount'] = 0;
         $data['balance_amount'] = $data['total_amount'];
 
-        $order = Order::create($data);
+        $order = Order::createWithUniqueNumber('order_number', fn (int $offset) => Order::nextOrderNumber($offset), $data);
         $this->syncOrderItems($order, $request);
 
         // Create initial advance as a Payment so recalculateBalance() tracks it correctly

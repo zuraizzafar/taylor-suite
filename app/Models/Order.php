@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
+use App\Traits\HasUniqueNumber;
 
 class Order extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUniqueNumber;
 
     protected $fillable = [
         'customer_id',
@@ -76,14 +77,15 @@ class Order extends Model
     }
 
     /**
-     * Generate the next order number (ORD-YYYY-NNN).
+     * Generate the next order number (ORD-YYYY-NNN). $offset shifts past a known collision
+     * (see HasUniqueNumber::createWithUniqueNumber()) so a retry doesn't recompute the same value.
      */
-    public static function nextOrderNumber(): string
+    public static function nextOrderNumber(int $offset = 0): string
     {
         $year = date('Y');
         $count = DB::table('orders')
             ->whereYear('created_at', $year)
             ->count();
-        return 'ORD-' . $year . '-' . str_pad($count + 1, 3, '0', STR_PAD_LEFT);
+        return 'ORD-' . $year . '-' . str_pad($count + 1 + $offset, 3, '0', STR_PAD_LEFT);
     }
 }
