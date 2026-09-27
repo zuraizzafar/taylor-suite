@@ -250,27 +250,37 @@ class TaxAndDiscountTest extends TestCase
         $this->assertEquals(18, TaxService::resolve('fabric_sale', null)['rate']);    // falls back to default
     }
 
-    public function test_pos_order_uses_tax_and_discount(): void
+    public function test_pos_order_uses_items_extras_tax_and_discount(): void
     {
         $this->post(route('pos.store'), [
             'customer_name' => 'Walk In', 'customer_mobile' => '0300', 'order_date' => '2026-10-01',
-            'subtotal' => 10000, 'advance_amount' => 1000,
+            'description' => ['Suiting pant coat stitching', 'Shirt stitching', ''],
+            'qty' => [2, 1, 5], 'rate' => [4000, 1500, 999],
+            'extra_name' => ['Embroidery'], 'extra_price' => [500],
+            'advance_amount' => 1000,
             'discount_type' => 'percent', 'discount_value' => 10,
             'tax_mode' => 'inclusive', 'tax_rate' => 18,
             'suits' => [['suit_type' => 'Shalwar Kameez', 'fabric_meter' => 4]],
         ])->assertRedirect();
 
         $o = Order::firstOrFail();
+        // (2*4000) + (1*1500) + extras 500 = 10000; blank-description row dropped
+        $this->assertEquals(10000, $o->subtotal);
+        $this->assertCount(2, $o->items);
+        $this->assertEquals(8000, $o->items[0]->line_total);
         $this->assertEquals(9000, $o->subtotal - $o->discount_amount);
         $this->assertEquals(10620, $o->total_amount);
         $this->assertEquals(9620, $o->fresh()->balance_amount);
+
+        $this->get(route('orders.show', $o))->assertOk()->assertSee('Suiting pant coat stitching');
     }
 
     public function test_pos_rejects_advance_larger_than_payable_total(): void
     {
         $this->post(route('pos.store'), [
             'customer_name' => 'Walk In', 'customer_mobile' => '0300', 'order_date' => '2026-10-01',
-            'subtotal' => 1000, 'advance_amount' => 5000, 'tax_mode' => 'none',
+            'description' => ['Item'], 'qty' => [1], 'rate' => [1000],
+            'advance_amount' => 5000, 'tax_mode' => 'none',
             'suits' => [['suit_type' => 'Shalwar Kameez', 'fabric_meter' => 4]],
         ])->assertSessionHasErrors('advance_amount');
         $this->assertSame(0, Order::count());

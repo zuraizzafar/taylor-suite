@@ -41,10 +41,12 @@ function posApp(taxInit) {
         // ── Order details ──────────────────────────────────────────────────
         orderDate:     new Date().toISOString().substring(0,10),
         deliveryDate:  '',
-        baseAmount:    0,
         advanceAmount: 0,
         paymentMethod: 'cash',
         orderNotes:    '',
+
+        // ── Billing items ──────────────────────────────────────────────────
+        items: [{ description: '', qty: 1, rate: 0 }],
 
         // ── Extras / Add-ons ───────────────────────────────────────────────
         extras: [],
@@ -52,12 +54,16 @@ function posApp(taxInit) {
         // ── Suits ──────────────────────────────────────────────────────────
         suits: [],
 
+        get itemsTotal() {
+            return this.items.reduce((s, i) => s + ((parseFloat(i.qty) || 0) * (parseFloat(i.rate) || 0)), 0);
+        },
+
         get extrasTotal() {
             return this.extras.reduce((s, e) => s + (parseFloat(e.price) || 0), 0);
         },
 
         get subtotal() {
-            return Math.max(0, (parseFloat(this.baseAmount) || 0) + this.extrasTotal);
+            return Math.max(0, this.itemsTotal + this.extrasTotal);
         },
 
         get totalAmount() { return this.grandTotal; },
@@ -153,6 +159,14 @@ function posApp(taxInit) {
 
         removeSuit(i) {
             this.suits.splice(i, 1);
+        },
+
+        addItem() {
+            this.items.push({ description: '', qty: 1, rate: 0 });
+        },
+
+        removeItem(i) {
+            if (this.items.length > 1) this.items.splice(i, 1);
         },
 
         addExtra() {
@@ -654,13 +668,40 @@ function posApp(taxInit) {
                 </div>
             </div>
 
+            {{-- Billing items --}}
+            <div>
+                <div class="flex items-center justify-between mb-2">
+                    <label class="text-xs font-semibold text-slate-600">{{ __('Items') }} *</label>
+                    <button type="button" @click="addItem()"
+                        class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-1 rounded-lg">+ {{ __('Add Item') }}</button>
+                </div>
+                <div class="hidden md:grid grid-cols-12 gap-2 px-1 text-xs font-semibold text-slate-500 uppercase mb-1">
+                    <div class="col-span-6">{{ __('Description') }}</div>
+                    <div class="col-span-2">{{ __('Qty') }}</div>
+                    <div class="col-span-3">{{ __('Rate') }}</div>
+                    <div class="col-span-1"></div>
+                </div>
+                <template x-for="(item, i) in items" :key="i">
+                    <div class="grid grid-cols-12 gap-2 items-center mb-1.5">
+                        <input type="text" :name="'description[' + i + ']'" x-model="item.description"
+                            placeholder="{{ __('e.g. Suiting pant coat stitching') }}"
+                            class="col-span-6 border border-slate-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <input type="number" :name="'qty[' + i + ']'" x-model.number="item.qty" min="0" step="0.01"
+                            class="col-span-2 border border-slate-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <input type="number" :name="'rate[' + i + ']'" x-model.number="item.rate" min="0" step="0.01"
+                            class="col-span-3 border border-slate-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <button type="button" @click="removeItem(i)"
+                            class="col-span-1 text-red-400 hover:text-red-600 px-1.5 py-1 rounded text-center">✕</button>
+                    </div>
+                </template>
+            </div>
+
             <div class="grid grid-cols-3 gap-3">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Base Amount (Rs) *</label>
-                    <input type="number" x-model="baseAmount" min="0" step="50"
-                        class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="0">
-                    <input type="hidden" name="subtotal" :value="subtotal">
+                    <span class="block text-xs font-semibold text-slate-600 mb-1">{{ __('Items Total') }}</span>
+                    <div class="border border-slate-200 rounded-lg px-3 py-2 text-sm bg-slate-50 font-semibold text-slate-700">
+                        Rs <span x-text="itemsTotal.toLocaleString()"></span>
+                    </div>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">{{ __('Advance') }} (Rs)</label>
@@ -849,7 +890,7 @@ function posApp(taxInit) {
                 <div class="text-sm text-slate-600">
                     <span x-text="suitsCount + ' suit' + (suitsCount !== 1 ? 's' : '')"></span>
                     <span class="mx-1.5 text-slate-300">·</span>
-                    Base: <span class="font-semibold text-slate-700">Rs <span x-text="(parseFloat(baseAmount)||0).toLocaleString()"></span></span>
+                    Items: <span class="font-semibold text-slate-700">Rs <span x-text="itemsTotal.toLocaleString()"></span></span>
                     <template x-if="extrasTotal > 0">
                         <span> + Extras: <span class="font-semibold text-amber-700">Rs <span x-text="extrasTotal.toLocaleString()"></span></span></span>
                     </template>

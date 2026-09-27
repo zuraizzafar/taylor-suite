@@ -98,7 +98,12 @@ class PosController extends Controller
             // Order
             'order_date'         => ['required', 'date'],
             'delivery_date'      => ['nullable', 'date', 'after_or_equal:order_date'],
-            'subtotal'           => ['required', 'numeric', 'min:0'],
+            'description'        => ['required', 'array', 'min:1'],
+            'description.*'      => ['nullable', 'string'],
+            'qty'                => ['required', 'array'],
+            'qty.*'              => ['nullable', 'numeric', 'min:0'],
+            'rate'               => ['required', 'array'],
+            'rate.*'             => ['nullable', 'numeric', 'min:0'],
             'discount_type'      => ['nullable', 'in:percent,fixed'],
             'discount_value'     => ['nullable', 'numeric', 'min:0'],
             'tax_mode'           => ['nullable', 'in:none,exclusive,inclusive'],
@@ -114,8 +119,11 @@ class PosController extends Controller
             'suits.*.notes'      => ['nullable', 'string'],
         ]);
 
+        $subtotal = $this->computeItemsSubtotal($request)
+            + collect($this->parsePosExtras($request))->sum('price');
+
         $calc    = TaxService::fromRequest(
-            $request, 'order', (float) $request->input('subtotal'),
+            $request, 'order', $subtotal,
             $request->input('branch_id') ?: $this->currentBranchId()
         );
         $total   = $calc['total_amount'];
@@ -170,6 +178,7 @@ class PosController extends Controller
                 'notes'          => $request->input('order_notes'),
                 'extras'         => $this->parsePosExtras($request),
             ] + TaxService::documentColumns($calc));
+            $this->syncOrderItems($order, $request);
 
             if ($advance > 0) {
                 Payment::create([
@@ -242,5 +251,43 @@ class PosController extends Controller
             }
         }
         return $extras;
+    }
+
+    /** Sum of qty * rate across non-empty description[]/qty[]/rate[] rows. */
+    private function computeItemsSubtotal(Request $request): float
+    {
+        $descriptions = $request->input('description', []);
+        $qtys         = $request->input('qty', []);
+        $rates        = $request->input('rate', []);
+
+        $sum = 0.0;
+        foreach ($descriptions as $i => $description) {
+            if (trim((string) $description) === '') {
+                continue;
+            }
+            $sum += (float) ($qtys[$i] ?? 1) * (float) ($rates[$i] ?? 0);
+        }
+        return round($sum, 2);
+    }
+
+    private function syncOrderItems(Order $order, Request $request): void
+    {
+        $descriptions = $request->input('description', []);
+        $qtys         = $request->input('qty', []);
+        $rates        = $request->input('rate', []);
+
+        $sort = 0;
+        foreach ($descriptions as $i => $description) {
+            $description = trim((string) $description);
+            if ($description === '') {
+                continue;
+            }
+            $order->items()->create([
+                'description' => $description,
+                'qty'         => (float) ($qtys[$i] ?? 1),
+                'rate'        => (float) ($rates[$i] ?? 0),
+                'sort_order'  => $sort++,
+            ]);
+        }
     }
 }
