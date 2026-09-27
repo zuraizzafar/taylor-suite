@@ -53,6 +53,11 @@ class Order extends Model
         return $this->hasMany(Suit::class);
     }
 
+    public function items(): HasMany
+    {
+        return $this->hasMany(OrderItem::class)->orderBy('sort_order');
+    }
+
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);

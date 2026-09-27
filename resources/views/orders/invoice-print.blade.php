@@ -484,6 +484,31 @@
     </div>
     @endif
 
+    @if($order->items->isNotEmpty())
+    <table class="items">
+        <thead>
+            <tr>
+                <th style="width:24px">#</th>
+                <th>تفصیل</th>
+                <th style="width:60px">تعداد</th>
+                <th style="width:90px">فی عدد قیمت</th>
+                <th style="width:100px">رقم</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($order->items as $i => $item)
+            <tr>
+                <td>{{ $i + 1 }}</td>
+                <td>{{ $item->description }}</td>
+                <td>{{ rtrim(rtrim(number_format((float) $item->qty, 2), '0'), '.') }}</td>
+                <td>Rs {{ number_format($item->rate) }}</td>
+                <td>Rs {{ number_format($item->line_total) }}</td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
+    @endif
+
     {{-- PAYMENT SUMMARY --}}
     <div class="payment-wrap" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px;">
         <div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 4px;">

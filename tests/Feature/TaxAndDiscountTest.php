@@ -135,7 +135,7 @@ class TaxAndDiscountTest extends TestCase
     {
         $this->post(route('orders.store'), [
             'customer_id' => $this->customer->id, 'order_date' => '2026-10-01',
-            'subtotal' => 20000, 'advance_amount' => 5000,
+            'description' => ['Item'], 'qty' => [1], 'rate' => [20000], 'advance_amount' => 5000,
             'discount_type' => 'fixed', 'discount_value' => 2000,
             'tax_mode' => 'exclusive', 'tax_rate' => 16,
             'total_amount' => 1, // a tampered client total must be ignored
@@ -154,13 +154,77 @@ class TaxAndDiscountTest extends TestCase
         $this->withSession(['locale' => 'ur'])->get(route('orders.invoice', $o))->assertOk()->assertSee('Akhuwat');
     }
 
+    public function test_order_items_carry_quantity_and_unit_price(): void
+    {
+        $this->post(route('orders.store'), [
+            'customer_id' => $this->customer->id, 'order_date' => '2026-10-01',
+            'description' => ['Suiting pant coat stitching', 'Shirt stitching', ''],
+            'qty' => [2, 3, 5], 'rate' => [1500, 800, 999],
+            'extra_name' => ['Embroidery'], 'extra_price' => [500],
+            'tax_mode' => 'none',
+        ])->assertRedirect();
+
+        $o = Order::firstOrFail();
+        // blank-description rows are dropped; only 2 real items persist
+        $this->assertCount(2, $o->items);
+        $this->assertEquals(2, $o->items[0]->qty);
+        $this->assertEquals(1500, $o->items[0]->rate);
+        $this->assertEquals(3000, $o->items[0]->line_total);
+        $this->assertEquals(2400, $o->items[1]->line_total);
+        // (2*1500) + (3*800) + extras 500 = 5900
+        $this->assertEquals(5900, $o->subtotal);
+        $this->assertEquals(5900, $o->total_amount);
+
+        $this->get(route('orders.show', $o))->assertOk()
+            ->assertSee('Suiting pant coat stitching')->assertSee('Shirt stitching');
+        $this->get(route('orders.edit', $o))->assertOk()->assertSee('Suiting pant coat stitching');
+        $this->get(route('orders.invoice', $o))->assertOk()->assertHeader('content-type', 'application/pdf');
+        $this->withSession(['locale' => 'ur'])->get(route('orders.invoice', $o))
+            ->assertOk()->assertSee('Suiting pant coat stitching');
+    }
+
+    public function test_editing_order_items_replaces_the_previous_set(): void
+    {
+        $this->post(route('orders.store'), [
+            'customer_id' => $this->customer->id, 'order_date' => '2026-10-01',
+            'description' => ['Item A'], 'qty' => [1], 'rate' => [1000], 'tax_mode' => 'none',
+        ]);
+        $o = Order::firstOrFail();
+        $this->assertCount(1, $o->items);
+
+        $this->put(route('orders.update', $o), [
+            'order_date' => '2026-10-01',
+            'description' => ['Item B', 'Item C'], 'qty' => [2, 1], 'rate' => [500, 300],
+            'tax_mode' => 'none',
+        ])->assertRedirect();
+
+        $o->refresh();
+        $this->assertCount(2, $o->items);
+        $this->assertEquals(['Item B', 'Item C'], $o->items->pluck('description')->all());
+        $this->assertEquals(1300, $o->subtotal); // (2*500) + (1*300)
+    }
+
+    public function test_order_without_items_still_renders_and_edit_falls_back_gracefully(): void
+    {
+        // Simulates a legacy/POS-created order with no line items yet.
+        $o = Order::create([
+            'customer_id' => $this->customer->id, 'order_number' => 'ORD-LEGACY-1', 'order_date' => '2026-10-01',
+            'subtotal' => 4000, 'total_amount' => 4000, 'advance_amount' => 0, 'balance_amount' => 4000,
+        ]);
+
+        $this->assertCount(0, $o->items);
+        $this->get(route('orders.show', $o))->assertOk();
+        $this->get(route('orders.edit', $o))->assertOk()->assertSee('4000');
+        $this->get(route('orders.invoice', $o))->assertOk()->assertHeader('content-type', 'application/pdf');
+    }
+
     public function test_disabled_module_forces_no_tax(): void
     {
         Setting::set('tax_order_enabled', '0');
 
         $this->post(route('orders.store'), [
             'customer_id' => $this->customer->id, 'order_date' => '2026-10-01',
-            'subtotal' => 1000, 'tax_mode' => 'inclusive', 'tax_rate' => 18,
+            'description' => ['Item'], 'qty' => [1], 'rate' => [1000], 'tax_mode' => 'inclusive', 'tax_rate' => 18,
         ])->assertRedirect();
 
         $o = Order::firstOrFail();
@@ -253,17 +317,17 @@ class TaxAndDiscountTest extends TestCase
         // Invoice: 10,000 taxable, exclusive 18% => 1,800 output tax (borne by us)
         $this->post(route('orders.store'), [
             'customer_id' => $this->customer->id, 'order_date' => '2026-10-03',
-            'subtotal' => 10000, 'tax_mode' => 'exclusive', 'tax_rate' => 18,
+            'description' => ['Item'], 'qty' => [1], 'rate' => [10000], 'tax_mode' => 'exclusive', 'tax_rate' => 18,
         ]);
         // Invoice: 5,000 taxable, inclusive 18% => 900 output tax (charged)
         $this->post(route('orders.store'), [
             'customer_id' => $this->customer->id, 'order_date' => '2026-10-04',
-            'subtotal' => 5000, 'tax_mode' => 'inclusive', 'tax_rate' => 18,
+            'description' => ['Item'], 'qty' => [1], 'rate' => [5000], 'tax_mode' => 'inclusive', 'tax_rate' => 18,
         ]);
         // An untaxed invoice must not appear
         $this->post(route('orders.store'), [
             'customer_id' => $this->customer->id, 'order_date' => '2026-10-05',
-            'subtotal' => 700, 'tax_mode' => 'none',
+            'description' => ['Item'], 'qty' => [1], 'rate' => [700], 'tax_mode' => 'none',
         ]);
         Expense::create(['category' => 'Fabric Purchase', 'amount' => 590, 'tax_amount' => 90, 'date' => '2026-10-06']);
 
@@ -294,7 +358,7 @@ class TaxAndDiscountTest extends TestCase
     {
         $this->post(route('orders.store'), [
             'customer_id' => $this->customer->id, 'order_date' => '2026-10-03',
-            'subtotal' => 10000, 'discount_type' => 'percent', 'discount_value' => 10, 'tax_mode' => 'none',
+            'description' => ['Item'], 'qty' => [1], 'rate' => [10000], 'discount_type' => 'percent', 'discount_value' => 10, 'tax_mode' => 'none',
         ]);
         $this->post(route('quotations.store'), $this->quotationPayload(['quotation_date' => '2026-10-04']));
 
@@ -317,7 +381,7 @@ class TaxAndDiscountTest extends TestCase
 
         $this->post(route('orders.store'), [
             'customer_id' => $this->customer->id, 'order_date' => '2026-10-03',
-            'subtotal' => 10000, 'advance_amount' => 10000, 'tax_mode' => 'exclusive', 'tax_rate' => 18,
+            'description' => ['Item'], 'qty' => [1], 'rate' => [10000], 'advance_amount' => 10000, 'tax_mode' => 'exclusive', 'tax_rate' => 18,
         ]);
 
         $r = $this->get(route('dashboard'))->assertOk()->assertSee('Net Tax Payable');
@@ -365,7 +429,7 @@ class TaxAndDiscountTest extends TestCase
     public function test_suits_prompt_offers_add_or_skip_and_skips_when_suits_exist(): void
     {
         $this->post(route('orders.store'), [
-            'customer_id' => $this->customer->id, 'order_date' => '2026-10-01', 'subtotal' => 1000, 'tax_mode' => 'none',
+            'customer_id' => $this->customer->id, 'order_date' => '2026-10-01', 'description' => ['Item'], 'qty' => [1], 'rate' => [1000], 'tax_mode' => 'none',
         ]);
         $o = Order::firstOrFail();
 

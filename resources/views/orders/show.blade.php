@@ -84,6 +84,38 @@
         @endif
     </div>
 
+    @if($order->items->isNotEmpty())
+    <div class="bg-white rounded-xl shadow-sm border border-slate-100">
+        <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+            <h3 class="font-semibold text-slate-700">🧾 {{ __('Items') }} ({{ $order->items->count() }})</h3>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-slate-50 text-slate-600">
+                    <tr>
+                        <th class="px-4 py-2 text-left font-medium">#</th>
+                        <th class="px-4 py-2 text-left font-medium">{{ __('Description') }}</th>
+                        <th class="px-4 py-2 text-left font-medium">{{ __('Qty') }}</th>
+                        <th class="px-4 py-2 text-left font-medium">{{ __('Rate') }}</th>
+                        <th class="px-4 py-2 text-left font-medium">{{ __('Amount') }}</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-50">
+                    @foreach($order->items as $i => $item)
+                    <tr class="hover:bg-slate-50">
+                        <td class="px-4 py-2 text-slate-500">{{ $i + 1 }}</td>
+                        <td class="px-4 py-2 text-slate-700">{{ $item->description }}</td>
+                        <td class="px-4 py-2 text-slate-600">{{ (float) $item->qty }}</td>
+                        <td class="px-4 py-2 text-slate-600">Rs {{ number_format($item->rate) }}</td>
+                        <td class="px-4 py-2 font-medium text-slate-800">Rs {{ number_format($item->line_total) }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+    @endif
+
     {{-- Suits in this order --}}
     <div class="bg-white rounded-xl shadow-sm border border-slate-100">
         <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">

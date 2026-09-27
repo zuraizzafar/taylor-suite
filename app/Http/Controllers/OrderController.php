@@ -67,16 +67,23 @@ class OrderController extends Controller
             'branch_id'      => ['nullable', 'exists:branches,id'],
             'order_date'     => ['required', 'date'],
             'delivery_date'  => ['nullable', 'date', 'after_or_equal:order_date'],
-            'subtotal'       => ['required', 'numeric', 'min:0'],
             'discount_type'  => ['nullable', 'in:percent,fixed'],
             'discount_value' => ['nullable', 'numeric', 'min:0'],
             'tax_mode'       => ['nullable', 'in:none,exclusive,inclusive'],
             'tax_rate'       => ['nullable', 'numeric', 'min:0', 'max:100'],
             'advance_amount' => ['nullable', 'numeric', 'min:0'],
             'notes'          => ['nullable', 'string'],
+            'description'    => ['required', 'array', 'min:1'],
+            'description.*'  => ['nullable', 'string'],
+            'qty'            => ['required', 'array'],
+            'qty.*'          => ['nullable', 'numeric', 'min:0'],
+            'rate'           => ['required', 'array'],
+            'rate.*'         => ['nullable', 'numeric', 'min:0'],
         ]);
 
         $data['extras'] = $this->parseExtras($request);
+        $subtotal = $this->computeItemsSubtotal($request) + collect($data['extras'])->sum('price');
+        unset($data['description'], $data['qty'], $data['rate']);
 
         $advanceAmount = (float) ($data['advance_amount'] ?? 0);
         unset($data['advance_amount']); // managed via Payment record below
@@ -85,7 +92,7 @@ class OrderController extends Controller
             $data['branch_id'] = $branchId;
         }
 
-        $calc = TaxService::fromRequest($request, 'order', (float) $data['subtotal'], $data['branch_id'] ?? null);
+        $calc = TaxService::fromRequest($request, 'order', $subtotal, $data['branch_id'] ?? null);
         unset($data['discount_type'], $data['discount_value'], $data['tax_mode'], $data['tax_rate']);
         $data = array_merge($data, TaxService::documentColumns($calc));
 
@@ -94,6 +101,7 @@ class OrderController extends Controller
         $data['balance_amount'] = $data['total_amount'];
 
         $order = Order::create($data);
+        $this->syncOrderItems($order, $request);
 
         // Create initial advance as a Payment so recalculateBalance() tracks it correctly
         if ($advanceAmount > 0) {
@@ -116,7 +124,7 @@ class OrderController extends Controller
 
     public function show(Order $order): View
     {
-        $order->load(['customer', 'branch', 'suits.worker', 'suits.measurement', 'payments.receivedBy']);
+        $order->load(['customer', 'branch', 'items', 'suits.worker', 'suits.measurement', 'payments.receivedBy']);
         $tax = TaxService::resolve('order', $order->branch_id);
         return view('orders.show', compact('order', 'tax'));
     }
@@ -134,6 +142,7 @@ class OrderController extends Controller
 
     public function edit(Order $order): View
     {
+        $order->load('items');
         $customers      = Customer::orderBy('name')->get();
         $branches       = Branch::where('is_active', true)->orderBy('name')->get();
         $extraTypes     = ExtraType::where('is_active', true)->orderBy('name')->get();
@@ -148,25 +157,33 @@ class OrderController extends Controller
             'branch_id'      => ['nullable', 'exists:branches,id'],
             'order_date'     => ['required', 'date'],
             'delivery_date'  => ['nullable', 'date', 'after_or_equal:order_date'],
-            'subtotal'       => ['required', 'numeric', 'min:0'],
             'discount_type'  => ['nullable', 'in:percent,fixed'],
             'discount_value' => ['nullable', 'numeric', 'min:0'],
             'tax_mode'       => ['nullable', 'in:none,exclusive,inclusive'],
             'tax_rate'       => ['nullable', 'numeric', 'min:0', 'max:100'],
             'advance_amount' => ['nullable', 'numeric', 'min:0'],
             'notes'          => ['nullable', 'string'],
+            'description'    => ['required', 'array', 'min:1'],
+            'description.*'  => ['nullable', 'string'],
+            'qty'            => ['required', 'array'],
+            'qty.*'          => ['nullable', 'numeric', 'min:0'],
+            'rate'           => ['required', 'array'],
+            'rate.*'         => ['nullable', 'numeric', 'min:0'],
         ]);
 
         $data['extras'] = $this->parseExtras($request);
+        $subtotal = $this->computeItemsSubtotal($request) + collect($data['extras'])->sum('price');
+        unset($data['description'], $data['qty'], $data['rate']);
 
         $newAdvance = (float) ($data['advance_amount'] ?? 0);
         unset($data['advance_amount'], $data['balance_amount']); // computed by recalculateBalance
 
-        $calc = TaxService::fromRequest($request, 'order', (float) $data['subtotal'], $data['branch_id'] ?? $order->branch_id);
+        $calc = TaxService::fromRequest($request, 'order', $subtotal, $data['branch_id'] ?? $order->branch_id);
         unset($data['discount_type'], $data['discount_value'], $data['tax_mode'], $data['tax_rate']);
         $data = array_merge($data, TaxService::documentColumns($calc));
 
         $order->update($data);
+        $this->syncOrderItems($order, $request);
 
         // Sync the INITIAL_ADVANCE payment record
         $advancePayment = $order->payments()->where('reference', 'INITIAL_ADVANCE')->first();
@@ -203,7 +220,7 @@ class OrderController extends Controller
 
     public function invoice(Order $order): Response
     {
-        $order->load(['customer.measurements', 'suits.worker', 'suits.measurement']);
+        $order->load(['customer.measurements', 'items', 'suits.worker', 'suits.measurement']);
         $settings        = Setting::allKeyed();
         $previousBalance = $order->customer->outstandingBalance($order->id);
         $tax             = TaxService::resolve('order', $order->branch_id);
@@ -278,5 +295,45 @@ class OrderController extends Controller
             }
         }
         return $extras;
+    }
+
+    /** Sum of qty * rate across non-empty description[]/qty[]/rate[] rows. */
+    private function computeItemsSubtotal(Request $request): float
+    {
+        $descriptions = $request->input('description', []);
+        $qtys         = $request->input('qty', []);
+        $rates        = $request->input('rate', []);
+
+        $sum = 0.0;
+        foreach ($descriptions as $i => $description) {
+            if (trim((string) $description) === '') {
+                continue;
+            }
+            $sum += (float) ($qtys[$i] ?? 1) * (float) ($rates[$i] ?? 0);
+        }
+        return round($sum, 2);
+    }
+
+    private function syncOrderItems(Order $order, Request $request): void
+    {
+        $descriptions = $request->input('description', []);
+        $qtys         = $request->input('qty', []);
+        $rates        = $request->input('rate', []);
+
+        $order->items()->delete();
+
+        $sort = 0;
+        foreach ($descriptions as $i => $description) {
+            $description = trim((string) $description);
+            if ($description === '') {
+                continue;
+            }
+            $order->items()->create([
+                'description' => $description,
+                'qty'         => (float) ($qtys[$i] ?? 1),
+                'rate'        => (float) ($rates[$i] ?? 0),
+                'sort_order'  => $sort++,
+            ]);
+        }
     }
 }

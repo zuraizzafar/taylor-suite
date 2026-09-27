@@ -463,6 +463,32 @@
     </div>
     @endif
 
+    @if($order->items->isNotEmpty())
+    {{-- BILLING ITEMS --}}
+    <table class="items">
+        <thead>
+            <tr>
+                <th style="width:24px">#</th>
+                <th>{{ $isUrdu ? __('Description') : 'Description' }}</th>
+                <th style="width:50px;text-align:right">{{ $isUrdu ? __('Qty') : 'Qty' }}</th>
+                <th style="width:90px;text-align:right">{{ $isUrdu ? __('Unit Price') : 'Unit Price' }}</th>
+                <th style="width:95px;text-align:right">{{ $isUrdu ? __('Amount') : 'Amount' }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($order->items as $i => $item)
+            <tr>
+                <td>{{ $i + 1 }}</td>
+                <td>{{ $item->description }}</td>
+                <td style="text-align:right">{{ rtrim(rtrim(number_format((float) $item->qty, 2), '0'), '.') }}</td>
+                <td style="text-align:right">Rs {{ number_format($item->rate) }}</td>
+                <td style="text-align:right">Rs {{ number_format($item->line_total) }}</td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
+    @endif
+
     {{-- PAYMENT SUMMARY --}}
     <div class="payment-wrap" style="display: table; width: 100%; margin-bottom: 16px;">
         @if(app()->getLocale() === 'ur')
